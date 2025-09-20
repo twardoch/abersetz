@@ -288,22 +288,22 @@ class SetupWizard:
         )
 
         if siliconflow_available:
-            engines["hysf"] = {
-                "name": "hysf",
-                "chunk_size": 2400,
-                "credential": {"name": "siliconflow"},
-                "options": {
+            engines["hysf"] = EngineConfig(
+                name="hysf",
+                chunk_size=2400,
+                credential=Credential(name="siliconflow"),
+                options={
                     "base_url": "https://api.siliconflow.com/v1",
                     "model": "Qwen/Qwen2.5-7B-Instruct",
                     "temperature": 0.3,
                 },
-            }
+            )
 
-            engines["ullm"] = {
-                "name": "ullm",
-                "chunk_size": 2400,
-                "credential": {"name": "siliconflow"},
-                "options": {
+            engines["ullm"] = EngineConfig(
+                name="ullm",
+                chunk_size=2400,
+                credential=Credential(name="siliconflow"),
+                options={
                     "profiles": {
                         "default": {
                             "base_url": "https://api.siliconflow.com/v1",
@@ -314,18 +314,18 @@ class SetupWizard:
                         }
                     }
                 },
-            }
+            )
 
         # Add OpenAI if available
         openai_available = any(
             p.name == "openai" and p.is_available for p in self.discovered_providers
         )
         if openai_available and "ullm" not in engines:
-            engines["ullm"] = {
-                "name": "ullm",
-                "chunk_size": 2400,
-                "credential": {"name": "openai"},
-                "options": {
+            engines["ullm"] = EngineConfig(
+                name="ullm",
+                chunk_size=2400,
+                credential=Credential(name="openai"),
+                options={
                     "profiles": {
                         "default": {
                             "base_url": "https://api.openai.com/v1",
@@ -336,7 +336,7 @@ class SetupWizard:
                         }
                     }
                 },
-            }
+            )
 
         config.engines = engines
 

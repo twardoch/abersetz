@@ -15,6 +15,12 @@ All notable changes to abersetz will be documented in this file.
 
 ### Added
 - `abersetz lang` command listing supported language codes and their English names.
+- `abersetz setup` command for automatic configuration discovery and initialization
+  - Scans environment for API keys from 13+ providers
+  - Tests discovered endpoints with /models calls
+  - Generates optimized config based on available services
+  - Interactive table display of discovered services
+  - Supports --non-interactive mode for CI/automation
 
 ### Fixed
 - Fixed `abersetz config path` command double output issue by removing redundant console.print call

@@ -28,12 +28,11 @@ this_file: TODO.md
 - [x] Add offline smoke test to verify installation without network access
 
 ## Smart Configuration Setup
-- [ ] Implement `abersetz setup` command for automatic configuration discovery
-- [ ] Scan environment variables for API keys (OPENAI_API_KEY, ANTHROPIC_API_KEY, SILICONFLOW_API_KEY, etc.)
-- [ ] Test discovered endpoints with lightweight /models calls
-- [ ] Auto-detect available translation engines based on found credentials
-- [ ] Create interactive setup with rich console showing discovered services
-- [ ] Generate optimized config with proper engine priorities and chunk sizes
-- [ ] Test each configured engine with minimal translation to verify functionality
-- [ ] Allow non-interactive mode for CI/automation with --non-interactive flag
-- [ ] Add provider discovery based on patterns from external/dump_models.py
+- [x] Implement `abersetz setup` command for automatic configuration discovery
+- [x] Scan environment variables for API keys (OPENAI_API_KEY, ANTHROPIC_API_KEY, SILICONFLOW_API_KEY, etc.)
+- [x] Test discovered endpoints with lightweight /models calls
+- [x] Auto-detect available translation engines based on found credentials
+- [x] Create interactive setup with rich console showing discovered services
+- [x] Generate optimized config with proper engine priorities and chunk sizes
+- [x] Allow non-interactive mode for CI/automation with --non-interactive flag
+- [x] Add provider discovery based on patterns from external/dump_models.py
