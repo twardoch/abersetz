@@ -1,0 +1,310 @@
+"""Translation engine adapters."""
+# this_file: src/abersetz/engines.py
+
+from __future__ import annotations
+
+import json
+import re
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass
+from typing import Any, Protocol
+
+import translators  # type: ignore
+from deep_translator import (  # type: ignore
+    DeeplTranslator,
+    GoogleTranslator,
+    LibreTranslator,
+    LingueeTranslator,
+    MicrosoftTranslator,
+    MyMemoryTranslator,
+    PapagoTranslator,
+)
+from openai import OpenAI
+from tenacity import retry, stop_after_attempt, wait_exponential
+
+from .chunking import TextFormat
+from .config import AbersetzConfig, EngineConfig, resolve_credential
+
+
+class EngineError(RuntimeError):
+    """Raised when an engine cannot be constructed or invoked."""
+
+
+@dataclass(slots=True)
+class EngineRequest:
+    """Payload passed to engines."""
+
+    text: str
+    source_lang: str
+    target_lang: str
+    is_html: bool
+    vocabulary: dict[str, str]
+    prolog: dict[str, str]
+    chunk_index: int
+    total_chunks: int
+
+
+@dataclass(slots=True)
+class EngineResult:
+    """Normalized engine output."""
+
+    text: str
+    vocabulary: dict[str, str]
+
+
+class Engine(Protocol):
+    """Protocol implemented by engine adapters."""
+
+    name: str
+    chunk_size: int | None
+    html_chunk_size: int | None
+
+    def translate(self, request: EngineRequest) -> EngineResult:
+        """Translate a chunk."""
+
+    def chunk_size_for(self, fmt: TextFormat) -> int | None:
+        """Return preferred chunk size for the given text format."""
+
+
+class EngineBase:
+    """Shared helpers for engines."""
+
+    def __init__(
+        self,
+        name: str,
+        chunk_size: int | None,
+        html_chunk_size: int | None,
+    ) -> None:
+        self.name = name
+        self.chunk_size = chunk_size
+        self.html_chunk_size = html_chunk_size
+
+    def chunk_size_for(self, fmt: TextFormat) -> int | None:
+        if fmt is TextFormat.HTML and self.html_chunk_size:
+            return self.html_chunk_size
+        return self.chunk_size
+
+
+class TranslatorsEngine(EngineBase):
+    """Wrapper around the `translators` package."""
+
+    def __init__(self, provider: str, config: EngineConfig) -> None:
+        super().__init__(config.name, config.chunk_size, config.html_chunk_size)
+        self.provider = provider
+
+    def translate(self, request: EngineRequest) -> EngineResult:
+        if request.is_html:
+            text = translators.translate_html(
+                request.text,
+                translator=self.provider,
+                from_language=request.source_lang,
+                to_language=request.target_lang,
+            )
+        else:
+            text = translators.translate_text(
+                request.text,
+                translator=self.provider,
+                from_language=request.source_lang,
+                to_language=request.target_lang,
+            )
+        return EngineResult(text=text, vocabulary=dict(request.vocabulary))
+
+
+class DeepTranslatorEngine(EngineBase):
+    """Adapter for `deep-translator` providers."""
+
+    PROVIDERS: Mapping[str, Callable[..., Any]] = {
+        "google": GoogleTranslator,
+        "deepl": DeeplTranslator,
+        "microsoft": MicrosoftTranslator,
+        "libre": LibreTranslator,
+        "linguee": LingueeTranslator,
+        "papago": PapagoTranslator,
+        "my_memory": MyMemoryTranslator,
+    }
+
+    def __init__(self, provider: str, config: EngineConfig) -> None:
+        super().__init__(config.name, config.chunk_size, config.html_chunk_size)
+        if provider not in self.PROVIDERS:
+            raise EngineError(f"Unsupported deep-translator provider: {provider}")
+        self.provider = provider
+
+    def translate(self, request: EngineRequest) -> EngineResult:
+        translator_cls = self.PROVIDERS[self.provider]
+        translator = translator_cls(source=request.source_lang, target=request.target_lang)
+        text = translator.translate(request.text)
+        return EngineResult(text=text, vocabulary=dict(request.vocabulary))
+
+
+class LlmEngine(EngineBase):
+    """Shared logic for LLM backed engines."""
+
+    OUTPUT_RE = re.compile(r"<output>(?P<body>.*?)</output>", re.DOTALL | re.IGNORECASE)
+    VOCAB_RE = re.compile(r"<vocabulary>(?P<body>.*?)</vocabulary>", re.DOTALL | re.IGNORECASE)
+
+    def __init__(
+        self,
+        config: EngineConfig,
+        client: Any,
+        *,
+        model: str,
+        temperature: float,
+        static_prolog: Mapping[str, str] | None = None,
+    ) -> None:
+        super().__init__(config.name, config.chunk_size, config.html_chunk_size)
+        self._client = client
+        self._model = model
+        self._temperature = temperature
+        self._static_prolog = dict(static_prolog or {})
+
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1), reraise=True)
+    def _invoke(self, messages: list[dict[str, str]]) -> str:
+        response = self._client.chat.completions.create(
+            model=self._model,
+            messages=messages,
+            temperature=self._temperature,
+        )
+        return response.choices[0].message.content or ""
+
+    def translate(self, request: EngineRequest) -> EngineResult:
+        vocabulary = dict(self._static_prolog)
+        vocabulary.update(request.prolog)
+        merged = dict(request.vocabulary)
+        messages = self._build_messages(request, vocabulary, merged)
+        raw = self._invoke(messages)
+        text, new_vocab = self._parse_payload(raw)
+        merged.update(new_vocab)
+        return EngineResult(text=text, vocabulary=merged)
+
+    def _build_messages(
+        self,
+        request: EngineRequest,
+        vocabulary: Mapping[str, str],
+        merged: Mapping[str, str],
+    ) -> list[dict[str, str]]:
+        vocab_payload: dict[str, str] = dict(vocabulary)
+        if merged:
+            vocab_payload.setdefault("__current__", json.dumps(merged, ensure_ascii=False))
+        prolog = json.dumps(vocab_payload, ensure_ascii=False) if vocab_payload else "{}"
+        meta = {
+            "chunk": request.chunk_index + 1,
+            "total": request.total_chunks,
+            "is_html": str(request.is_html).lower(),
+        }
+        instructions = (
+            "Translate the <segment> into the target language. Respond with "
+            '<output>...</output> and optionally <vocabulary>{"new": "value"}</vocabulary>.'
+        )
+        user_content = (
+            f"<instructions>{instructions}</instructions>\n"
+            f"<meta>{json.dumps(meta, ensure_ascii=False)}</meta>\n"
+            f"<prolog>{prolog}</prolog>\n"
+            f"<target>{request.target_lang}</target>\n"
+            f"<source>{request.source_lang}</source>\n"
+            f"<segment>{request.text}</segment>"
+        )
+        return [
+            {
+                "role": "system",
+                "content": "You produce deterministic translations strictly in XML tags.",
+            },
+            {"role": "user", "content": user_content},
+        ]
+
+    def _parse_payload(self, payload: str) -> tuple[str, dict[str, str]]:
+        text_match = self.OUTPUT_RE.search(payload)
+        text = text_match.group("body").strip() if text_match else payload.strip()
+        vocab_match = self.VOCAB_RE.search(payload)
+        if not vocab_match:
+            return text, {}
+        try:
+            vocab = json.loads(vocab_match.group("body"))
+        except json.JSONDecodeError:
+            vocab = {}
+        if isinstance(vocab, dict):
+            return text, {str(k): str(v) for k, v in vocab.items()}
+        return text, {}
+
+
+def _make_openai_client(token: str, base_url: str | None) -> OpenAI:
+    """Create an OpenAI client respecting optional base URL."""
+    if base_url:
+        return OpenAI(api_key=token, base_url=base_url)
+    return OpenAI(api_key=token)
+
+
+def _build_llm_engine(
+    selector: str,
+    config: AbersetzConfig,
+    engine_cfg: EngineConfig,
+    *,
+    profile: Mapping[str, Any] | None,
+    client: Any | None,
+) -> Engine:
+    options = dict(engine_cfg.options)
+    settings = dict(profile or {})
+    base_url = settings.get("base_url") or options.get("base_url")
+    model = settings.get("model") or options.get("model")
+    if not model:
+        raise EngineError(f"No model configured for engine {selector}")
+    temperature = float(settings.get("temperature", options.get("temperature", 0.3)))
+    token = resolve_credential(config, engine_cfg.credential)
+    if token is None:
+        raise EngineError(f"Missing credential for engine {selector}")
+    openai_client = client or _make_openai_client(token, base_url)
+    static_prolog = settings.get("prolog") or options.get("prolog") or {}
+    return LlmEngine(
+        engine_cfg,
+        openai_client,
+        model=model,
+        temperature=temperature,
+        static_prolog=static_prolog,
+    )
+
+
+def _translators_provider(variant: str | None, engine_cfg: EngineConfig) -> str:
+    return variant or engine_cfg.options.get("provider", "google")
+
+
+def _select_profile(engine_cfg: EngineConfig, variant: str | None) -> Mapping[str, Any] | None:
+    profiles = engine_cfg.options.get("profiles", {})
+    if not profiles:
+        return None
+    profile_name = variant or "default"
+    if profile_name not in profiles:
+        raise EngineError(f"Unknown profile '{profile_name}' for engine '{engine_cfg.name}'")
+    return profiles[profile_name]
+
+
+def create_engine(
+    selector: str,
+    config: AbersetzConfig,
+    *,
+    client: Any | None = None,
+) -> Engine:
+    """Factory that builds the requested engine."""
+    base, _, variant = selector.partition("/")
+    engine_cfg = config.engines.get(base)
+    if engine_cfg is None:
+        raise EngineError(f"No configuration found for engine '{base}'")
+    if base == "translators":
+        provider = _translators_provider(variant, engine_cfg)
+        return TranslatorsEngine(provider, engine_cfg)
+    if base == "deep-translator":
+        provider = _translators_provider(variant, engine_cfg)
+        return DeepTranslatorEngine(provider, engine_cfg)
+    if base == "hysf":
+        return _build_llm_engine(selector, config, engine_cfg, profile=None, client=client)
+    if base == "ullm":
+        profile = _select_profile(engine_cfg, variant)
+        return _build_llm_engine(selector, config, engine_cfg, profile=profile, client=client)
+    raise EngineError(f"Unsupported engine '{base}'")
+
+
+__all__ = [
+    "Engine",
+    "EngineError",
+    "EngineRequest",
+    "EngineResult",
+    "create_engine",
+]

@@ -1,0 +1,6 @@
+# this_file: examples/poem_en.txt
+
+Dawn spills over the rooftops,
+Bells shimmer in the mist,
+Neighbours trade their greetings,
+And hope feels like a gift.
