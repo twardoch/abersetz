@@ -1,6 +1,7 @@
 ---
 this_file: TODO.md
 ---
+## Completed MVP Tasks
 - [x] Scaffold config module with platformdirs persistence and tests.
 - [x] Implement file discovery, HTML detection, and chunking helpers with coverage.
 - [x] Integrate translation engines (translators, deep-translator, hysf, ullm) behind a common interface.
@@ -9,3 +10,8 @@ this_file: TODO.md
 - [x] Populate ``examples/`` with sample inputs, outputs, and walkthrough README snippet.
 - [x] Refresh README, CLAUDE, and supporting docs to match new functionality.
 - [x] Run full pytest + coverage, record results in WORK.md and finalize cleanup.
+
+## Quality Improvements
+- [ ] Improve error handling for malformed config files and missing API keys
+- [ ] Add retry mechanism for translators/deep-translator engines
+- [ ] Create integration tests for real translation engines (with skip markers for CI)
