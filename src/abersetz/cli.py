@@ -73,11 +73,11 @@ def _validate_language_code(code: str | None, param_name: str) -> str | None:
 
 
 def _build_options_from_cli(
+    to_lang: str,
     path: str | Path,
     *,
     engine: str | None,
     from_lang: str | None,
-    to_lang: str | None,
     recurse: bool,
     overwrite: bool,
     output: str | None,
@@ -95,9 +95,9 @@ def _build_options_from_cli(
     to_lang = _validate_language_code(to_lang, "--to-lang")
 
     return TranslatorOptions(
+        to_lang=to_lang,
         engine=engine,
         from_lang=from_lang,
-        to_lang=to_lang,
         recurse=recurse,
         overwrite=overwrite,
         output_dir=Path(output).resolve() if output else None,
@@ -127,14 +127,14 @@ class AbersetzCLI:
 
     def tr(
         self,
-        path: str,
+        to_lang: str,
+        path: str | Path,
         *,
         engine: str | None = None,
         from_lang: str | None = None,
-        to_lang: str | None = None,
         recurse: bool = True,
         overwrite: bool = False,
-        output: str | None = None,
+        output: str | Path | None = None,
         save_voc: bool = False,
         chunk_size: int | None = None,
         html_chunk_size: int | None = None,
@@ -147,10 +147,10 @@ class AbersetzCLI:
     ) -> None:
         _configure_logging(verbose)
         opts = _build_options_from_cli(
-            path,
+            to_lang=to_lang,
+            path=path,
             engine=engine,
             from_lang=from_lang,
-            to_lang=to_lang,
             recurse=recurse,
             overwrite=overwrite,
             output=output,

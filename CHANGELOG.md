@@ -5,6 +5,12 @@ this_file: CHANGELOG.md
 
 All notable changes to abersetz will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- Switched persisted configuration from JSON to TOML with automatic migration for existing installs.
+- Added TOML parser/serializer dependencies (`tomli` fallback and `tomli-w`) to support the new format.
+
 ## [0.1.0] - 2025-01-20
 
 ### Added

@@ -17,6 +17,8 @@ this_file: DEPENDENCIES.md
 ### Core Utilities
 - **loguru** (>=0.7): Simple yet powerful logging with minimal setup. Provides structured logging with automatic rotation, retention, and colored output.
 - **platformdirs** (>=4.3): Cross-platform user directories for configuration storage. Ensures config files are stored in appropriate OS-specific locations.
+- **tomli-w** (>=1.0): Lightweight TOML serializer used to persist configuration data in the new `config.toml` format without writing custom emitters.
+- **tomli** (>=2.0, Python <3.11 only): Backports the standard library TOML parser for Python 3.10 environments, guaranteeing consistent config loading across supported versions.
 - **semantic-text-splitter** (>=0.7): Intelligent text chunking that respects semantic boundaries. Critical for maintaining context in translation chunks.
 - **tenacity** (>=8.4): Robust retry logic with exponential backoff. Essential for handling transient API failures and rate limits.
 

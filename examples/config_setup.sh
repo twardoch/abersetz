@@ -77,74 +77,77 @@ done
 echo ""
 
 # Create sample configuration
-CONFIG_FILE="$HOME/.config/abersetz/config.json"
+CONFIG_FILE="$HOME/.config/abersetz/config.toml"
 if [ ! -f "$CONFIG_FILE" ]; then
     echo "Creating default configuration..."
     mkdir -p "$(dirname "$CONFIG_FILE")"
     cat > "$CONFIG_FILE" <<'EOF'
-{
-  "defaults": {
-    "engine": "translators/google",
-    "from_lang": "auto",
-    "to_lang": "en",
-    "chunk_size": 1200,
-    "html_chunk_size": 1800
-  },
-  "credentials": {
-    "openai": {"env": "OPENAI_API_KEY"},
-    "anthropic": {"env": "ANTHROPIC_API_KEY"},
-    "siliconflow": {"env": "SILICONFLOW_API_KEY"},
-    "deepseek": {"env": "DEEPSEEK_API_KEY"},
-    "groq": {"env": "GROQ_API_KEY"},
-    "google": {"env": "GOOGLE_API_KEY"}
-  },
-  "engines": {
-    "hysf": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "model": "tencent/Hunyuan-MT-7B",
-        "base_url": "https://api.siliconflow.com/v1",
-        "temperature": 0.3
-      }
-    },
-    "ullm": {
-      "chunk_size": 2400,
-      "options": {
-        "profiles": {
-          "default": {
-            "base_url": "https://api.siliconflow.com/v1",
-            "model": "tencent/Hunyuan-MT-7B",
-            "credential": {"name": "siliconflow"},
-            "temperature": 0.3,
-            "max_input_tokens": 32000
-          },
-          "gpt4": {
-            "base_url": "https://api.openai.com/v1",
-            "model": "gpt-4-turbo-preview",
-            "credential": {"name": "openai"},
-            "temperature": 0.3,
-            "max_input_tokens": 128000
-          },
-          "claude": {
-            "base_url": "https://api.anthropic.com/v1",
-            "model": "claude-3-opus-20240229",
-            "credential": {"name": "anthropic"},
-            "temperature": 0.3,
-            "max_input_tokens": 200000
-          },
-          "deepseek": {
-            "base_url": "https://api.deepseek.com/v1",
-            "model": "deepseek-chat",
-            "credential": {"name": "deepseek"},
-            "temperature": 0.3,
-            "max_input_tokens": 32000
-          }
-        }
-      }
-    }
-  }
-}
+[defaults]
+engine = "translators/google"
+from_lang = "auto"
+to_lang = "en"
+chunk_size = 1200
+html_chunk_size = 1800
+
+[credentials.openai]
+env = "OPENAI_API_KEY"
+
+[credentials.anthropic]
+env = "ANTHROPIC_API_KEY"
+
+[credentials.siliconflow]
+env = "SILICONFLOW_API_KEY"
+
+[credentials.deepseek]
+env = "DEEPSEEK_API_KEY"
+
+[credentials.groq]
+env = "GROQ_API_KEY"
+
+[credentials.google]
+env = "GOOGLE_API_KEY"
+
+[engines.hysf]
+chunk_size = 2400
+
+[engines.hysf.credential]
+name = "siliconflow"
+
+[engines.hysf.options]
+model = "tencent/Hunyuan-MT-7B"
+base_url = "https://api.siliconflow.com/v1"
+temperature = 0.3
+
+[engines.ullm]
+chunk_size = 2400
+
+[engines.ullm.options.profiles.default]
+base_url = "https://api.siliconflow.com/v1"
+model = "tencent/Hunyuan-MT-7B"
+credential = { name = "siliconflow" }
+temperature = 0.3
+max_input_tokens = 32000
+
+[engines.ullm.options.profiles.gpt4]
+base_url = "https://api.openai.com/v1"
+model = "gpt-4-turbo-preview"
+credential = { name = "openai" }
+temperature = 0.3
+max_input_tokens = 128000
+
+[engines.ullm.options.profiles.claude]
+base_url = "https://api.anthropic.com/v1"
+model = "claude-3-opus-20240229"
+credential = { name = "anthropic" }
+temperature = 0.3
+max_input_tokens = 200000
+
+[engines.ullm.options.profiles.deepseek]
+base_url = "https://api.deepseek.com/v1"
+model = "deepseek-chat"
+credential = { name = "deepseek" }
+temperature = 0.3
+max_input_tokens = 32000
 EOF
     echo "✓ Configuration created at $CONFIG_FILE"
 else

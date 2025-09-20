@@ -791,47 +791,45 @@ abersetz translate ./docs --to-lang pl --engine translators/google --output ./bu
 - Engine-specific settings (API endpoints, retry policies, HTML behaviour).
 - Credential entries, each allowing either `{ "env": "ENV_NAME" }` or `{ "value": "actual-secret" }`.
 
-Example snippet (stored in `config.json`):
-```json
-{
-  "defaults": {
-    "engine": "translators/google",
-    "from_lang": "auto",
-    "to_lang": "en",
-    "chunk_size": 1200,
-    "html_chunk_size": 1800
-  },
-  "credentials": {
-    "siliconflow": {"env": "SILICONFLOW_API_KEY"}
-  },
-  "engines": {
-    "hysf": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "model": "tencent/Hunyuan-MT-7B",
-        "base_url": "https://api.siliconflow.com/v1",
-        "temperature": 0.3
-      }
-    },
-    "ullm": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "profiles": {
-          "default": {
-            "base_url": "https://api.siliconflow.com/v1",
-            "model": "tencent/Hunyuan-MT-7B",
-            "temperature": 0.3,
-            "max_input_tokens": 32000,
-            "prolog": {}
-          }
-        }
-      }
-    }
-  }
-}
+Example snippet (stored in `config.toml`):
+```toml
+[defaults]
+engine = "translators/google"
+from_lang = "auto"
+to_lang = "en"
+chunk_size = 1200
+html_chunk_size = 1800
+
+[credentials.siliconflow]
+name = "siliconflow"
+env = "SILICONFLOW_API_KEY"
+
+[engines.hysf]
+chunk_size = 2400
+
+[engines.hysf.credential]
+name = "siliconflow"
+
+[engines.hysf.options]
+model = "tencent/Hunyuan-MT-7B"
+base_url = "https://api.siliconflow.com/v1"
+temperature = 0.3
+
+[engines.ullm]
+chunk_size = 2400
+
+[engines.ullm.credential]
+name = "siliconflow"
+
+[engines.ullm.options.profiles.default]
+base_url = "https://api.siliconflow.com/v1"
+model = "tencent/Hunyuan-MT-7B"
+temperature = 0.3
+max_input_tokens = 32000
+
+[engines.ullm.options.profiles.default.prolog]
 ```
+
 Use `abersetz config show` and `abersetz config path` to inspect the file.
 
 ## Python API
@@ -885,6 +883,12 @@ this_file: CHANGELOG.md
 # Changelog
 
 All notable changes to abersetz will be documented in this file.
+
+## [Unreleased]
+
+### Changed
+- Switched persisted configuration from JSON to TOML with automatic migration for existing installs.
+- Added TOML parser/serializer dependencies (`tomli` fallback and `tomli-w`) to support the new format.
 
 ## [0.1.0] - 2025-01-20
 
@@ -940,6 +944,7 @@ All notable changes to abersetz will be documented in this file.
 - Offline-friendly dry-run mode for testing
 - Optional vocabulary sidecar files with --save-voc flag
 - Retry logic with tenacity for robust API calls
+
 </document_content>
 </document>
 
@@ -1001,47 +1006,45 @@ abersetz translate ./docs --to-lang pl --engine translators/google --output ./bu
 - Engine-specific settings (API endpoints, retry policies, HTML behaviour).
 - Credential entries, each allowing either `{ "env": "ENV_NAME" }` or `{ "value": "actual-secret" }`.
 
-Example snippet (stored in `config.json`):
-```json
-{
-  "defaults": {
-    "engine": "translators/google",
-    "from_lang": "auto",
-    "to_lang": "en",
-    "chunk_size": 1200,
-    "html_chunk_size": 1800
-  },
-  "credentials": {
-    "siliconflow": {"env": "SILICONFLOW_API_KEY"}
-  },
-  "engines": {
-    "hysf": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "model": "tencent/Hunyuan-MT-7B",
-        "base_url": "https://api.siliconflow.com/v1",
-        "temperature": 0.3
-      }
-    },
-    "ullm": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "profiles": {
-          "default": {
-            "base_url": "https://api.siliconflow.com/v1",
-            "model": "tencent/Hunyuan-MT-7B",
-            "temperature": 0.3,
-            "max_input_tokens": 32000,
-            "prolog": {}
-          }
-        }
-      }
-    }
-  }
-}
+Example snippet (stored in `config.toml`):
+```toml
+[defaults]
+engine = "translators/google"
+from_lang = "auto"
+to_lang = "en"
+chunk_size = 1200
+html_chunk_size = 1800
+
+[credentials.siliconflow]
+name = "siliconflow"
+env = "SILICONFLOW_API_KEY"
+
+[engines.hysf]
+chunk_size = 2400
+
+[engines.hysf.credential]
+name = "siliconflow"
+
+[engines.hysf.options]
+model = "tencent/Hunyuan-MT-7B"
+base_url = "https://api.siliconflow.com/v1"
+temperature = 0.3
+
+[engines.ullm]
+chunk_size = 2400
+
+[engines.ullm.credential]
+name = "siliconflow"
+
+[engines.ullm.options.profiles.default]
+base_url = "https://api.siliconflow.com/v1"
+model = "tencent/Hunyuan-MT-7B"
+temperature = 0.3
+max_input_tokens = 32000
+
+[engines.ullm.options.profiles.default.prolog]
 ```
+
 Use `abersetz config show` and `abersetz config path` to inspect the file.
 
 ## Python API
@@ -1108,6 +1111,8 @@ this_file: DEPENDENCIES.md
 ### Core Utilities
 - **loguru** (>=0.7): Simple yet powerful logging with minimal setup. Provides structured logging with automatic rotation, retention, and colored output.
 - **platformdirs** (>=4.3): Cross-platform user directories for configuration storage. Ensures config files are stored in appropriate OS-specific locations.
+- **tomli-w** (>=1.0): Lightweight TOML serializer used to persist configuration data in the new `config.toml` format without writing custom emitters.
+- **tomli** (>=2.0, Python <3.11 only): Backports the standard library TOML parser for Python 3.10 environments, guaranteeing consistent config loading across supported versions.
 - **semantic-text-splitter** (>=0.7): Intelligent text chunking that respects semantic boundaries. Critical for maintaining context in translation chunks.
 - **tenacity** (>=8.4): Robust retry logic with exponential backoff. Essential for handling transient API failures and rate limits.
 
@@ -1134,6 +1139,7 @@ this_file: DEPENDENCIES.md
 5. **Cross-Platform**: `platformdirs` ensures the tool works correctly on Windows, macOS, and Linux without platform-specific code.
 
 6. **Code Quality**: The development dependencies ensure high code quality through testing (91% coverage) and automatic formatting/linting.
+
 </document_content>
 </document>
 
@@ -1195,47 +1201,45 @@ abersetz translate ./docs --to-lang pl --engine translators/google --output ./bu
 - Engine-specific settings (API endpoints, retry policies, HTML behaviour).
 - Credential entries, each allowing either `{ "env": "ENV_NAME" }` or `{ "value": "actual-secret" }`.
 
-Example snippet (stored in `config.json`):
-```json
-{
-  "defaults": {
-    "engine": "translators/google",
-    "from_lang": "auto",
-    "to_lang": "en",
-    "chunk_size": 1200,
-    "html_chunk_size": 1800
-  },
-  "credentials": {
-    "siliconflow": {"env": "SILICONFLOW_API_KEY"}
-  },
-  "engines": {
-    "hysf": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "model": "tencent/Hunyuan-MT-7B",
-        "base_url": "https://api.siliconflow.com/v1",
-        "temperature": 0.3
-      }
-    },
-    "ullm": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "profiles": {
-          "default": {
-            "base_url": "https://api.siliconflow.com/v1",
-            "model": "tencent/Hunyuan-MT-7B",
-            "temperature": 0.3,
-            "max_input_tokens": 32000,
-            "prolog": {}
-          }
-        }
-      }
-    }
-  }
-}
+Example snippet (stored in `config.toml`):
+```toml
+[defaults]
+engine = "translators/google"
+from_lang = "auto"
+to_lang = "en"
+chunk_size = 1200
+html_chunk_size = 1800
+
+[credentials.siliconflow]
+name = "siliconflow"
+env = "SILICONFLOW_API_KEY"
+
+[engines.hysf]
+chunk_size = 2400
+
+[engines.hysf.credential]
+name = "siliconflow"
+
+[engines.hysf.options]
+model = "tencent/Hunyuan-MT-7B"
+base_url = "https://api.siliconflow.com/v1"
+temperature = 0.3
+
+[engines.ullm]
+chunk_size = 2400
+
+[engines.ullm.credential]
+name = "siliconflow"
+
+[engines.ullm.options.profiles.default]
+base_url = "https://api.siliconflow.com/v1"
+model = "tencent/Hunyuan-MT-7B"
+temperature = 0.3
+max_input_tokens = 32000
+
+[engines.ullm.options.profiles.default.prolog]
 ```
+
 Use `abersetz config show` and `abersetz config path` to inspect the file.
 
 ## Python API
@@ -1474,47 +1478,45 @@ abersetz translate ./docs --to-lang pl --engine translators/google --output ./bu
 - Engine-specific settings (API endpoints, retry policies, HTML behaviour).
 - Credential entries, each allowing either `{ "env": "ENV_NAME" }` or `{ "value": "actual-secret" }`.
 
-Example snippet (stored in `config.json`):
-```json
-{
-  "defaults": {
-    "engine": "translators/google",
-    "from_lang": "auto",
-    "to_lang": "en",
-    "chunk_size": 1200,
-    "html_chunk_size": 1800
-  },
-  "credentials": {
-    "siliconflow": {"env": "SILICONFLOW_API_KEY"}
-  },
-  "engines": {
-    "hysf": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "model": "tencent/Hunyuan-MT-7B",
-        "base_url": "https://api.siliconflow.com/v1",
-        "temperature": 0.3
-      }
-    },
-    "ullm": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "profiles": {
-          "default": {
-            "base_url": "https://api.siliconflow.com/v1",
-            "model": "tencent/Hunyuan-MT-7B",
-            "temperature": 0.3,
-            "max_input_tokens": 32000,
-            "prolog": {}
-          }
-        }
-      }
-    }
-  }
-}
+Example snippet (stored in `config.toml`):
+```toml
+[defaults]
+engine = "translators/google"
+from_lang = "auto"
+to_lang = "en"
+chunk_size = 1200
+html_chunk_size = 1800
+
+[credentials.siliconflow]
+name = "siliconflow"
+env = "SILICONFLOW_API_KEY"
+
+[engines.hysf]
+chunk_size = 2400
+
+[engines.hysf.credential]
+name = "siliconflow"
+
+[engines.hysf.options]
+model = "tencent/Hunyuan-MT-7B"
+base_url = "https://api.siliconflow.com/v1"
+temperature = 0.3
+
+[engines.ullm]
+chunk_size = 2400
+
+[engines.ullm.credential]
+name = "siliconflow"
+
+[engines.ullm.options.profiles.default]
+base_url = "https://api.siliconflow.com/v1"
+model = "tencent/Hunyuan-MT-7B"
+temperature = 0.3
+max_input_tokens = 32000
+
+[engines.ullm.options.profiles.default.prolog]
 ```
+
 Use `abersetz config show` and `abersetz config path` to inspect the file.
 
 ## Python API
@@ -1716,47 +1718,45 @@ abersetz translate ./docs --to-lang pl --engine translators/google --output ./bu
 - Engine-specific settings (API endpoints, retry policies, HTML behaviour).
 - Credential entries, each allowing either `{ "env": "ENV_NAME" }` or `{ "value": "actual-secret" }`.
 
-Example snippet (stored in `config.json`):
-```json
-{
-  "defaults": {
-    "engine": "translators/google",
-    "from_lang": "auto",
-    "to_lang": "en",
-    "chunk_size": 1200,
-    "html_chunk_size": 1800
-  },
-  "credentials": {
-    "siliconflow": {"env": "SILICONFLOW_API_KEY"}
-  },
-  "engines": {
-    "hysf": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "model": "tencent/Hunyuan-MT-7B",
-        "base_url": "https://api.siliconflow.com/v1",
-        "temperature": 0.3
-      }
-    },
-    "ullm": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "profiles": {
-          "default": {
-            "base_url": "https://api.siliconflow.com/v1",
-            "model": "tencent/Hunyuan-MT-7B",
-            "temperature": 0.3,
-            "max_input_tokens": 32000,
-            "prolog": {}
-          }
-        }
-      }
-    }
-  }
-}
+Example snippet (stored in `config.toml`):
+```toml
+[defaults]
+engine = "translators/google"
+from_lang = "auto"
+to_lang = "en"
+chunk_size = 1200
+html_chunk_size = 1800
+
+[credentials.siliconflow]
+name = "siliconflow"
+env = "SILICONFLOW_API_KEY"
+
+[engines.hysf]
+chunk_size = 2400
+
+[engines.hysf.credential]
+name = "siliconflow"
+
+[engines.hysf.options]
+model = "tencent/Hunyuan-MT-7B"
+base_url = "https://api.siliconflow.com/v1"
+temperature = 0.3
+
+[engines.ullm]
+chunk_size = 2400
+
+[engines.ullm.credential]
+name = "siliconflow"
+
+[engines.ullm.options.profiles.default]
+base_url = "https://api.siliconflow.com/v1"
+model = "tencent/Hunyuan-MT-7B"
+temperature = 0.3
+max_input_tokens = 32000
+
+[engines.ullm.options.profiles.default.prolog]
 ```
+
 Use `abersetz config show` and `abersetz config path` to inspect the file.
 
 ## Python API
@@ -3079,7 +3079,7 @@ nav_order: 5
 
 ## Overview
 
-Abersetz stores configuration in a JSON file managed by `platformdirs`, ensuring cross-platform compatibility.
+Abersetz stores configuration in a TOML file managed by `platformdirs`, ensuring cross-platform compatibility.
 
 ## Configuration Location
 
@@ -3090,55 +3090,56 @@ abersetz config path
 ```
 
 Typical locations:
-- **Linux**: `~/.config/abersetz/config.json`
-- **macOS**: `~/Library/Application Support/abersetz/config.json`
-- **Windows**: `%APPDATA%\abersetz\config.json`
+- **Linux**: `~/.config/abersetz/config.toml`
+- **macOS**: `~/Library/Application Support/abersetz/config.toml`
+- **Windows**: `%APPDATA%\abersetz\config.toml`
 
 ## Configuration Structure
 
 ### Complete Example
 
-```json
-{
-  "defaults": {
-    "engine": "translators/google",
-    "from_lang": "auto",
-    "to_lang": "en",
-    "chunk_size": 1200,
-    "html_chunk_size": 1800
-  },
-  "credentials": {
-    "openai": {"env": "OPENAI_API_KEY"},
-    "anthropic": {"env": "ANTHROPIC_API_KEY"},
-    "siliconflow": {"env": "SILICONFLOW_API_KEY"},
-    "deepseek": {"env": "DEEPSEEK_API_KEY"}
-  },
-  "engines": {
-    "hysf": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "model": "tencent/Hunyuan-MT-7B",
-        "base_url": "https://api.siliconflow.com/v1",
-        "temperature": 0.3
-      }
-    },
-    "ullm": {
-      "chunk_size": 2400,
-      "options": {
-        "profiles": {
-          "default": {
-            "base_url": "https://api.siliconflow.com/v1",
-            "model": "tencent/Hunyuan-MT-7B",
-            "credential": {"name": "siliconflow"},
-            "temperature": 0.3,
-            "max_input_tokens": 32000
-          }
-        }
-      }
-    }
-  }
-}
+```toml
+[defaults]
+engine = "translators/google"
+from_lang = "auto"
+to_lang = "en"
+chunk_size = 1200
+html_chunk_size = 1800
+
+[credentials.openai]
+env = "OPENAI_API_KEY"
+
+[credentials.anthropic]
+env = "ANTHROPIC_API_KEY"
+
+[credentials.siliconflow]
+env = "SILICONFLOW_API_KEY"
+
+[credentials.deepseek]
+env = "DEEPSEEK_API_KEY"
+
+[engines.hysf]
+chunk_size = 2400
+
+[engines.hysf.credential]
+name = "siliconflow"
+
+[engines.hysf.options]
+model = "tencent/Hunyuan-MT-7B"
+base_url = "https://api.siliconflow.com/v1"
+temperature = 0.3
+
+[engines.ullm]
+chunk_size = 2400
+
+[engines.ullm.options.profiles.default]
+base_url = "https://api.siliconflow.com/v1"
+model = "tencent/Hunyuan-MT-7B"
+credential = { name = "siliconflow" }
+temperature = 0.3
+max_input_tokens = 32000
+
+[engines.ullm.options.profiles.default.prolog]
 ```
 
 ## Configuration Sections
@@ -3147,52 +3148,44 @@ Typical locations:
 
 Global default settings for all translations:
 
-```json
-{
-  "defaults": {
-    "engine": "translators/google",  // Default translation engine
-    "from_lang": "auto",             // Source language (auto-detect)
-    "to_lang": "en",                 // Target language
-    "chunk_size": 1200,              // Characters per text chunk
-    "html_chunk_size": 1800          // Characters per HTML chunk
-  }
-}
+```toml
+[defaults]
+engine = "translators/google" # Default translation engine
+from_lang = "auto"             # Source language (auto-detect)
+to_lang = "en"                  # Target language
+chunk_size = 1200              # Characters per text chunk
+html_chunk_size = 1800         # Characters per HTML chunk
 ```
+
 
 ### credentials
 
 API key storage with environment variable references:
 
-```json
-{
-  "credentials": {
-    "openai": {
-      "env": "OPENAI_API_KEY"        // Read from environment
-    },
-    "custom": {
-      "value": "sk-actual-key-here"  // Direct value (not recommended)
-    }
-  }
-}
+```toml
+[credentials.openai]
+env = "OPENAI_API_KEY"        # Read from environment
+
+[credentials.custom]
+value = "sk-actual-key-here"  # Direct value (not recommended)
 ```
+
 
 ### engines
 
 Custom engine configurations:
 
-```json
-{
-  "engines": {
-    "engine_name": {
-      "chunk_size": 2000,
-      "credential": {"name": "credential_name"},
-      "options": {
-        // Engine-specific options
-      }
-    }
-  }
-}
+```toml
+[engines.engine_name]
+chunk_size = 2000
+
+[engines.engine_name.credential]
+name = "credential_name"
+
+# Engine-specific options
+[engines.engine_name.options]
 ```
+
 
 ## Setting Up Credentials
 
@@ -3209,25 +3202,21 @@ export SILICONFLOW_API_KEY="sk-..."
 
 Then reference in config:
 
-```json
-{
-  "credentials": {
-    "openai": {"env": "OPENAI_API_KEY"}
-  }
-}
+```toml
+[credentials.openai]
+env = "OPENAI_API_KEY"
 ```
+
 
 ### Direct Values (Not Recommended)
 
 Store directly in config (less secure):
 
-```json
-{
-  "credentials": {
-    "openai": {"value": "sk-actual-key-here"}
-  }
-}
+```toml
+[credentials.openai]
+value = "sk-actual-key-here"
 ```
+
 
 ## Engine Configuration
 
@@ -3235,36 +3224,28 @@ Store directly in config (less secure):
 
 Configure multiple LLM profiles:
 
-```json
-{
-  "engines": {
-    "ullm": {
-      "chunk_size": 2400,
-      "options": {
-        "profiles": {
-          "gpt4": {
-            "base_url": "https://api.openai.com/v1",
-            "model": "gpt-4-turbo-preview",
-            "credential": {"name": "openai"},
-            "temperature": 0.3,
-            "max_input_tokens": 128000,
-            "prolog": {
-              "role": "You are an expert translator"
-            }
-          },
-          "claude": {
-            "base_url": "https://api.anthropic.com/v1",
-            "model": "claude-3-opus-20240229",
-            "credential": {"name": "anthropic"},
-            "temperature": 0.3,
-            "max_input_tokens": 200000
-          }
-        }
-      }
-    }
-  }
-}
+```toml
+[engines.ullm]
+chunk_size = 2400
+
+[engines.ullm.options.profiles.gpt4]
+base_url = "https://api.openai.com/v1"
+model = "gpt-4-turbo-preview"
+credential = { name = "openai" }
+temperature = 0.3
+max_input_tokens = 128000
+
+[engines.ullm.options.profiles.gpt4.prolog]
+role = "You are an expert translator"
+
+[engines.ullm.options.profiles.claude]
+base_url = "https://api.anthropic.com/v1"
+model = "claude-3-opus-20240229"
+credential = { name = "anthropic" }
+temperature = 0.3
+max_input_tokens = 200000
 ```
+
 
 Usage:
 ```bash
@@ -3276,20 +3257,16 @@ abtr file.txt --engine ullm/claude --to-lang fr
 
 Configure self-hosted models:
 
-```json
-{
-  "engines": {
-    "local_llm": {
-      "chunk_size": 1500,
-      "options": {
-        "base_url": "http://localhost:8080/v1",
-        "model": "local-model",
-        "temperature": 0.5
-      }
-    }
-  }
-}
+```toml
+[engines.local_llm]
+chunk_size = 1500
+
+[engines.local_llm.options]
+base_url = "http://localhost:8080/v1"
+model = "local-model"
+temperature = 0.5
 ```
+
 
 ## Managing Configuration
 
@@ -3429,80 +3406,76 @@ export TOGETHERAI_API_KEY="..."
 
 ### Minimal Config
 
-```json
-{
-  "defaults": {
-    "engine": "translators/google",
-    "to_lang": "es"
-  }
-}
+```toml
+[defaults]
+engine = "translators/google"
+to_lang = "es"
 ```
+
 
 ### Multi-engine Config
 
-```json
-{
-  "defaults": {
-    "engine": "translators/google"
-  },
-  "credentials": {
-    "openai": {"env": "OPENAI_API_KEY"},
-    "anthropic": {"env": "ANTHROPIC_API_KEY"}
-  },
-  "engines": {
-    "gpt": {
-      "chunk_size": 3000,
-      "credential": {"name": "openai"},
-      "options": {
-        "model": "gpt-4-turbo-preview",
-        "base_url": "https://api.openai.com/v1"
-      }
-    },
-    "claude": {
-      "chunk_size": 3000,
-      "credential": {"name": "anthropic"},
-      "options": {
-        "model": "claude-3-opus-20240229",
-        "base_url": "https://api.anthropic.com/v1"
-      }
-    }
-  }
-}
+```toml
+[defaults]
+engine = "translators/google"
+
+[credentials.openai]
+env = "OPENAI_API_KEY"
+
+[credentials.anthropic]
+env = "ANTHROPIC_API_KEY"
+
+[engines.gpt]
+chunk_size = 3000
+
+[engines.gpt.credential]
+name = "openai"
+
+[engines.gpt.options]
+model = "gpt-4-turbo-preview"
+base_url = "https://api.openai.com/v1"
+
+[engines.claude]
+chunk_size = 3000
+
+[engines.claude.credential]
+name = "anthropic"
+
+[engines.claude.options]
+model = "claude-3-opus-20240229"
+base_url = "https://api.anthropic.com/v1"
 ```
+
 
 ### Enterprise Config
 
-```json
-{
-  "defaults": {
-    "engine": "corporate_llm",
-    "to_lang": "en",
-    "chunk_size": 2000
-  },
-  "credentials": {
-    "corporate": {
-      "env": "CORP_TRANSLATION_KEY"
-    }
-  },
-  "engines": {
-    "corporate_llm": {
-      "chunk_size": 2500,
-      "credential": {"name": "corporate"},
-      "options": {
-        "base_url": "https://translation.company.com/v1",
-        "model": "corp-translator-v2",
-        "temperature": 0.2,
-        "max_retries": 5,
-        "timeout": 30
-      }
-    }
-  }
-}
+```toml
+[defaults]
+engine = "corporate_llm"
+to_lang = "en"
+chunk_size = 2000
+
+[credentials.corporate]
+env = "CORP_TRANSLATION_KEY"
+
+[engines.corporate_llm]
+chunk_size = 2500
+
+[engines.corporate_llm.credential]
+name = "corporate"
+
+[engines.corporate_llm.options]
+base_url = "https://translation.company.com/v1"
+model = "corp-translator-v2"
+temperature = 0.2
+max_retries = 5
+timeout = 30
 ```
+
 
 ## Security Best Practices
 
-1. **Never commit API keys**: Add `config.json` to `.gitignore`
+1. **Never commit API keys**: Add `config.toml` to `.gitignore`
 
 2. **Use environment variables**: Store keys in environment, not config
 
@@ -4184,74 +4157,77 @@ done
 echo ""
 
 # Create sample configuration
-CONFIG_FILE="$HOME/.config/abersetz/config.json"
+CONFIG_FILE="$HOME/.config/abersetz/config.toml"
 if [ ! -f "$CONFIG_FILE" ]; then
     echo "Creating default configuration..."
     mkdir -p "$(dirname "$CONFIG_FILE")"
     cat > "$CONFIG_FILE" <<'EOF'
-{
-  "defaults": {
-    "engine": "translators/google",
-    "from_lang": "auto",
-    "to_lang": "en",
-    "chunk_size": 1200,
-    "html_chunk_size": 1800
-  },
-  "credentials": {
-    "openai": {"env": "OPENAI_API_KEY"},
-    "anthropic": {"env": "ANTHROPIC_API_KEY"},
-    "siliconflow": {"env": "SILICONFLOW_API_KEY"},
-    "deepseek": {"env": "DEEPSEEK_API_KEY"},
-    "groq": {"env": "GROQ_API_KEY"},
-    "google": {"env": "GOOGLE_API_KEY"}
-  },
-  "engines": {
-    "hysf": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "model": "tencent/Hunyuan-MT-7B",
-        "base_url": "https://api.siliconflow.com/v1",
-        "temperature": 0.3
-      }
-    },
-    "ullm": {
-      "chunk_size": 2400,
-      "options": {
-        "profiles": {
-          "default": {
-            "base_url": "https://api.siliconflow.com/v1",
-            "model": "tencent/Hunyuan-MT-7B",
-            "credential": {"name": "siliconflow"},
-            "temperature": 0.3,
-            "max_input_tokens": 32000
-          },
-          "gpt4": {
-            "base_url": "https://api.openai.com/v1",
-            "model": "gpt-4-turbo-preview",
-            "credential": {"name": "openai"},
-            "temperature": 0.3,
-            "max_input_tokens": 128000
-          },
-          "claude": {
-            "base_url": "https://api.anthropic.com/v1",
-            "model": "claude-3-opus-20240229",
-            "credential": {"name": "anthropic"},
-            "temperature": 0.3,
-            "max_input_tokens": 200000
-          },
-          "deepseek": {
-            "base_url": "https://api.deepseek.com/v1",
-            "model": "deepseek-chat",
-            "credential": {"name": "deepseek"},
-            "temperature": 0.3,
-            "max_input_tokens": 32000
-          }
-        }
-      }
-    }
-  }
-}
+[defaults]
+engine = "translators/google"
+from_lang = "auto"
+to_lang = "en"
+chunk_size = 1200
+html_chunk_size = 1800
+
+[credentials.openai]
+env = "OPENAI_API_KEY"
+
+[credentials.anthropic]
+env = "ANTHROPIC_API_KEY"
+
+[credentials.siliconflow]
+env = "SILICONFLOW_API_KEY"
+
+[credentials.deepseek]
+env = "DEEPSEEK_API_KEY"
+
+[credentials.groq]
+env = "GROQ_API_KEY"
+
+[credentials.google]
+env = "GOOGLE_API_KEY"
+
+[engines.hysf]
+chunk_size = 2400
+
+[engines.hysf.credential]
+name = "siliconflow"
+
+[engines.hysf.options]
+model = "tencent/Hunyuan-MT-7B"
+base_url = "https://api.siliconflow.com/v1"
+temperature = 0.3
+
+[engines.ullm]
+chunk_size = 2400
+
+[engines.ullm.options.profiles.default]
+base_url = "https://api.siliconflow.com/v1"
+model = "tencent/Hunyuan-MT-7B"
+credential = { name = "siliconflow" }
+temperature = 0.3
+max_input_tokens = 32000
+
+[engines.ullm.options.profiles.gpt4]
+base_url = "https://api.openai.com/v1"
+model = "gpt-4-turbo-preview"
+credential = { name = "openai" }
+temperature = 0.3
+max_input_tokens = 128000
+
+[engines.ullm.options.profiles.claude]
+base_url = "https://api.anthropic.com/v1"
+model = "claude-3-opus-20240229"
+credential = { name = "anthropic" }
+temperature = 0.3
+max_input_tokens = 200000
+
+[engines.ullm.options.profiles.deepseek]
+base_url = "https://api.deepseek.com/v1"
+model = "deepseek-chat"
+credential = { name = "deepseek" }
+temperature = 0.3
+max_input_tokens = 32000
 EOF
     echo "✓ Configuration created at $CONFIG_FILE"
 else
@@ -4675,6 +4651,8 @@ dependencies = [
     "semantic-text-splitter>=0.7",
     "tenacity>=8.4",
     "translators>=5.9",
+    "tomli-w>=1.0",
+    "tomli>=2.0; python_version < \"3.11\"",
 ]
 
 [[project.authors]]
@@ -4817,14 +4795,14 @@ class AbersetzCLI:
         """Show version information."""
     def tr((
         self,
-        path: str,
+        to_lang: str,
+        path: str | Path,
         *,
         engine: str | None = None,
         from_lang: str | None = None,
-        to_lang: str | None = None,
         recurse: bool = True,
         overwrite: bool = False,
-        output: str | None = None,
+        output: str | Path | None = None,
         save_voc: bool = False,
         chunk_size: int | None = None,
         html_chunk_size: int | None = None,
@@ -4853,11 +4831,11 @@ def _validate_language_code((code: str | None, param_name: str)) -> str | None:
     """Validate language code format."""
 
 def _build_options_from_cli((
+    to_lang: str,
     path: str | Path,
     *,
     engine: str | None,
     from_lang: str | None,
-    to_lang: str | None,
     recurse: bool,
     overwrite: bool,
     output: str | None,
@@ -4876,14 +4854,14 @@ def version((self)) -> str:
 
 def tr((
         self,
-        path: str,
+        to_lang: str,
+        path: str | Path,
         *,
         engine: str | None = None,
         from_lang: str | None = None,
-        to_lang: str | None = None,
         recurse: bool = True,
         overwrite: bool = False,
-        output: str | None = None,
+        output: str | Path | None = None,
         save_voc: bool = False,
         chunk_size: int | None = None,
         html_chunk_size: int | None = None,
