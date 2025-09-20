@@ -2737,12 +2737,15 @@ from types import SimpleNamespace
 import pytest
 import abersetz.config as config_module
 from abersetz.engines import EngineRequest, create_engine
-from unittest.mock import Mock
 
 class DummyClient:
     """Simple stub mimicking OpenAI chat completions."""
     def __init__((self, payload: str)):
     def _create((self, **kwargs: object)) -> SimpleNamespace:
+
+class MockTranslator:
+    def __init__((self, source: str, target: str)):
+    def translate((self, text: str)) -> str:
 
 def __init__((self, payload: str)):
 
@@ -2760,6 +2763,17 @@ def test_ullm_engine_uses_profile((monkeypatch: pytest.MonkeyPatch)) -> None:
 
 def test_translators_engine_retry_on_failure((monkeypatch: pytest.MonkeyPatch)) -> None:
     """Test that TranslatorsEngine retries on network failures."""
+
+def fake_translate_with_retry((
+        text: str, translator: str, from_language: str, to_language: str, **_: object
+    )) -> str:
+
+def test_deep_translator_engine_retry_on_failure((monkeypatch: pytest.MonkeyPatch)) -> None:
+    """Test that DeepTranslatorEngine retries on network failures."""
+
+def __init__((self, source: str, target: str)):
+
+def translate((self, text: str)) -> str:
 
 
 # File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/tests/test_integration.py
