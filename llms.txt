@@ -1924,11 +1924,32 @@ this_file: WORK.md
 ---
 # Work Log
 
-## 2025-09-20
+## 2025-01-20
+### MVP Complete
 - Established planning artifacts (`PLAN.md`, `TODO.md`) and refreshed README/CLAUDE alignment.
 - Implemented configuration store, chunking utilities, engine adapters, translation pipeline, and Fire CLI.
 - Added example assets and comprehensive pytest suite covering config, chunking, engines, pipeline, and CLI wiring.
-- Tests: `python -m pytest -xvs` (pass, coverage 91%).
+- Tests: `python -m pytest --cov=. --cov-report=term-missing` (14 tests pass, coverage 91%).
+- Fixed pyproject.toml configuration for modern uv/hatch compatibility.
+- Created CHANGELOG.md and DEPENDENCIES.md documentation.
+
+### Quality Improvements (In Progress)
+Working on 3 targeted improvements for robustness:
+
+1. **Better Error Handling**
+   - Add validation for malformed JSON config files
+   - Improve error messages when API keys are missing
+   - Add helpful suggestions for common configuration mistakes
+
+2. **Network Retry Logic**
+   - Add tenacity retry wrapper for translators engine
+   - Add retry logic for deep-translator engines
+   - Ensure consistent retry behavior across all engines
+
+3. **Integration Testing**
+   - Create integration tests for real translation APIs
+   - Add pytest markers to skip in CI environments
+   - Document how to run integration tests locally
 
 </document_content>
 </document>
@@ -1938,13 +1959,13 @@ this_file: WORK.md
 <document_content>
 #!/usr/bin/env bash
 cd "$(dirname "$0")"
+uvx hatch clean; 
 fd -e py -x autoflake {}; 
 fd -e py -x pyupgrade --py311-plus {}; 
 fd -e py -x ruff check --output-format=github --fix --unsafe-fixes {}; 
 fd -e py -x ruff format --respect-gitignore --target-version py311 {};
 uvx hatch fmt;
 llms .;
-uvx hatch clean; 
 gitnextver .; 
 uvx hatch build;
 
@@ -2612,12 +2633,19 @@ import json
 from pathlib import Path
 import pytest
 import abersetz.config as config_module
+import platform
 
 def test_load_config_yields_defaults((tmp_path: Path)) -> None:
 
 def test_save_config_persists_changes((tmp_path: Path)) -> None:
 
 def test_resolve_credential_prefers_environment((monkeypatch: pytest.MonkeyPatch)) -> None:
+
+def test_load_config_handles_malformed_json((tmp_path: Path, monkeypatch: pytest.MonkeyPatch)) -> None:
+    """Test that malformed JSON config files are handled gracefully."""
+
+def test_load_config_handles_permission_error((tmp_path: Path, monkeypatch: pytest.MonkeyPatch)) -> None:
+    """Test that permission errors are handled gracefully."""
 
 
 # File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/tests/test_engines.py

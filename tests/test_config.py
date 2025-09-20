@@ -38,3 +38,42 @@ def test_resolve_credential_prefers_environment(monkeypatch: pytest.MonkeyPatch)
         {"value": "direct"},
     )
     assert resolved_direct == "direct"
+
+
+def test_load_config_handles_malformed_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that malformed JSON config files are handled gracefully."""
+    # Set custom config dir to tmp_path
+    monkeypatch.setenv("ABERSETZ_CONFIG_DIR", str(tmp_path))
+
+    # Write malformed JSON to config file
+    config_file = tmp_path / "config.json"
+    config_file.write_text("{ invalid json: }")
+
+    # Should return defaults with a warning instead of crashing
+    cfg = config_module.load_config()
+    assert cfg.defaults.engine == "translators/google"
+
+    # Config should be reset to defaults
+    assert config_file.exists()
+    stored = json.loads(config_file.read_text())
+    assert stored["defaults"]["engine"] == "translators/google"
+
+
+def test_load_config_handles_permission_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that permission errors are handled gracefully."""
+    # Set custom config dir to tmp_path
+    monkeypatch.setenv("ABERSETZ_CONFIG_DIR", str(tmp_path))
+
+    # Create config file and make it unreadable (skip on Windows)
+    import platform
+    if platform.system() != "Windows":
+        config_file = tmp_path / "config.json"
+        config_file.write_text('{"defaults": {}}')
+        config_file.chmod(0o000)
+
+        # Should return defaults without crashing
+        cfg = config_module.load_config()
+        assert cfg.defaults.engine == "translators/google"
+
+        # Restore permissions for cleanup
+        config_file.chmod(0o644)
