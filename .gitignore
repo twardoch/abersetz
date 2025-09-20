@@ -298,3 +298,4 @@ x64/
 x86/
 ~$*
 external/
+dist/

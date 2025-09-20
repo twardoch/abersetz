@@ -218,12 +218,40 @@ def config_path() -> Path:
 
 def load_config() -> AbersetzConfig:
     """Load configuration from disk, creating defaults if needed."""
+    from loguru import logger
+
     path = config_path()
     if not path.exists():
         path.parent.mkdir(parents=True, exist_ok=True)
         save_config(_default_config())
         return _default_config()
-    return AbersetzConfig.from_dict(json.loads(path.read_text()))
+
+    try:
+        content = path.read_text()
+        data = json.loads(content)
+        return AbersetzConfig.from_dict(data)
+    except json.JSONDecodeError as e:
+        logger.warning(
+            f"Config file at {path} contains invalid JSON: {e}. "
+            f"Resetting to defaults. Backup saved as config.json.backup"
+        )
+        # Save backup of corrupted file
+        backup_path = path.parent / "config.json.backup"
+        try:
+            backup_path.write_text(content)
+        except Exception:
+            pass  # Best effort backup
+
+        # Reset to defaults
+        default = _default_config()
+        save_config(default)
+        return default
+    except (OSError, PermissionError) as e:
+        logger.warning(
+            f"Cannot read config file at {path}: {e}. "
+            f"Using default configuration. Check file permissions."
+        )
+        return _default_config()
 
 
 def save_config(config: AbersetzConfig) -> None:
@@ -237,7 +265,12 @@ def resolve_credential(
     config: AbersetzConfig,
     reference: CredentialLike,
 ) -> str | None:
-    """Resolve a credential reference to a usable secret."""
+    """Resolve a credential reference to a usable secret.
+
+    Returns None if no credential found, logs helpful messages.
+    """
+    from loguru import logger
+
     credential = Credential.from_any(reference)
     if credential is None:
         return None
@@ -249,10 +282,22 @@ def resolve_credential(
         env_value = os.getenv(credential.env)
         if env_value:
             return env_value
+        else:
+            logger.debug(
+                f"Environment variable '{credential.env}' not set. "
+                f"Set it with: export {credential.env}=your-api-key"
+            )
     if credential.value:
         return credential.value
     if credential.name and credential.name in config.credentials:
         return resolve_credential(config, config.credentials[credential.name])
+
+    # Log helpful message when no credential found
+    if credential.env:
+        logger.info(
+            f"No API key found for credential. Please set the '{credential.env}' "
+            f"environment variable or add it to your config file at {config_path()}"
+        )
     return None
 
 

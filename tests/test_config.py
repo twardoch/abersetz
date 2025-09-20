@@ -40,7 +40,9 @@ def test_resolve_credential_prefers_environment(monkeypatch: pytest.MonkeyPatch)
     assert resolved_direct == "direct"
 
 
-def test_load_config_handles_malformed_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_load_config_handles_malformed_json(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Test that malformed JSON config files are handled gracefully."""
     # Set custom config dir to tmp_path
     monkeypatch.setenv("ABERSETZ_CONFIG_DIR", str(tmp_path))
@@ -59,13 +61,16 @@ def test_load_config_handles_malformed_json(tmp_path: Path, monkeypatch: pytest.
     assert stored["defaults"]["engine"] == "translators/google"
 
 
-def test_load_config_handles_permission_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_load_config_handles_permission_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Test that permission errors are handled gracefully."""
     # Set custom config dir to tmp_path
     monkeypatch.setenv("ABERSETZ_CONFIG_DIR", str(tmp_path))
 
     # Create config file and make it unreadable (skip on Windows)
     import platform
+
     if platform.system() != "Windows":
         config_file = tmp_path / "config.json"
         config_file.write_text('{"defaults": {}}')

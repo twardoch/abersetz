@@ -684,6 +684,7 @@ x64/
 x86/
 ~$*
 external/
+dist/
 
 </document_content>
 </document>
@@ -2301,6 +2302,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 from platformdirs import user_config_dir
+from loguru import logger
+from loguru import logger
 
 class Defaults:
     """Runtime defaults for translation."""
@@ -2641,10 +2644,14 @@ def test_save_config_persists_changes((tmp_path: Path)) -> None:
 
 def test_resolve_credential_prefers_environment((monkeypatch: pytest.MonkeyPatch)) -> None:
 
-def test_load_config_handles_malformed_json((tmp_path: Path, monkeypatch: pytest.MonkeyPatch)) -> None:
+def test_load_config_handles_malformed_json((
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+)) -> None:
     """Test that malformed JSON config files are handled gracefully."""
 
-def test_load_config_handles_permission_error((tmp_path: Path, monkeypatch: pytest.MonkeyPatch)) -> None:
+def test_load_config_handles_permission_error((
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+)) -> None:
     """Test that permission errors are handled gracefully."""
 
 
