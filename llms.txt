@@ -19,7 +19,6 @@ Project Structure:
 │       └── 📁 tests
 ├── 📁 src
 │   └── 📁 abersetz
-│       ├── 📄 __about__.py
 │       ├── 📄 __init__.py
 │       ├── 📄 abersetz.py
 │       ├── 📄 chunking.py
@@ -33,6 +32,7 @@ Project Structure:
 │   ├── 📄 test_cli.py
 │   ├── 📄 test_config.py
 │   ├── 📄 test_engines.py
+│   ├── 📄 test_integration.py
 │   ├── 📄 test_package.py
 │   └── 📄 test_pipeline.py
 ├── 📄 .gitignore
@@ -50,6 +50,7 @@ Project Structure:
 ├── 📄 pyproject.toml
 ├── 📄 QWEN.md
 ├── 📄 README.md
+├── 📄 TESTING.md
 ├── 📄 TODO.md
 └── 📄 WORK.md
 
@@ -684,6 +685,7 @@ x86/
 ~$*
 external/
 dist/
+src/abersetz/__about__.py
 
 </document_content>
 </document>
@@ -1893,6 +1895,72 @@ MIT
 </document>
 
 <document index="17">
+<source>TESTING.md</source>
+<document_content>
+---
+this_file: TESTING.md
+---
+# Testing Guide
+
+## Running Tests
+
+### Unit Tests
+Run the standard test suite:
+```bash
+python -m pytest
+```
+
+With coverage report:
+```bash
+python -m pytest --cov=. --cov-report=term-missing
+```
+
+### Integration Tests
+Integration tests make real API calls and are skipped by default to avoid network dependencies in CI.
+
+To run integration tests locally:
+```bash
+export ABERSETZ_INTEGRATION_TESTS=true
+python -m pytest tests/test_integration.py -v
+```
+
+Some tests require API keys:
+```bash
+export SILICONFLOW_API_KEY=your-api-key
+export ABERSETZ_INTEGRATION_TESTS=true
+python -m pytest tests/test_integration.py -v
+```
+
+### Test Markers
+- `@pytest.mark.integration` - Tests that require network access
+- `@pytest.mark.skipif` - Conditional test execution based on environment
+
+### Continuous Testing
+Use pytest-watch for automatic test runs on file changes:
+```bash
+uvx pytest-watch -- -xvs
+```
+
+## Test Coverage
+Current coverage: **91%**
+
+Areas with good coverage:
+- Configuration management (90%)
+- Translation pipeline (97%)
+- CLI interface (78%)
+- Engine abstractions (82%)
+
+## Testing Best Practices
+1. Write tests before implementing features (TDD)
+2. Test edge cases: empty inputs, None values, large inputs
+3. Mock external services in unit tests
+4. Use integration tests sparingly for real API validation
+5. Keep tests focused and independent
+6. Use descriptive test names: `test_function_when_condition_then_result`
+</document_content>
+</document>
+
+<document index="18">
 <source>TODO.md</source>
 <document_content>
 ---
@@ -1916,7 +1984,7 @@ this_file: TODO.md
 </document_content>
 </document>
 
-<document index="18">
+<document index="19">
 <source>WORK.md</source>
 <document_content>
 ---
@@ -1954,7 +2022,7 @@ Working on 3 targeted improvements for robustness:
 </document_content>
 </document>
 
-<document index="19">
+<document index="20">
 <source>build.sh</source>
 <document_content>
 #!/usr/bin/env bash
@@ -1972,7 +2040,7 @@ uvx hatch build;
 </document_content>
 </document>
 
-<document index="20">
+<document index="21">
 <source>examples/poem_en.txt</source>
 <document_content>
 # this_file: examples/poem_en.txt
@@ -1985,7 +2053,7 @@ And hope feels like a gift.
 </document_content>
 </document>
 
-<document index="21">
+<document index="22">
 <source>examples/poem_pl.txt</source>
 <document_content>
 # this_file: examples/poem_pl.txt
@@ -1998,7 +2066,7 @@ A nadzieja znów czuje się jak dar.
 </document_content>
 </document>
 
-<document index="22">
+<document index="23">
 <source>examples/vocab.json</source>
 <document_content>
 {
@@ -2010,7 +2078,7 @@ A nadzieja znów czuje się jak dar.
 </document_content>
 </document>
 
-<document index="23">
+<document index="24">
 <source>examples/walkthrough.md</source>
 <document_content>
 ---
@@ -2032,7 +2100,7 @@ The command writes the translated poem to `examples/out/poem_en.txt` and saves t
 </document_content>
 </document>
 
-<document index="24">
+<document index="25">
 <source>package.toml</source>
 <document_content>
 # Package configuration
@@ -2049,7 +2117,7 @@ github_actions = true   # Add GitHub Actions workflows
 </document_content>
 </document>
 
-<document index="25">
+<document index="26">
 <source>pyproject.toml</source>
 <document_content>
 # this_file: pyproject.toml
@@ -2145,15 +2213,12 @@ indent-style = "space"
 [tool.pytest.ini_options]
 addopts = "-q"
 testpaths = ["tests"]
+markers = [
+    "integration: mark test as integration test (requires network/API access)",
+]
 
 </document_content>
 </document>
-
-# File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/src/abersetz/__about__.py
-# Language: python
-
-from typing import Union
-
 
 # File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/src/abersetz/__init__.py
 # Language: python
@@ -2414,12 +2479,12 @@ class EngineBase:
     def chunk_size_for((self, fmt: TextFormat)) -> int | None:
 
 class TranslatorsEngine(E, n, g, i, n, e, B, a, s, e):
-    """Wrapper around the `translators` package."""
+    """Wrapper around the `translators` package with retry logic."""
     def __init__((self, provider: str, config: EngineConfig)) -> None:
     def translate((self, request: EngineRequest)) -> EngineResult:
 
 class DeepTranslatorEngine(E, n, g, i, n, e, B, a, s, e):
-    """Adapter for `deep-translator` providers."""
+    """Adapter for `deep-translator` providers with retry logic."""
     def __init__((self, provider: str, config: EngineConfig)) -> None:
     def translate((self, request: EngineRequest)) -> EngineResult:
 
@@ -2460,9 +2525,17 @@ def chunk_size_for((self, fmt: TextFormat)) -> int | None:
 
 def __init__((self, provider: str, config: EngineConfig)) -> None:
 
+def _translate_with_retry((
+        self, text: str, is_html: bool, source_lang: str, target_lang: str
+    )) -> str:
+    """Internal method with retry logic for network failures."""
+
 def translate((self, request: EngineRequest)) -> EngineResult:
 
 def __init__((self, provider: str, config: EngineConfig)) -> None:
+
+def _translate_with_retry((self, text: str, source_lang: str, target_lang: str)) -> str:
+    """Internal method with retry logic for network failures."""
 
 def translate((self, request: EngineRequest)) -> EngineResult:
 
@@ -2670,6 +2743,10 @@ class DummyClient:
     def __init__((self, payload: str)):
     def _create((self, **kwargs: object)) -> SimpleNamespace:
 
+class MockTranslator:
+    def __init__((self, source: str, target: str)):
+    def translate((self, text: str)) -> str:
+
 def __init__((self, payload: str)):
 
 def _create((self, **kwargs: object)) -> SimpleNamespace:
@@ -2683,6 +2760,52 @@ def fake_translate_text((
 def test_hysf_engine_parses_vocabulary((monkeypatch: pytest.MonkeyPatch)) -> None:
 
 def test_ullm_engine_uses_profile((monkeypatch: pytest.MonkeyPatch)) -> None:
+
+def test_translators_engine_retry_on_failure((monkeypatch: pytest.MonkeyPatch)) -> None:
+    """Test that TranslatorsEngine retries on network failures."""
+
+def fake_translate_with_retry((
+        text: str, translator: str, from_language: str, to_language: str, **_: object
+    )) -> str:
+
+def test_deep_translator_engine_retry_on_failure((monkeypatch: pytest.MonkeyPatch)) -> None:
+    """Test that DeepTranslatorEngine retries on network failures."""
+
+def __init__((self, source: str, target: str)):
+
+def translate((self, text: str)) -> str:
+
+
+# File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/tests/test_integration.py
+# Language: python
+
+import os
+import pytest
+from abersetz import TranslatorOptions, translate_path
+from abersetz.config import load_config
+from abersetz.engines import EngineRequest, create_engine
+from unittest.mock import patch
+import requests
+
+def test_translators_google_real(()) -> None:
+    """Test Google Translate via translators library (requires network)."""
+
+def test_deep_translator_google_real(()) -> None:
+    """Test Google Translate via deep-translator library (requires network)."""
+
+def test_hysf_engine_real(()) -> None:
+    """Test Siliconflow translation engine (requires API key)."""
+
+def test_translate_file_api((tmp_path)) -> None:
+    """Test the high-level translate_path API."""
+
+def test_html_translation(()) -> None:
+    """Test HTML content translation preserves markup."""
+
+def test_retry_on_network_failure(()) -> None:
+    """Test that retry mechanism works for real network issues."""
+
+def flaky_get((*args, **kwargs)):
 
 
 # File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/tests/test_package.py

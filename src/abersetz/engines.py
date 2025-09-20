@@ -86,32 +86,41 @@ class EngineBase:
 
 
 class TranslatorsEngine(EngineBase):
-    """Wrapper around the `translators` package."""
+    """Wrapper around the `translators` package with retry logic."""
 
     def __init__(self, provider: str, config: EngineConfig) -> None:
         super().__init__(config.name, config.chunk_size, config.html_chunk_size)
         self.provider = provider
 
-    def translate(self, request: EngineRequest) -> EngineResult:
-        if request.is_html:
-            text = translators.translate_html(
-                request.text,
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, max=10), reraise=True)
+    def _translate_with_retry(
+        self, text: str, is_html: bool, source_lang: str, target_lang: str
+    ) -> str:
+        """Internal method with retry logic for network failures."""
+        if is_html:
+            return translators.translate_html(
+                text,
                 translator=self.provider,
-                from_language=request.source_lang,
-                to_language=request.target_lang,
+                from_language=source_lang,
+                to_language=target_lang,
             )
         else:
-            text = translators.translate_text(
-                request.text,
+            return translators.translate_text(
+                text,
                 translator=self.provider,
-                from_language=request.source_lang,
-                to_language=request.target_lang,
+                from_language=source_lang,
+                to_language=target_lang,
             )
+
+    def translate(self, request: EngineRequest) -> EngineResult:
+        text = self._translate_with_retry(
+            request.text, request.is_html, request.source_lang, request.target_lang
+        )
         return EngineResult(text=text, vocabulary=dict(request.vocabulary))
 
 
 class DeepTranslatorEngine(EngineBase):
-    """Adapter for `deep-translator` providers."""
+    """Adapter for `deep-translator` providers with retry logic."""
 
     PROVIDERS: Mapping[str, Callable[..., Any]] = {
         "google": GoogleTranslator,
@@ -129,10 +138,15 @@ class DeepTranslatorEngine(EngineBase):
             raise EngineError(f"Unsupported deep-translator provider: {provider}")
         self.provider = provider
 
-    def translate(self, request: EngineRequest) -> EngineResult:
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, max=10), reraise=True)
+    def _translate_with_retry(self, text: str, source_lang: str, target_lang: str) -> str:
+        """Internal method with retry logic for network failures."""
         translator_cls = self.PROVIDERS[self.provider]
-        translator = translator_cls(source=request.source_lang, target=request.target_lang)
-        text = translator.translate(request.text)
+        translator = translator_cls(source=source_lang, target=target_lang)
+        return translator.translate(text)
+
+    def translate(self, request: EngineRequest) -> EngineResult:
+        text = self._translate_with_retry(request.text, request.source_lang, request.target_lang)
         return EngineResult(text=text, vocabulary=dict(request.vocabulary))
 
 

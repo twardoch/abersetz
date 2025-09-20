@@ -111,3 +111,80 @@ def test_ullm_engine_uses_profile(monkeypatch: pytest.MonkeyPatch) -> None:
     assert result.vocabulary["Term"] == "Done"
     assert result.vocabulary["Existing"] == "Istniejący"
     assert client.calls[0]["model"] == profile["model"]
+
+
+def test_translators_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that TranslatorsEngine retries on network failures."""
+
+    cfg = config_module.load_config()
+    engine = create_engine("translators/google", cfg)
+
+    # Mock translators to fail twice then succeed
+    call_count = 0
+
+    def fake_translate_with_retry(
+        text: str, translator: str, from_language: str, to_language: str, **_: object
+    ) -> str:
+        nonlocal call_count
+        call_count += 1
+        if call_count < 3:
+            raise ConnectionError("Network error")
+        return "Translated after retries"
+
+    monkeypatch.setattr("abersetz.engines.translators.translate_text", fake_translate_with_retry)
+
+    request = EngineRequest(
+        text="hello",
+        source_lang="en",
+        target_lang="pl",
+        is_html=False,
+        vocabulary={},
+        prolog={},
+        chunk_index=0,
+        total_chunks=1,
+    )
+
+    result = engine.translate(request)
+    assert result.text == "Translated after retries"
+    assert call_count == 3  # Two failures + one success
+
+
+def test_deep_translator_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that DeepTranslatorEngine retries on network failures."""
+
+    cfg = config_module.load_config()
+
+    # Mock GoogleTranslator to fail twice then succeed
+    call_count = 0
+
+    class MockTranslator:
+        def __init__(self, source: str, target: str):
+            self.source = source
+            self.target = target
+
+        def translate(self, text: str) -> str:
+            nonlocal call_count
+            call_count += 1
+            if call_count < 3:
+                raise ConnectionError("Network error")
+            return "Translated after retries"
+
+    monkeypatch.setattr("abersetz.engines.GoogleTranslator", MockTranslator)
+
+    # Now create the engine after the mock is in place
+    engine = create_engine("deep-translator/google", cfg)
+
+    request = EngineRequest(
+        text="hello",
+        source_lang="en",
+        target_lang="pl",
+        is_html=False,
+        vocabulary={},
+        prolog={},
+        chunk_index=0,
+        total_chunks=1,
+    )
+
+    result = engine.translate(request)
+    assert result.text == "Translated after retries"
+    assert call_count == 3  # Two failures + one success
