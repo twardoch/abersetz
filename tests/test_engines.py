@@ -52,7 +52,7 @@ def test_translators_engine_invokes_library(monkeypatch: pytest.MonkeyPatch) -> 
         source_lang="en",
         target_lang="pl",
         is_html=False,
-        vocabulary={},
+        voc={},
         prolog={},
         chunk_index=0,
         total_chunks=1,
@@ -62,10 +62,10 @@ def test_translators_engine_invokes_library(monkeypatch: pytest.MonkeyPatch) -> 
     assert captured["translator"] == "google"
 
 
-def test_hysf_engine_parses_vocabulary(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_hysf_engine_parses_voc(monkeypatch: pytest.MonkeyPatch) -> None:
     cfg = config_module.load_config()
     monkeypatch.setenv("SILICONFLOW_API_KEY", "env-key")
-    payload = '<output>cześć</output><vocabulary>{"hi": "cześć"}</vocabulary>'
+    payload = '<output>cześć</output><voc>{"hi": "cześć"}</voc>'
     client = DummyClient(payload)
     engine = create_engine("hysf", cfg, client=client)
 
@@ -74,14 +74,14 @@ def test_hysf_engine_parses_vocabulary(monkeypatch: pytest.MonkeyPatch) -> None:
         source_lang="en",
         target_lang="pl",
         is_html=False,
-        vocabulary={},
+        voc={},
         prolog={"existing": "value"},
         chunk_index=0,
         total_chunks=1,
     )
     result = engine.translate(request)
     assert result.text == "cześć"
-    assert result.vocabulary == {"hi": "cześć"}
+    assert result.voc == {"hi": "cześć"}
     assert client.calls  # ensure API invoked
 
 
@@ -92,7 +92,7 @@ def test_ullm_engine_uses_profile(monkeypatch: pytest.MonkeyPatch) -> None:
     config_module.save_config(cfg)
     monkeypatch.setenv("SILICONFLOW_API_KEY", "env-key")
 
-    payload = '<output>done</output><vocabulary>{"Term": "Done"}</vocabulary>'
+    payload = '<output>done</output><voc>{"Term": "Done"}</voc>'
     client = DummyClient(payload)
     engine = create_engine("ullm/default", cfg, client=client)
 
@@ -101,15 +101,15 @@ def test_ullm_engine_uses_profile(monkeypatch: pytest.MonkeyPatch) -> None:
         source_lang="en",
         target_lang="pl",
         is_html=False,
-        vocabulary={"Existing": "Istniejący"},
+        voc={"Existing": "Istniejący"},
         prolog={},
         chunk_index=0,
         total_chunks=2,
     )
     result = engine.translate(request)
     assert result.text == "done"
-    assert result.vocabulary["Term"] == "Done"
-    assert result.vocabulary["Existing"] == "Istniejący"
+    assert result.voc["Term"] == "Done"
+    assert result.voc["Existing"] == "Istniejący"
     assert client.calls[0]["model"] == profile["model"]
 
 
@@ -138,7 +138,7 @@ def test_translators_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch) ->
         source_lang="en",
         target_lang="pl",
         is_html=False,
-        vocabulary={},
+        voc={},
         prolog={},
         chunk_index=0,
         total_chunks=1,
@@ -184,7 +184,7 @@ def test_deep_translator_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch
             source_lang="en",
             target_lang="pl",
             is_html=False,
-            vocabulary={},
+            voc={},
             prolog={},
             chunk_index=0,
             total_chunks=1,

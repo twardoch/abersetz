@@ -25,9 +25,9 @@ class DummyEngine:
 
     def translate(self, request) -> EngineResult:
         self.chunks.append(request.text)
-        vocabulary = dict(request.vocabulary)
-        vocabulary[f"chunk_{len(self.chunks)}"] = request.text.upper()
-        return EngineResult(text=request.text.upper(), vocabulary=vocabulary)
+        voc = dict(request.voc)
+        voc[f"chunk_{len(self.chunks)}"] = request.text.upper()
+        return EngineResult(text=request.text.upper(), voc=voc)
 
 
 def test_translate_path_processes_files(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -39,13 +39,13 @@ def test_translate_path_processes_files(tmp_path: Path, monkeypatch: pytest.Monk
     dummy = DummyEngine()
     monkeypatch.setattr("abersetz.pipeline.create_engine", lambda *args, **kwargs: dummy)
 
-    options = TranslatorOptions(output_dir=tmp_path / "out", save_vocabulary=True, chunk_size=4)
+    options = TranslatorOptions(output_dir=tmp_path / "out", save_voc=True, chunk_size=4)
     results = translate_path(src_dir, options)
 
     assert len(results) == 1
     output_file = tmp_path / "out" / "sample.txt"
     assert output_file.read_text(encoding="utf-8") == "HELLO WORLD"
-    vocab_file = output_file.with_suffix(output_file.suffix + ".vocabulary.json")
+    vocab_file = output_file.with_suffix(output_file.suffix + ".voc.json")
     saved_vocab = vocab_file.read_text(encoding="utf-8")
     assert "chunk_1" in saved_vocab
     assert dummy.chunks  # ensure engine invoked

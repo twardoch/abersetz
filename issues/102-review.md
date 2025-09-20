@@ -20,12 +20,12 @@ Here is a point-by-point comparison of the codebase against `SPEC.md`:
 
 | Section | Specification Point | Compliance | Analysis & Comments |
 | :--- | :--- | :--- | :--- |
-| **2.1** | **File Handling** | ✅ **Full** | The `pipeline.py` module correctly handles file discovery, both for single files and directories. The `--recurse` flag is implemented in `cli.py` and passed to the pipeline. The `--overwrite` and `--output` flags are also correctly implemented. |
+| **2.1** | **File Handling** | ✅ **Full** | The `pipeline.py` module correctly handles file discovery, both for single files and directories. The `--recurse` flag is implemented in `cli.py` and passed to the pipeline. The `--write_over` and `--output` flags are also correctly implemented. |
 | **2.2** | **Translation Pipeline** | ✅ **Full** | The `pipeline.py` module implements the `locate -> chunk -> translate -> merge -> save` workflow as specified. The `translate_path` function orchestrates this process effectively. |
 | **2.3** | **Content-Type Detection** | ✅ **Full** | `pipeline.py` includes a `_is_html` function that performs a basic but effective check for HTML tags, satisfying the requirement. |
 | **3.1** | **Pre-integrated Engines** | ✅ **Full** | `engines.py` provides wrappers for `translators` and `deep-translator`. The engine selection logic correctly parses engine strings like `translators/google`. |
 | **3.2.1** | **`hysf` Engine** | ✅ **Full** | The `HysfEngine` class in `engines.py` uses the `openai` client to interact with the specified Siliconflow endpoint. It correctly retrieves credentials from the configuration and uses `tenacity` for retries. |
-| **3.2.2** | **`ullm` Engine** | ✅ **Full** | The `UllmEngine` in `engines.py` is highly configurable as specified. It supports profiles, custom prologs, and, most importantly, the `<output>` and `<vocabulary>` tag parsing logic. The vocabulary is correctly extracted and propagated to subsequent chunks. |
+| **3.2.2** | **`ullm` Engine** | ✅ **Full** | The `UllmEngine` in `engines.py` is highly configurable as specified. It supports profiles, custom prologs, and, most importantly, the `<output>` and `<voc>` tag parsing logic. The voc is correctly extracted and propagated to subsequent chunks. |
 | **4.0** | **Configuration** | ✅ **Full** | `config.py` provides a robust configuration management system using `platformdirs`. It correctly handles storing and resolving credentials (both `env` and `value`). The schema matches the requirements, allowing for global defaults and engine-specific overrides. |
 | **5.0** | **CLI** | ✅ **Full** | `cli.py` uses `python-fire` to expose the `translate` command with all the specified arguments. The CLI arguments are correctly wired to the `TranslatorOptions` dataclass. |
 | **6.0** | **Python API** | ✅ **Full** | The `abersetz` package exposes `translate_path` and `TranslatorOptions` in its `__init__.py`, providing a clean and simple programmatic interface. |

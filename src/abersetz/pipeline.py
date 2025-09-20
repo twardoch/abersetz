@@ -23,16 +23,16 @@ class TranslatorOptions:
     from_lang: str | None = None
     to_lang: str | None = None
     recurse: bool = True
-    overwrite: bool = False
+    write_over: bool = False
     output_dir: Path | None = None
-    save_vocabulary: bool = False
+    save_voc: bool = False
     chunk_size: int | None = None
     html_chunk_size: int | None = None
     include: tuple[str, ...] = DEFAULT_PATTERNS
-    exclude: tuple[str, ...] = tuple()
+    xclude: tuple[str, ...] = tuple()
     dry_run: bool = False
     prolog: dict[str, str] = field(default_factory=dict)
-    initial_vocabulary: dict[str, str] = field(default_factory=dict)
+    initial_voc: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(slots=True)
@@ -42,8 +42,12 @@ class TranslationResult:
     source: Path
     destination: Path
     chunks: int
-    vocabulary: dict[str, str]
+    voc: dict[str, str]
     format: TextFormat
+    engine: str = ""
+    source_lang: str = ""
+    target_lang: str = ""
+    chunk_size: int = 0
 
 
 class PipelineError(RuntimeError):
@@ -114,11 +118,11 @@ def _discover_files(root: Path, opts: TranslatorOptions) -> Iterable[Path]:
     matched: list[Path] = []
     for pattern in opts.include:
         matched.extend(pattern_iter(pattern))
-    filtered = [path for path in matched if not _is_excluded(path, opts.exclude)]
+    filtered = [path for path in matched if not _is_xcluded(path, opts.xclude)]
     return sorted({path.resolve() for path in filtered if path.is_file()})
 
 
-def _is_excluded(path: Path, patterns: tuple[str, ...]) -> bool:
+def _is_xcluded(path: Path, patterns: tuple[str, ...]) -> bool:
     return any(path.match(pattern) for pattern in patterns)
 
 
@@ -129,6 +133,10 @@ def _translate_file(
     config: AbersetzConfig,
 ) -> TranslationResult:
     text = source.read_text(encoding="utf-8")
+
+    engine_selector = opts.engine or config.defaults.engine
+    source_lang = opts.from_lang or config.defaults.from_lang
+    target_lang = opts.to_lang or config.defaults.to_lang
 
     # Handle edge cases
     if not text.strip():
@@ -145,8 +153,12 @@ def _translate_file(
             source=source,
             destination=destination,
             chunks=0,
-            vocabulary={},
+            voc={},
             format=TextFormat.PLAIN,
+            engine=engine_selector,
+            source_lang=source_lang,
+            target_lang=target_lang,
+            chunk_size=0,
         )
 
     # Warn about very large files (>10MB)
@@ -160,12 +172,12 @@ def _translate_file(
     chunk_size = _select_chunk_size(fmt, engine, opts, config)
     chunks = chunk_text(text, chunk_size, fmt)
     # logger.debug("%s: %s chunk(s) of size %s", source, len(chunks) or 1, chunk_size)
-    results, vocabulary = _apply_engine(engine, chunks, fmt, opts, config)
+    results, voc = _apply_engine(engine, chunks, fmt, opts, config)
     merged_text = "".join(item.text for item in results)
     destination = _persist_output(
         source,
         merged_text,
-        vocabulary,
+        voc,
         fmt,
         opts,
         opts.to_lang or config.defaults.to_lang,
@@ -174,8 +186,12 @@ def _translate_file(
         source=source,
         destination=destination,
         chunks=len(chunks) or 1,
-        vocabulary=vocabulary,
+        voc=voc,
         format=fmt,
+        engine=engine_selector,
+        source_lang=source_lang,
+        target_lang=target_lang,
+        chunk_size=chunk_size,
     )
 
 
@@ -186,18 +202,18 @@ def _apply_engine(
     opts: TranslatorOptions,
     config: AbersetzConfig,
 ) -> tuple[list[EngineResult], dict[str, str]]:
-    vocabulary = dict(opts.initial_vocabulary)
+    voc = dict(opts.initial_voc)
     prolog = dict(opts.prolog)
     results: list[EngineResult] = []
     chunk_list = list(chunks)
     total = len(chunk_list) or 1
     for index, chunk in enumerate(chunk_list):
         # logger.debug("Engine %s chunk %s/%s", engine.name, index + 1, total)
-        request = _build_request(chunk, index, total, fmt, opts, config, vocabulary, prolog)
+        request = _build_request(chunk, index, total, fmt, opts, config, voc, prolog)
         result = engine.translate(request)
-        vocabulary = result.vocabulary
+        voc = result.voc
         results.append(result)
-    return results, vocabulary
+    return results, voc
 
 
 def _build_request(
@@ -207,7 +223,7 @@ def _build_request(
     fmt: TextFormat,
     opts: TranslatorOptions,
     config: AbersetzConfig,
-    vocabulary: dict[str, str],
+    voc: dict[str, str],
     prolog: dict[str, str],
 ) -> EngineRequest:
     return EngineRequest(
@@ -215,7 +231,7 @@ def _build_request(
         source_lang=opts.from_lang or "auto",
         target_lang=opts.to_lang or config.defaults.to_lang,
         is_html=fmt is TextFormat.HTML,
-        vocabulary=vocabulary,
+        voc=voc,
         prolog=prolog,
         chunk_index=index,
         total_chunks=total,
@@ -240,12 +256,12 @@ def _select_chunk_size(
 def _persist_output(
     source: Path,
     content: str,
-    vocabulary: dict[str, str],
+    voc: dict[str, str],
     fmt: TextFormat,
     opts: TranslatorOptions,
     target_lang: str,
 ) -> Path:
-    if opts.overwrite:
+    if opts.write_over:
         destination = source
     else:
         base = opts.output_dir or source.parent / target_lang
@@ -253,11 +269,9 @@ def _persist_output(
         destination = base / source.name
     if not opts.dry_run:
         destination.write_text(content, encoding="utf-8")
-        if opts.save_vocabulary:
-            vocab_path = destination.with_suffix(destination.suffix + ".vocabulary.json")
-            vocab_path.write_text(
-                json.dumps(vocabulary, indent=2, ensure_ascii=False), encoding="utf-8"
-            )
+        if opts.save_voc:
+            vocab_path = destination.with_suffix(destination.suffix + ".voc.json")
+            vocab_path.write_text(json.dumps(voc, indent=2, ensure_ascii=False), encoding="utf-8")
     return destination
 
 

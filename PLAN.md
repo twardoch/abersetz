@@ -11,12 +11,12 @@ this_file: PLAN.md
 - **Core modules** (all under `src/abersetz`):
   - `config.py`: platformdirs-backed config store for API secrets, engine defaults, and chunk sizing. Persists env var references plus direct values.
   - `engines.py`: thin wrappers for `translators`, `deep_translator`, and custom `hysf` / `ullm` engines built on `openai` + `tenacity`.
-  - `pipeline.py`: file discovery, HTML detection, chunking (via `semantic-text-splitter`), translation orchestration, vocabulary hand-off logic.
-  - `cli.py`: Fire command exposing translate command with recursion toggle, language args, engine selection, overwrite/save-vocabulary flags.
+  - `pipeline.py`: file discovery, HTML detection, chunking (via `semantic-text-splitter`), translation orchestration, voc hand-off logic.
+  - `cli.py`: Fire command exposing translate command with recursion toggle, language args, engine selection, write_over/save-voc flags.
   - `__init__.py`: public API shortcuts.
-- **Data flow**: gather files → derive chunker (plain vs HTML) → run translator engine per chunk (with vocabulary context) → merge & persist outputs while optionally saving vocabulary JSON.
+- **Data flow**: gather files → derive chunker (plain vs HTML) → run translator engine per chunk (with voc context) → merge & persist outputs while optionally saving voc JSON.
 - **Chunking**: use `semantic-text-splitter` `TextSplitter` + `MarkdownSplitter` depending on HTML detection; fallback to simple line chunker if library unavailable at runtime.
-- **Vocabulary sharing**: capture `<output>` + optional `<vocabulary>` tags from engines supporting it (custom LLM pathways); merge dictionaries and include as `prolog` for subsequent chunks.
+- **voc sharing**: capture `<output>` + optional `<voc>` tags from engines supporting it (custom LLM pathways); merge dictionaries and include as `prolog` for subsequent chunks.
 - **Configuration storage**: store YAML/JSON file under platformdirs user config; structure contains global defaults, per-engine overrides, secret references (`env` or `value`). Provide helper to resolve actual key at runtime.
 
 ## Dependencies and Justification
@@ -35,7 +35,7 @@ this_file: PLAN.md
 ## Risks & Mitigations
 - **Network failures / rate limits**: wrap API calls with tenacity, allow dry-run translation engine for tests.
 - **HTML detection accuracy**: implement heuristic (presence of tags) + allow forced mode; include tests for false positives.
-- **Vocabulary parsing errors**: handle missing / malformed JSON gracefully, log warning, continue translation.
+- **voc parsing errors**: handle missing / malformed JSON gracefully, log warning, continue translation.
 - **Chunk merging errors**: ensure deterministic join strategy; include newline handling tests.
 - **Missing API keys**: prompt informative errors linking to config commands.
 
@@ -47,7 +47,7 @@ this_file: PLAN.md
    - Tests: config read/write, env resolution fallback, default creation.
 
 2. **File Discovery & Chunking**
-   - Implement recursive globbing respecting include/exclude patterns (default: text extensions, optional `--recurse`).
+   - Implement recursive globbing respecting include/xclude patterns (default: text extensions, optional `--recurse`).
    - HTML detection utility returning enum (`html`, `markdown`, `plain`).
    - Chunking orchestrator leveraging semantic-text-splitter with configurable max length.
    - Tests: detection heuristics, chunk sizing boundaries, ensures final concatenation stable.
@@ -55,18 +55,18 @@ this_file: PLAN.md
 3. **Engine Integrations**
    - Wrap `translators` + `deep-translator` for synchronous text translation.
    - Build custom `hysf` engine using OpenAI client hitting siliconflow endpoint with tenacity retry.
-   - Build `ullm` engine that reads config-specified endpoint/model, handles vocabulary prolog & `<vocabulary>` parsing.
+   - Build `ullm` engine that reads config-specified endpoint/model, handles voc prolog & `<voc>` parsing.
    - Provide fake/local engine for testing pipeline without network.
-   - Tests: engine selection, request payload assembly, vocabulary merge, retry decorator behavior (mocked client).
+   - Tests: engine selection, request payload assembly, voc merge, retry decorator behavior (mocked client).
 
 4. **Pipeline Assembly**
-   - Connect file iteration, chunk translation, vocabulary propagation, and output writing.
-   - Support output directory vs overwrite; ensure directory creation.
-   - Implement optional `--save-voc` to emit vocabulary JSON alongside output.
-   - Tests: pipeline integration with stub engine, ensures file outputs, vocabulary persistence, error surfaces.
+   - Connect file iteration, chunk translation, voc propagation, and output writing.
+   - Support output directory vs write_over; ensure directory creation.
+   - Implement optional `--save-voc` to emit voc JSON alongside output.
+   - Tests: pipeline integration with stub engine, ensures file outputs, voc persistence, error surfaces.
 
 5. **CLI & Examples**
-   - Expose Fire CLI command `abersetz translate` with options (`--engine`, `--from-lang`, `--to-lang`, `--recurse`, `--overwrite`, `--save-voc`, chunk overrides).
+   - Expose Fire CLI command `abersetz translate` with options (`--engine`, `--from-lang`, `--to-lang`, `--recurse`, `--write_over`, `--save-voc`, chunk overrides).
    - Provide CLI entrypoint in `pyproject` or console script mapping.
    - Create `examples/` containing sample source files, example config template, and README snippet showing CLI invocations.
    - Tests: CLI command executed via Fire (simulate using `CliRunner` or direct call) verifying argument wiring.
@@ -78,7 +78,7 @@ this_file: PLAN.md
    - Run full test suite + coverage; document results in `WORK.md`.
 
 ## Test Strategy Summary
-- Unit tests for config, detection, chunker, vocabulary merge, engine payload generation.
+- Unit tests for config, detection, chunker, voc merge, engine payload generation.
 - Integration test using stub engine to translate sample file end-to-end within tmp path.
 - CLI smoke tests verifying Fire wiring.
 - Keep coverage ≥80%; enforce via pytest-cov.

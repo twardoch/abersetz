@@ -37,7 +37,7 @@ this_file: DEPENDENCIES.md
 
 1. **Multiple Translation Backends**: Having both `translators` and `deep-translator` provides redundancy and access to different translation providers. Users can choose based on availability, quality, or cost.
 
-2. **LLM Support**: The `openai` client enables advanced LLM-based translation with vocabulary management, providing higher quality for specialized content.
+2. **LLM Support**: The `openai` client enables advanced LLM-based translation with voc management, providing higher quality for specialized content.
 
 3. **Developer Experience**: `fire` and `rich` create an intuitive CLI with minimal code. `loguru` simplifies debugging without complex logging configuration.
 

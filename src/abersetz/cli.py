@@ -80,16 +80,16 @@ def _build_options_from_cli(
     from_lang: str | None,
     to_lang: str,
     recurse: bool,
-    overwrite: bool,
+    write_over: bool,
     output: str | None,
     save_voc: bool,
     chunk_size: int | None,
     html_chunk_size: int | None,
     include: str | Sequence[str] | None,
-    exclude: str | Sequence[str] | None,
+    xclude: str | Sequence[str] | None,
     dry_run: bool,
     prolog: str | None,
-    vocabulary: str | None,
+    voc: str | None,
 ) -> TranslatorOptions:
     # Validate language codes
     from_lang = _validate_language_code(from_lang, "--from-lang")
@@ -100,16 +100,16 @@ def _build_options_from_cli(
         engine=engine,
         from_lang=from_lang,
         recurse=recurse,
-        overwrite=overwrite,
+        write_over=write_over,
         output_dir=Path(output).resolve() if output else None,
-        save_vocabulary=save_voc,
+        save_voc=save_voc,
         chunk_size=chunk_size,
         html_chunk_size=html_chunk_size,
         include=_parse_patterns(include) or TranslatorOptions().include,
-        exclude=_parse_patterns(exclude),
+        xclude=_parse_patterns(xclude),
         dry_run=dry_run,
         prolog=_load_json_data(prolog),
-        initial_vocabulary=_load_json_data(vocabulary),
+        initial_voc=_load_json_data(voc),
     )
 
 
@@ -145,16 +145,16 @@ class AbersetzCLI:
         engine: str | None = None,
         from_lang: str | None = None,
         recurse: bool = True,
-        overwrite: bool = False,
+        write_over: bool = False,
         output: str | Path | None = None,
         save_voc: bool = False,
         chunk_size: int | None = None,
         html_chunk_size: int | None = None,
         include: str | Sequence[str] | None = None,
-        exclude: str | Sequence[str] | None = None,
+        xclude: str | Sequence[str] | None = None,
         dry_run: bool = False,
         prolog: str | None = None,
-        vocabulary: str | None = None,
+        voc: str | None = None,
         verbose: bool = False,
     ) -> None:
         _configure_logging(verbose)
@@ -164,16 +164,16 @@ class AbersetzCLI:
             engine=engine,
             from_lang=from_lang,
             recurse=recurse,
-            overwrite=overwrite,
+            write_over=write_over,
             output=output,
             save_voc=save_voc,
             chunk_size=chunk_size,
             html_chunk_size=html_chunk_size,
             include=include,
-            exclude=exclude,
+            xclude=xclude,
             dry_run=dry_run,
             prolog=prolog,
-            vocabulary=vocabulary,
+            voc=voc,
         )
         try:
             results = translate_path(path, opts)
@@ -182,6 +182,18 @@ class AbersetzCLI:
             raise
         # Minimal output - just print destinations
         for result in results:
+            if verbose:
+                logger.debug("Input: {}", result.source)
+                logger.debug(
+                    "Engine: {} (from {} -> {}, chunk_size={}, format={})",
+                    result.engine or opts.engine,
+                    result.source_lang or (opts.from_lang or "auto"),
+                    result.target_lang or (opts.to_lang or ""),
+                    result.chunk_size,
+                    result.format.name,
+                )
+                logger.debug("Chunks: {}", result.chunks)
+                logger.debug("Output: {}", result.destination)
             print(result.destination)
 
     def config(self) -> ConfigCommands:

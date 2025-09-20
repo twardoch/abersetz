@@ -29,7 +29,7 @@ def test_translators_google_real() -> None:
         source_lang="en",
         target_lang="es",
         is_html=False,
-        vocabulary={},
+        voc={},
         prolog={},
         chunk_index=0,
         total_chunks=1,
@@ -51,7 +51,7 @@ def test_deep_translator_google_real() -> None:
         source_lang="en",
         target_lang="fr",
         is_html=False,
-        vocabulary={},
+        voc={},
         prolog={},
         chunk_index=0,
         total_chunks=1,
@@ -77,7 +77,7 @@ def test_hysf_engine_real() -> None:
         source_lang="en",
         target_lang="ja",
         is_html=False,
-        vocabulary={},
+        voc={},
         prolog={},
         chunk_index=0,
         total_chunks=1,
@@ -130,7 +130,7 @@ def test_html_translation() -> None:
         source_lang="en",
         target_lang="es",
         is_html=True,
-        vocabulary={},
+        voc={},
         prolog={},
         chunk_index=0,
         total_chunks=1,
@@ -159,7 +159,7 @@ def test_translators_bing_real() -> None:
         source_lang="en",
         target_lang="pt",  # Portuguese
         is_html=False,
-        vocabulary={},
+        voc={},
         prolog={},
         chunk_index=0,
         total_chunks=1,
@@ -175,8 +175,8 @@ def test_translators_bing_real() -> None:
 
 
 @pytest.mark.integration
-def test_batch_translation_with_vocabulary() -> None:
-    """Test translating multiple chunks with vocabulary propagation."""
+def test_batch_translation_with_voc() -> None:
+    """Test translating multiple chunks with voc propagation."""
     config = load_config()
     engine = create_engine("translators/google", config)
 
@@ -186,7 +186,7 @@ def test_batch_translation_with_vocabulary() -> None:
         source_lang="en",
         target_lang="es",
         is_html=False,
-        vocabulary={},
+        voc={},
         prolog={},
         chunk_index=0,
         total_chunks=2,
@@ -195,13 +195,13 @@ def test_batch_translation_with_vocabulary() -> None:
     result1 = engine.translate(request1)
     assert result1.text
 
-    # Second chunk reusing vocabulary from first
+    # Second chunk reusing voc from first
     request2 = EngineRequest(
         text="The data is stored in the algorithm.",
         source_lang="en",
         target_lang="es",
         is_html=False,
-        vocabulary=result1.vocabulary,
+        voc=result1.voc,
         prolog={},
         chunk_index=1,
         total_chunks=2,
@@ -238,7 +238,7 @@ def test_retry_on_network_failure() -> None:
             source_lang="en",
             target_lang="fr",
             is_html=False,
-            vocabulary={},
+            voc={},
             prolog={},
             chunk_index=0,
             total_chunks=1,

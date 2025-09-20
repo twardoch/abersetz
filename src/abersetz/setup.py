@@ -294,8 +294,8 @@ class SetupWizard:
                 credential=Credential(name="siliconflow"),
                 options={
                     "base_url": "https://api.siliconflow.com/v1",
-                    "model": "Qwen/Qwen2.5-7B-Instruct",
-                    "temperature": 0.3,
+                    "model": "tencent/Hunyuan-MT-7B",
+                    "temperature": 0.9,
                 },
             )
 
@@ -307,8 +307,8 @@ class SetupWizard:
                     "profiles": {
                         "default": {
                             "base_url": "https://api.siliconflow.com/v1",
-                            "model": "Qwen/Qwen2.5-7B-Instruct",
-                            "temperature": 0.3,
+                            "model": "tencent/Hunyuan-MT-7B",
+                            "temperature": 0.9,
                             "max_input_tokens": 32000,
                             "prolog": {},
                         }
@@ -330,7 +330,7 @@ class SetupWizard:
                         "default": {
                             "base_url": "https://api.openai.com/v1",
                             "model": "gpt-4o-mini",
-                            "temperature": 0.3,
+                            "temperature": 0.9,
                             "max_input_tokens": 16000,
                             "prolog": {},
                         }

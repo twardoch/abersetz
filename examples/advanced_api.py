@@ -39,7 +39,7 @@ class TranslationWorkflow:
                         output_dir=output_dir,
                         recurse=True,
                         include=("*.md", "*.txt", "*.html"),
-                        exclude=("*test*", "*draft*", ".*"),
+                        xclude=("*test*", "*draft*", ".*"),
                     ),
                     config=self.config,
                 )
@@ -80,7 +80,7 @@ class TranslationWorkflow:
                     "destination": str(result.destination),
                     "chunks": result.chunks,
                     "format": result.format.value,
-                    "vocabulary_size": len(result.vocabulary),
+                    "voc_size": len(result.voc),
                 }
             )
 
@@ -91,14 +91,14 @@ class TranslationWorkflow:
         return report
 
 
-class VocabularyManager:
+class vocManager:
     """Manage translation vocabularies across projects."""
 
     def __init__(self):
         self.vocabularies: dict[str, dict[str, str]] = {}
 
-    def load_vocabulary(self, file_path: str, lang_pair: str):
-        """Load vocabulary from JSON file."""
+    def load_voc(self, file_path: str, lang_pair: str):
+        """Load voc from JSON file."""
         with open(file_path) as f:
             self.vocabularies[lang_pair] = json.load(f)
 
@@ -111,10 +111,10 @@ class VocabularyManager:
         return merged
 
     def translate_with_consistency(
-        self, files: list[str], to_lang: str, base_vocabulary: dict[str, str] = None
+        self, files: list[str], to_lang: str, base_voc: dict[str, str] = None
     ):
         """Translate files with consistent terminology."""
-        accumulated_vocab = base_vocabulary or {}
+        accumulated_vocab = base_voc or {}
         results = []
 
         for file_path in files:
@@ -124,18 +124,18 @@ class VocabularyManager:
                 file_path,
                 TranslatorOptions(
                     to_lang=to_lang,
-                    engine="ullm/default",  # LLM engine for vocabulary support
-                    initial_vocabulary=accumulated_vocab,
-                    save_vocabulary=True,
+                    engine="ullm/default",  # LLM engine for voc support
+                    initial_voc=accumulated_vocab,
+                    save_voc=True,
                 ),
             )
 
             if file_results:
                 result = file_results[0]
                 results.append(result)
-                # Update accumulated vocabulary
-                accumulated_vocab.update(result.vocabulary)
-                print(f"  Added {len(result.vocabulary)} new terms")
+                # Update accumulated voc
+                accumulated_vocab.update(result.voc)
+                print(f"  Added {len(result.voc)} new terms")
 
         return results, accumulated_vocab
 
@@ -153,7 +153,7 @@ class ParallelTranslator:
             source_lang="auto",
             target_lang=to_lang,
             is_html=False,
-            vocabulary={},
+            voc={},
             prolog={},
             chunk_index=0,
             total_chunks=1,
@@ -194,11 +194,11 @@ def example_multi_language():
     workflow.generate_report()
 
 
-def example_vocabulary_consistency():
+def example_voc_consistency():
     """Maintain consistent terminology across documents."""
-    manager = VocabularyManager()
+    manager = vocManager()
 
-    # Load existing vocabulary
+    # Load existing voc
     technical_terms = {
         "API": "API",
         "endpoint": "endpoint",
@@ -209,14 +209,14 @@ def example_vocabulary_consistency():
     files = ["api_reference.md", "user_guide.md", "developer_docs.md"]
 
     results, final_vocab = manager.translate_with_consistency(
-        files=files, to_lang="es", base_vocabulary=technical_terms
+        files=files, to_lang="es", base_voc=technical_terms
     )
 
-    # Save final vocabulary
-    with open("technical_vocabulary_es.json", "w") as f:
+    # Save final voc
+    with open("technical_voc_es.json", "w") as f:
         json.dump(final_vocab, f, indent=2, ensure_ascii=False)
 
-    print(f"\nFinal vocabulary has {len(final_vocab)} terms")
+    print(f"\nFinal voc has {len(final_vocab)} terms")
 
 
 def example_parallel_comparison():
@@ -289,7 +289,7 @@ if __name__ == "__main__":
 
     examples = {
         "multi": example_multi_language,
-        "vocab": example_vocabulary_consistency,
+        "vocab": example_voc_consistency,
         "compare": example_parallel_comparison,
         "incremental": example_incremental_translation,
     }

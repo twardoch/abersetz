@@ -51,8 +51,8 @@ just_the_docs:
   collections:
     docs:
       name: Documentation
-      nav_exclude: false
-      search_exclude: false
+      nav_xclude: false
+      search_xclude: false
 
 # Plugins
 plugins:
@@ -66,8 +66,8 @@ kramdown:
     block:
       line_numbers: false
 
-# Exclude files
-exclude:
+# xclude files
+xclude:
   - "*.py"
   - "*.sh"
   - "requirements.txt"

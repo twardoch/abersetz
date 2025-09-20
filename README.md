@@ -9,16 +9,16 @@ Minimalist file translator that reuses proven machine translation engines while 
 - Focuses on translating files, not single strings.
 - Reuses stable engines from `translators` and `deep-translator`, plus pluggable LLM-based engines for consistent terminology.
 - Persists engine preferences and API secrets with `platformdirs`, supporting either raw values or the environment variable that stores them.
-- Shares vocabulary between chunks so long documents stay consistent.
+- Shares voc between chunks so long documents stay consistent.
 - Keeps a lean codebase: no custom infrastructure, just clear building blocks.
 
 ## Key Features
-- Recursive file discovery with include/exclude filters.
+- Recursive file discovery with include/xclude filters.
 - Automatic HTML vs. plain-text detection to preserve markup when possible.
 - Semantic chunking via `semantic-text-splitter`, with configurable lengths per engine.
-- Vocabulary-aware translation pipeline that merges `<vocabulary>` JSON emitted by LLM engines.
+- voc-aware translation pipeline that merges `<voc>` JSON emitted by LLM engines.
 - Offline-friendly dry-run mode for testing and demos.
-- Optional vocabulary sidecar files when `--save-voc` is set.
+- Optional voc sidecar files when `--save-voc` is set.
 
 ## Installation
 ```bash
@@ -26,6 +26,16 @@ pip install abersetz
 ```
 
 ## Quick Start
+
+### First-time Setup
+```bash
+# Automatically discover and configure available translation services
+abersetz setup
+```
+
+This will scan your environment for API keys, test endpoints, and create an optimized configuration.
+
+### Basic Translation
 ```bash
 # Using the main CLI
 abersetz tr pl ./docs --engine translators/google --output ./build/pl
@@ -43,8 +53,8 @@ abtr pl ./docs --engine translators/google --output ./build/pl
   - `hysf`
   - `ullm/<profile>` where profiles are defined in config.
 - `--recurse/--no-recurse`: recurse into subdirectories (defaults to on).
-- `--overwrite`: replace input files instead of writing to output dir.
-- `--save-voc`: drop merged vocabulary JSON next to each translated file.
+- `--write_over`: replace input files instead of writing to output dir.
+- `--save-voc`: drop merged voc JSON next to each translated file.
 - `--chunk-size` / `--html-chunk-size`: override default chunk lengths.
 - `--verbose`: enable debug logging via loguru.
 
@@ -112,7 +122,7 @@ translate_path(
 The `examples/` directory holds ready-to-run demos:
 - `poem_en.txt`: source text.
 - `poem_pl.txt`: translated sample output.
-- `vocab.json`: vocabulary generated during translation.
+- `vocab.json`: voc generated during translation.
 - `walkthrough.md`: step-by-step CLI invocation log.
 
 ## Development Workflow

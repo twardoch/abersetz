@@ -29,7 +29,7 @@ def example_batch():
             to_lang="fr",
             engine="deep-translator/google",
             include=("*.txt", "*.md"),
-            exclude=("*_fr.txt", "*_fr.md"),
+            xclude=("*_fr.txt", "*_fr.md"),
             output_dir=Path("translations/fr"),
             recurse=False,
         ),
@@ -37,9 +37,9 @@ def example_batch():
     print(f"Translated {len(results)} files")
 
 
-# Example 3: Using LLM engine with vocabulary
-def example_llm_with_vocabulary():
-    """Use LLM translation with custom vocabulary."""
+# Example 3: Using LLM engine with voc
+def example_llm_with_voc():
+    """Use LLM translation with custom voc."""
     initial_vocab = {
         "abersetz": "abersetz (translation tool)",
         "chunk": "fragment",
@@ -51,14 +51,14 @@ def example_llm_with_vocabulary():
         TranslatorOptions(
             to_lang="de",
             engine="hysf",  # or "ullm/default"
-            initial_vocabulary=initial_vocab,
-            save_vocabulary=True,  # Save merged vocabulary
+            initial_voc=initial_vocab,
+            save_voc=True,  # Save merged voc
             chunk_size=2000,
         ),
     )
 
     if results:
-        print(f"Final vocabulary: {results[0].vocabulary}")
+        print(f"Final voc: {results[0].voc}")
 
 
 # Example 4: Dry run mode for testing
@@ -87,7 +87,7 @@ def example_html():
             to_lang="pt",
             engine="deep-translator/deepl",
             html_chunk_size=2500,  # Larger chunks for HTML
-            overwrite=False,  # Create new files
+            write_over=False,  # Create new files
         ),
     )
     print(f"HTML translation complete: {results[0].destination}")
@@ -129,7 +129,7 @@ if __name__ == "__main__":
     examples = {
         "simple": example_simple,
         "batch": example_batch,
-        "llm": example_llm_with_vocabulary,
+        "llm": example_llm_with_voc,
         "dry": example_dry_run,
         "html": example_html,
         "config": example_with_config,

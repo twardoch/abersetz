@@ -21,7 +21,7 @@ Minimalist file translator with pluggable engines
 
 - **File-focused**: Designed for translating documents, not single strings
 - **Multiple engines**: Supports free and paid translation services
-- **Vocabulary consistency**: LLM engines maintain terminology across chunks
+- **voc consistency**: LLM engines maintain terminology across chunks
 - **Simple CLI**: Clean interface with minimal output
 - **Python API**: Full programmatic access for automation
 
@@ -34,7 +34,7 @@ Minimalist file translator with pluggable engines
 
 - 📁 **Smart file handling**
   - Recursive directory translation
-  - Pattern matching with include/exclude
+  - Pattern matching with include/xclude
   - HTML markup preservation
   - Automatic format detection
 
@@ -43,10 +43,10 @@ Minimalist file translator with pluggable engines
   - Configurable chunk sizes per engine
   - Context preservation across chunks
 
-- 📚 **Vocabulary management**
-  - JSON vocabulary propagation
+- 📚 **voc management**
+  - JSON voc propagation
   - Consistent terminology in long documents
-  - Optional vocabulary export
+  - Optional voc export
 
 ## Getting Started
 
@@ -96,7 +96,7 @@ abtr ja . --include "*.md" --output ./ja
 # Dry run to preview
 abersetz tr zh-CN project/ --dry-run
 
-# Use LLM with vocabulary
+# Use LLM with voc
 export SILICONFLOW_API_KEY="your-key"
 abtr es technical.md --engine hysf --save-voc
 ```

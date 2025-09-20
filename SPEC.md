@@ -15,7 +15,7 @@ this_file: SPEC.md
 -   **File Discovery:** When given a directory, the tool shall be able to recursively find files to translate. A `--recurse` flag should control this behavior.
 -   **Output:** The tool shall support two output modes:
     -   Saving translated files to a specified output directory, mirroring the source directory structure.
-    -   Overwriting the original files with their translated content, using an `--overwrite` flag.
+    -   Overwriting the original files with their translated content, using an `--write_over` flag.
 
 ### 2.2. Translation Pipeline
 
@@ -58,13 +58,13 @@ The tool shall support multiple translation engines.
     -   Temperature
     -   Chunk size
     -   Maximum input token length
--   **Vocabulary Management:**
-    -   The engine shall support a "prolog" in the first chunk, which can contain a JSON object of predefined vocabulary.
+-   **voc Management:**
+    -   The engine shall support a "prolog" in the first chunk, which can contain a JSON object of predefined voc.
     -   The prompt shall instruct the LLM to return the translation within an `<output>` tag.
-    -   The prompt shall also instruct the LLM to optionally return a `<vocabulary>` tag containing a JSON object of newly established term translations.
-    -   The tool shall parse the `<vocabulary>` output, merge it with the existing vocabulary, and pass the updated vocabulary to subsequent chunks.
--   **Vocabulary Persistence:**
-    -   A `--save-voc` flag shall enable saving the final, merged vocabulary as a JSON file next to the translated output file.
+    -   The prompt shall also instruct the LLM to optionally return a `<voc>` tag containing a JSON object of newly established term translations.
+    -   The tool shall parse the `<voc>` output, merge it with the existing voc, and pass the updated voc to subsequent chunks.
+-   **voc Persistence:**
+    -   A `--save-voc` flag shall enable saving the final, merged voc as a JSON file next to the translated output file.
 
 ## 4. Configuration
 
@@ -82,9 +82,9 @@ The tool shall support multiple translation engines.
     -   `--to-lang`: Target language (default: `en`).
     -   `--engine`: The translation engine to use.
     -   `--recurse` / `--no-recurse`: Enable/disable recursive file discovery.
-    -   `--overwrite`: Overwrite original files instead of saving to an output directory.
+    -   `--write_over`: write_over original files instead of saving to an output directory.
     -   `--output`: The directory to save translated files.
-    -   `--save-voc`: Save the vocabulary file.
+    -   `--save-voc`: Save the voc file.
 
 ## 6. Python API
 

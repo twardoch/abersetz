@@ -177,7 +177,7 @@ DEFAULT_CONFIG_DICT: dict[str, Any] = {
             "options": {
                 "model": "tencent/Hunyuan-MT-7B",
                 "base_url": "https://api.siliconflow.com/v1",
-                "temperature": 0.3,
+                "temperature": 0.9,
             },
         },
         "ullm": {
@@ -189,7 +189,7 @@ DEFAULT_CONFIG_DICT: dict[str, Any] = {
                     "default": {
                         "base_url": "https://api.siliconflow.com/v1",
                         "model": "tencent/Hunyuan-MT-7B",
-                        "temperature": 0.3,
+                        "temperature": 0.9,
                         "max_input_tokens": 32000,
                         "prolog": {},
                     }

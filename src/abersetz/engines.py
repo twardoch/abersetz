@@ -38,7 +38,7 @@ class EngineRequest:
     source_lang: str
     target_lang: str
     is_html: bool
-    vocabulary: dict[str, str]
+    voc: dict[str, str]
     prolog: dict[str, str]
     chunk_index: int
     total_chunks: int
@@ -49,7 +49,7 @@ class EngineResult:
     """Normalized engine output."""
 
     text: str
-    vocabulary: dict[str, str]
+    voc: dict[str, str]
 
 
 class Engine(Protocol):
@@ -116,7 +116,7 @@ class TranslatorsEngine(EngineBase):
         text = self._translate_with_retry(
             request.text, request.is_html, request.source_lang, request.target_lang
         )
-        return EngineResult(text=text, vocabulary=dict(request.vocabulary))
+        return EngineResult(text=text, voc=dict(request.voc))
 
 
 class DeepTranslatorEngine(EngineBase):
@@ -147,14 +147,14 @@ class DeepTranslatorEngine(EngineBase):
 
     def translate(self, request: EngineRequest) -> EngineResult:
         text = self._translate_with_retry(request.text, request.source_lang, request.target_lang)
-        return EngineResult(text=text, vocabulary=dict(request.vocabulary))
+        return EngineResult(text=text, voc=dict(request.voc))
 
 
 class LlmEngine(EngineBase):
     """Shared logic for LLM backed engines."""
 
     OUTPUT_RE = re.compile(r"<output>(?P<body>.*?)</output>", re.DOTALL | re.IGNORECASE)
-    VOCAB_RE = re.compile(r"<vocabulary>(?P<body>.*?)</vocabulary>", re.DOTALL | re.IGNORECASE)
+    VOCAB_RE = re.compile(r"<voc>(?P<body>.*?)</voc>", re.DOTALL | re.IGNORECASE)
 
     def __init__(
         self,
@@ -181,22 +181,22 @@ class LlmEngine(EngineBase):
         return response.choices[0].message.content or ""
 
     def translate(self, request: EngineRequest) -> EngineResult:
-        vocabulary = dict(self._static_prolog)
-        vocabulary.update(request.prolog)
-        merged = dict(request.vocabulary)
-        messages = self._build_messages(request, vocabulary, merged)
+        voc = dict(self._static_prolog)
+        voc.update(request.prolog)
+        merged = dict(request.voc)
+        messages = self._build_messages(request, voc, merged)
         raw = self._invoke(messages)
         text, new_vocab = self._parse_payload(raw)
         merged.update(new_vocab)
-        return EngineResult(text=text, vocabulary=merged)
+        return EngineResult(text=text, voc=merged)
 
     def _build_messages(
         self,
         request: EngineRequest,
-        vocabulary: Mapping[str, str],
+        voc: Mapping[str, str],
         merged: Mapping[str, str],
     ) -> list[dict[str, str]]:
-        vocab_payload: dict[str, str] = dict(vocabulary)
+        vocab_payload: dict[str, str] = dict(voc)
         if merged:
             vocab_payload.setdefault("__current__", json.dumps(merged, ensure_ascii=False))
         prolog = json.dumps(vocab_payload, ensure_ascii=False) if vocab_payload else "{}"
@@ -207,7 +207,7 @@ class LlmEngine(EngineBase):
         }
         instructions = (
             "Translate the <segment> into the target language. Respond with "
-            '<output>...</output> and optionally <vocabulary>{"new": "value"}</vocabulary>.'
+            '<output>...</output> and optionally <voc>{"new": "value"}</voc>.'
         )
         user_content = (
             f"<instructions>{instructions}</instructions>\n"
@@ -261,7 +261,7 @@ def _build_llm_engine(
     model = settings.get("model") or options.get("model")
     if not model:
         raise EngineError(f"No model configured for engine {selector}")
-    temperature = float(settings.get("temperature", options.get("temperature", 0.3)))
+    temperature = float(settings.get("temperature", options.get("temperature", 0.9)))
     token = resolve_credential(config, engine_cfg.credential)
     if token is None:
         raise EngineError(f"Missing credential for engine {selector}")

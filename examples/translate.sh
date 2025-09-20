@@ -17,11 +17,11 @@ abersetz tr de ./docs --recurse --output ./docs_de
 
 # Example 4: Translate with specific patterns
 echo -e "\n=== Example 4: Pattern matching ==="
-abtr ja . --include "*.md,*.txt" --exclude "*test*,.*" --output ./translations/ja
+abtr ja . --include "*.md,*.txt" --xclude "*test*,.*" --output ./translations/ja
 
-# Example 5: Overwrite original files (be careful!)
+# Example 5: write_over original files (be careful!)
 echo -e "\n=== Example 5: In-place translation ==="
-# abersetz tr es backup_first.txt --overwrite
+# abersetz tr es backup_first.txt --write_over
 
 # Example 6: Dry run to test without translating
 echo -e "\n=== Example 6: Dry run mode ==="
@@ -38,8 +38,8 @@ abtr pt file.txt --engine translators/bing
 # DeepL via deep-translator
 abtr pt file.txt --engine deep-translator/deepl
 
-# Example 8: Save vocabulary for LLM engines
-echo -e "\n=== Example 8: LLM with vocabulary ==="
+# Example 8: Save voc for LLM engines
+echo -e "\n=== Example 8: LLM with voc ==="
 # Requires SILICONFLOW_API_KEY environment variable
 # abersetz tr es technical.md --engine hysf --save-voc
 

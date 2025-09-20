@@ -45,12 +45,12 @@ abersetz tr PATH [OPTIONS]
 | `--engine` | Translation engine | `translators/google` |
 | `--output` | Output directory | `<lang>/<filename>` |
 | `--recurse/--no-recurse` | Process subdirectories | `True` |
-| `--overwrite` | Replace original files | `False` |
+| `--write_over` | Replace original files | `False` |
 | `--include` | File patterns to include | `*.txt,*.md,*.html` |
-| `--exclude` | File patterns to exclude | None |
+| `--xclude` | File patterns to xclude | None |
 | `--chunk-size` | Characters per chunk | `1200` |
 | `--html-chunk-size` | Characters per HTML chunk | `1800` |
-| `--save-voc` | Save vocabulary JSON | `False` |
+| `--save-voc` | Save voc JSON | `False` |
 | `--dry-run` | Preview without translating | `False` |
 | `--verbose` | Enable debug output | `False` |
 
@@ -116,7 +116,7 @@ With specific patterns:
 ```bash
 abtr ja ./project \
   --include "*.md,*.txt" \
-  --exclude "*test*,.*" \
+  --xclude "*test*,.*" \
   --output ./translations/ja
 ```
 
@@ -143,13 +143,13 @@ abtr pt file.txt --engine ullm/gpt4
 
 ### Advanced Options
 
-Overwrite original files:
+write_over original files:
 
 ```bash
-abersetz tr es backup.txt --overwrite
+abersetz tr es backup.txt --write_over
 ```
 
-Save vocabulary for LLM engines:
+Save voc for LLM engines:
 
 ```bash
 abtr de technical.md \
@@ -194,7 +194,7 @@ Common language codes supported:
 
 ## Pattern Matching
 
-Include/exclude patterns support wildcards:
+Include/xclude patterns support wildcards:
 
 - `*.txt` - All .txt files
 - `doc*` - Files starting with "doc"

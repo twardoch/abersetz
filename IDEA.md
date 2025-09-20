@@ -9,7 +9,7 @@ The working scheme is:
 - We split the files into chunks
 - We translate the chunks
 - We merge the chunks 
-- We save the translated files into a new folder or we overwrite
+- We save the translated files into a new folder or we write_over
 
 https://pypi.org/project/translators/ ships with a CLI tool called 'fanyi' that can be used to translate text: 
 
@@ -62,11 +62,11 @@ The second custom engine is 'ullm' (universal large language model) with configu
 
 The implementation of the LLM engine should be similar to @external/cerebrate-file.txt but using the OpenAI Python package plus tenacity to handle the API calls. 
 
-The main point is that the first chunk for the translation input should be sent with a potentially configured "prolog" which would typically be a custom vocabulary expressed in JSON. 
+The main point is that the first chunk for the translation input should be sent with a potentially configured "prolog" which would typically be a custom voc expressed in JSON. 
 
-The LLM prompt request for the translation to be output inside the `<output>` tag, and optionally would (in the same call) include `<vocabulary>` where the prompt would request the model to output a same-formatted JSON that would include "newly established custom vocabulary". The idea is that the model should be able to translate, and then also output the most important translations as a from-to dict so that subsequent chunks could translate the same stuff consistently. 
+The LLM prompt request for the translation to be output inside the `<output>` tag, and optionally would (in the same call) include `<voc>` where the prompt would request the model to output a same-formatted JSON that would include "newly established custom voc". The idea is that the model should be able to translate, and then also output the most important translations as a from-to dict so that subsequent chunks could translate the same stuff consistently. 
 
-Our tool would parse for those vocabulary outputs and would merge that into our running vocabulary (and add it into the next chunk). We could also give the tool the --save_voc param and then in addition to the saved chunk, our tool would save the updated vocabulary JSON next to the output file. 
+Our tool would parse for those voc outputs and would merge that into our running voc (and add it into the next chunk). We could also give the tool the --save_voc param and then in addition to the saved chunk, our tool would save the updated voc JSON next to the output file. 
 
 <TASK>
 

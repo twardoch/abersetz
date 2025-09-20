@@ -1,0 +1,5 @@
+<target>pl</target>
+<output><segment># Fajn rano: Issie plopi pordavuňima,
+Beli cinkuju u magle,
+Susedi se ministruju pozdravima,
+I nada je kao dar.</segment>

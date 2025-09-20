@@ -59,16 +59,16 @@ options = TranslatorOptions(
     from_lang="auto",
     to_lang="en",
     recurse=True,
-    overwrite=False,
+    write_over=False,
     output_dir=Path("output/"),
-    save_vocabulary=False,
+    save_voc=False,
     chunk_size=1200,
     html_chunk_size=1800,
     include=("*.txt", "*.md"),
-    exclude=("*test*",),
+    xclude=("*test*",),
     dry_run=False,
     prolog={"role": "translator"},
-    initial_vocabulary={"term": "translation"}
+    initial_voc={"term": "translation"}
 )
 ```
 
@@ -77,16 +77,16 @@ options = TranslatorOptions(
 - `from_lang` (str): Source language code
 - `to_lang` (str): Target language code
 - `recurse` (bool): Process subdirectories
-- `overwrite` (bool): Replace original files
+- `write_over` (bool): Replace original files
 - `output_dir` (Path): Output directory path
-- `save_vocabulary` (bool): Save vocabulary JSON
+- `save_voc` (bool): Save voc JSON
 - `chunk_size` (int): Characters per text chunk
 - `html_chunk_size` (int): Characters per HTML chunk
 - `include` (tuple): File patterns to include
-- `exclude` (tuple): File patterns to exclude
+- `xclude` (tuple): File patterns to xclude
 - `dry_run` (bool): Preview without translating
 - `prolog` (dict): Initial context for LLMs
-- `initial_vocabulary` (dict): Starting vocabulary
+- `initial_voc` (dict): Starting voc
 
 ### TranslationResult
 
@@ -99,7 +99,7 @@ result = TranslationResult(
     source=Path("input.txt"),
     destination=Path("output.txt"),
     chunks=5,
-    vocabulary={"term": "translation"},
+    voc={"term": "translation"},
     format=TextFormat.PLAIN
 )
 ```
@@ -108,7 +108,7 @@ result = TranslationResult(
 - `source` (Path): Source file path
 - `destination` (Path): Output file path
 - `chunks` (int): Number of chunks processed
-- `vocabulary` (dict): Final vocabulary (LLM engines)
+- `voc` (dict): Final voc (LLM engines)
 - `format` (TextFormat): Detected format (PLAIN, HTML, MARKDOWN)
 
 ### PipelineError
@@ -190,7 +190,7 @@ request = EngineRequest(
     source_lang="en",
     target_lang="es",
     is_html=False,
-    vocabulary={},
+    voc={},
     prolog={},
     chunk_index=0,
     total_chunks=1
@@ -284,10 +284,10 @@ import json
 class TranslationWorkflow:
     def __init__(self):
         self.config = load_config()
-        self.vocabulary = {}
+        self.voc = {}
 
-    def translate_with_vocabulary(self, files, to_lang):
-        """Maintain vocabulary across files."""
+    def translate_with_voc(self, files, to_lang):
+        """Maintain voc across files."""
         all_results = []
 
         for file in files:
@@ -296,26 +296,26 @@ class TranslationWorkflow:
                 TranslatorOptions(
                     to_lang=to_lang,
                     engine="ullm/default",
-                    initial_vocabulary=self.vocabulary,
-                    save_vocabulary=True
+                    initial_voc=self.voc,
+                    save_voc=True
                 ),
                 config=self.config
             )
 
             if results:
-                # Update vocabulary
-                self.vocabulary.update(results[0].vocabulary)
+                # Update voc
+                self.voc.update(results[0].voc)
                 all_results.extend(results)
 
-        # Save final vocabulary
-        with open(f"vocabulary_{to_lang}.json", "w") as f:
-            json.dump(self.vocabulary, f, indent=2)
+        # Save final voc
+        with open(f"voc_{to_lang}.json", "w") as f:
+            json.dump(self.voc, f, indent=2)
 
         return all_results
 
 # Usage
 workflow = TranslationWorkflow()
-results = workflow.translate_with_vocabulary(
+results = workflow.translate_with_voc(
     ["doc1.md", "doc2.md", "doc3.md"],
     "es"
 )
@@ -403,17 +403,17 @@ class CustomEngine(EngineBase):
         translated = self.call_api(request.text)
         return EngineResult(
             text=translated,
-            vocabulary={}
+            voc={}
         )
 ```
 
-### Vocabulary Management
+### voc Management
 
 ```python
 from typing import Dict
 import json
 
-class VocabularyManager:
+class vocManager:
     """Manage translation vocabularies."""
 
     def __init__(self):
@@ -430,9 +430,9 @@ class VocabularyManager:
                 merged.update(self.vocabularies[pair])
         return merged
 
-    def save(self, vocabulary: Dict[str, str], path: str):
+    def save(self, voc: Dict[str, str], path: str):
         with open(path, "w") as f:
-            json.dump(vocabulary, f, indent=2, ensure_ascii=False)
+            json.dump(voc, f, indent=2, ensure_ascii=False)
 ```
 
 ## See Also

@@ -5,7 +5,7 @@ this_file: TODO.md
 - [x] Scaffold config module with platformdirs persistence and tests.
 - [x] Implement file discovery, HTML detection, and chunking helpers with coverage.
 - [x] Integrate translation engines (translators, deep-translator, hysf, ullm) behind a common interface.
-- [x] Assemble translation pipeline handling vocabulary propagation, outputs, and ``--save-voc``.
+- [x] Assemble translation pipeline handling voc propagation, outputs, and ``--save-voc``.
 - [x] Wire Fire-based CLI entrypoint and console script exposing translate workflow.
 - [x] Populate ``examples/`` with sample inputs, outputs, and walkthrough README snippet.
 - [x] Refresh README, CLAUDE, and supporting docs to match new functionality.

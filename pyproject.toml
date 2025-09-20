@@ -53,7 +53,7 @@ dev = [
 source = "vcs"
 
 [tool.hatch.build]
-exclude = ["/dist"]
+xclude = ["/dist"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/abersetz"]

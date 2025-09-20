@@ -35,7 +35,7 @@ translate_lang() {
         --output "$output_dir" \
         --recurse \
         --include "*.md,*.txt,*.html" \
-        --exclude ".*,*test*,*draft*"; then
+        --xclude ".*,*test*,*draft*"; then
         echo -e "${GREEN}✓ $lang completed${NC}"
         return 0
     else

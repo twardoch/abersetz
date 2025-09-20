@@ -7,8 +7,9 @@ from pathlib import Path
 
 import pytest
 
+from abersetz.chunking import TextFormat
 from abersetz.cli import AbersetzCLI
-from abersetz.pipeline import TranslatorOptions
+from abersetz.pipeline import TranslationResult, TranslatorOptions
 
 
 def test_cli_translate_wires_arguments(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -27,7 +28,7 @@ def test_cli_translate_wires_arguments(monkeypatch: pytest.MonkeyPatch, tmp_path
         path=str(tmp_path),
         engine="translators/google",
         include="*.txt,*.md",
-        exclude="*.tmp",
+        xclude="*.tmp",
         dry_run=True,
     )
 
@@ -35,7 +36,7 @@ def test_cli_translate_wires_arguments(monkeypatch: pytest.MonkeyPatch, tmp_path
     opts = calls["options"]
     assert isinstance(opts, TranslatorOptions)
     assert opts.include == ("*.txt", "*.md")
-    assert opts.exclude == ("*.tmp",)
+    assert opts.xclude == ("*.tmp",)
     assert opts.dry_run is True
 
 
@@ -55,3 +56,63 @@ def test_cli_lang_lists_languages(monkeypatch: pytest.MonkeyPatch) -> None:
     assert captured  # ensure output emitted
     assert rows == captured
     assert rows[0].startswith("af\t")  # alphabetical by code
+
+
+def test_cli_verbose_logs_translation_details(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    class DummyLogger:
+        def __init__(self) -> None:
+            self.records: list[str] = []
+
+        def remove(self) -> None:  # pragma: no cover - noop in tests
+            return None
+
+        def add(self, *args, **kwargs):  # pragma: no cover - noop in tests
+            return 1
+
+        def debug(self, message: str, *args, **kwargs) -> None:
+            formatted = message.format(*args) if args else message
+            self.records.append(formatted)
+
+    dummy_logger = DummyLogger()
+    monkeypatch.setattr("abersetz.cli.logger", dummy_logger, raising=False)
+
+    sample_source = tmp_path / "input.txt"
+    sample_destination = tmp_path / "pl" / "input.txt"
+    result = TranslationResult(
+        source=sample_source,
+        destination=sample_destination,
+        chunks=3,
+        voc={},
+        format=TextFormat.PLAIN,
+        engine="translators/google",
+        source_lang="auto",
+        target_lang="pl",
+        chunk_size=1200,
+    )
+
+    def fake_translate_path(path: str, options: TranslatorOptions):
+        return [result]
+
+    monkeypatch.setattr("abersetz.cli.translate_path", fake_translate_path)
+
+    printed: list[str] = []
+    monkeypatch.setattr("builtins.print", lambda value: printed.append(str(value)))
+
+    cli = AbersetzCLI()
+    cli.tr(
+        to_lang="pl",
+        path=str(sample_source),
+        engine="translators/google",
+        from_lang="auto",
+        verbose=True,
+    )
+
+    assert dummy_logger.records == [
+        f"Input: {sample_source}",
+        "Engine: translators/google (from auto -> pl, chunk_size=1200, format=PLAIN)",
+        "Chunks: 3",
+        f"Output: {sample_destination}",
+    ]
+    assert printed == [str(sample_destination)]
