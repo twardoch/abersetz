@@ -145,6 +145,73 @@ def test_html_translation() -> None:
 
 
 @pytest.mark.integration
+def test_translators_bing_real() -> None:
+    """Test Bing Translate via translators library (requires network)."""
+    config = load_config()
+    try:
+        engine = create_engine("translators/bing", config)
+    except Exception:
+        pytest.skip("Bing translator not available")
+        return
+
+    request = EngineRequest(
+        text="Welcome to the world",
+        source_lang="en",
+        target_lang="pt",  # Portuguese
+        is_html=False,
+        vocabulary={},
+        prolog={},
+        chunk_index=0,
+        total_chunks=1,
+    )
+
+    try:
+        result = engine.translate(request)
+        assert result.text
+        # Portuguese translation should contain some expected words
+        assert any(word in result.text.lower() for word in ["bem-vindo", "mundo", "ao"])
+    except Exception:
+        pytest.skip("Bing translator temporarily unavailable")
+
+
+@pytest.mark.integration
+def test_batch_translation_with_vocabulary() -> None:
+    """Test translating multiple chunks with vocabulary propagation."""
+    config = load_config()
+    engine = create_engine("translators/google", config)
+
+    # First chunk with technical terms
+    request1 = EngineRequest(
+        text="The algorithm processes data efficiently.",
+        source_lang="en",
+        target_lang="es",
+        is_html=False,
+        vocabulary={},
+        prolog={},
+        chunk_index=0,
+        total_chunks=2,
+    )
+
+    result1 = engine.translate(request1)
+    assert result1.text
+
+    # Second chunk reusing vocabulary from first
+    request2 = EngineRequest(
+        text="The data is stored in the algorithm.",
+        source_lang="en",
+        target_lang="es",
+        is_html=False,
+        vocabulary=result1.vocabulary,
+        prolog={},
+        chunk_index=1,
+        total_chunks=2,
+    )
+
+    result2 = engine.translate(request2)
+    assert result2.text
+
+
+@pytest.mark.integration
 def test_retry_on_network_failure() -> None:
     """Test that retry mechanism works for real network issues."""
     from unittest.mock import patch

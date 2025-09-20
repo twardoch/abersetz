@@ -169,22 +169,30 @@ def test_deep_translator_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch
                 raise ConnectionError("Network error")
             return "Translated after retries"
 
-    monkeypatch.setattr("abersetz.engines.GoogleTranslator", MockTranslator)
+    # Patch the PROVIDERS dictionary directly
+    from abersetz.engines import DeepTranslatorEngine
 
-    # Now create the engine after the mock is in place
-    engine = create_engine("deep-translator/google", cfg)
+    original_providers = DeepTranslatorEngine.PROVIDERS.copy()
+    DeepTranslatorEngine.PROVIDERS = {**original_providers, "google": MockTranslator}
 
-    request = EngineRequest(
-        text="hello",
-        source_lang="en",
-        target_lang="pl",
-        is_html=False,
-        vocabulary={},
-        prolog={},
-        chunk_index=0,
-        total_chunks=1,
-    )
+    try:
+        # Now create the engine after the mock is in place
+        engine = create_engine("deep-translator/google", cfg)
 
-    result = engine.translate(request)
-    assert result.text == "Translated after retries"
-    assert call_count == 3  # Two failures + one success
+        request = EngineRequest(
+            text="hello",
+            source_lang="en",
+            target_lang="pl",
+            is_html=False,
+            vocabulary={},
+            prolog={},
+            chunk_index=0,
+            total_chunks=1,
+        )
+
+        result = engine.translate(request)
+        assert result.text == "Translated after retries"
+        assert call_count == 3  # Two failures + one success
+    finally:
+        # Restore original PROVIDERS
+        DeepTranslatorEngine.PROVIDERS = original_providers

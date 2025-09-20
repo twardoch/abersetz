@@ -4,10 +4,22 @@ Project Structure:
 │   └── 📁 workflows
 │       ├── 📄 push.yml
 │       └── 📄 release.yml
+├── 📁 docs
+│   ├── 📄 _config.yml
+│   ├── 📄 cli.md
+│   ├── 📄 index.md
+│   └── 📄 installation.md
 ├── 📁 examples
-│   ├── 📁 pl
+│   ├── 📁 es
+│   ├── 📄 advanced_api.py
+│   ├── 📄 basic_api.py
+│   ├── 📄 batch_translate.sh
+│   ├── 📄 config_setup.sh
+│   ├── 📄 engines_config.json
+│   ├── 📄 pipeline.sh
 │   ├── 📄 poem_en.txt
 │   ├── 📄 poem_pl.txt
+│   ├── 📄 translate.sh
 │   ├── 📄 vocab.json
 │   └── 📄 walkthrough.md
 ├── 📁 external
@@ -897,6 +909,29 @@ All notable changes to abersetz will be documented in this file.
 - Fixed pyproject.toml configuration for modern uv/hatch compatibility
 - Updated dependency group configuration to use standard [dependency-groups]
 - Fixed type annotations to use modern Python union syntax (|)
+
+## [0.1.1] - 2025-01-21
+
+### Changed
+- Renamed CLI main command from `translate` to `tr` for brevity
+- Added `abtr` console script as direct shorthand for `abersetz tr`
+- Improved CLI help output by instantiating the Fire class correctly
+- Reduced logging and rich output to minimum for cleaner interface
+- Simplified CLI output to just show destination files
+
+### Added
+- Version command (`abersetz version`) to display tool version
+- Language code validation with silent handling of non-standard codes
+
+### Fixed
+- Fixed Fire CLI to properly expose available commands in help output
+- Updated test suite to match renamed CLI command
+- Fixed deep-translator retry test by properly mocking the provider
+
+### Improved
+- Better error handling for malformed config files with automatic backup
+- Added retry mechanisms with tenacity for all translation engines
+- Created comprehensive integration tests with skip markers for CI
 
 ### Technical Details
 - Python 3.10+ support
@@ -2098,9 +2133,20 @@ this_file: TODO.md
 - [x] Run full pytest + coverage, record results in WORK.md and finalize cleanup.
 
 ## Quality Improvements
-- [ ] Improve error handling for malformed config files and missing API keys
-- [ ] Add retry mechanism for translators/deep-translator engines
-- [ ] Create integration tests for real translation engines (with skip markers for CI)
+- [x] Improve error handling for malformed config files and missing API keys
+- [x] Add retry mechanism for translators/deep-translator engines
+- [x] Create integration tests for real translation engines (with skip markers for CI)
+
+## Small-Scale Quality Enhancements
+- [x] Add input validation for language codes to prevent invalid language errors
+- [x] Add progress indicator for multi-file translations using rich.progress
+- [x] Add a `--version` flag to CLI that shows abersetz version
+- [x] Reduce logging and rich output to minimum for cleaner interface
+
+## Reliability & Robustness Improvements
+- [ ] Add input file validation to check existence and readability before translation
+- [ ] Add graceful handling of edge cases (empty files, very large files >10MB)
+- [ ] Add offline smoke test to verify installation without network access
 
 </document_content>
 </document>
@@ -2157,11 +2203,1275 @@ uvx hatch fmt;
 llms .;
 gitnextver .; 
 uvx hatch build;
-
+uv publish;
 </document_content>
 </document>
 
 <document index="22">
+<source>docs/_config.yml</source>
+<document_content>
+# Jekyll configuration for abersetz documentation
+# Using just-the-docs theme
+
+title: abersetz
+description: Minimalist file translator with pluggable engines
+baseurl: "/abersetz"
+url: "https://twardoch.github.io"
+
+# Theme configuration
+remote_theme: just-the-docs/just-the-docs@v0.7.0
+color_scheme: light
+
+# Enable search
+search_enabled: true
+search:
+  heading_level: 2
+  previews: 3
+  preview_words_before: 5
+  preview_words_after: 10
+  tokenizer_separator: /[\s/]+/
+  rel_url: true
+  button: false
+
+# Enable navigation
+nav_enabled: true
+nav_sort: case_sensitive
+
+# Footer
+footer_content: "Copyright &copy; 2025 Adam Twardoch. Distributed under the MIT License."
+last_edit_timestamp: true
+last_edit_time_format: "%b %e %Y at %I:%M %p"
+
+# Back to top link
+back_to_top: true
+back_to_top_text: "Back to top"
+
+# External links
+aux_links:
+  "GitHub":
+    - "https://github.com/twardoch/abersetz"
+  "PyPI":
+    - "https://pypi.org/project/abersetz"
+
+# Collections for organizing content
+collections:
+  docs:
+    permalink: "/:collection/:path/"
+    output: true
+
+just_the_docs:
+  collections:
+    docs:
+      name: Documentation
+      nav_exclude: false
+      search_exclude: false
+
+# Plugins
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Markdown settings
+markdown: kramdown
+kramdown:
+  syntax_highlighter_opts:
+    block:
+      line_numbers: false
+
+# Exclude files
+exclude:
+  - "*.py"
+  - "*.sh"
+  - "requirements.txt"
+  - "Gemfile"
+  - "Gemfile.lock"
+  - "node_modules/"
+  - "vendor/"
+</document_content>
+</document>
+
+<document index="23">
+<source>docs/cli.md</source>
+<document_content>
+---
+layout: default
+title: CLI Reference
+nav_order: 3
+---
+
+# CLI Reference
+{: .no_toc }
+
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
+
+## Overview
+
+Abersetz provides two command-line tools:
+
+- `abersetz`: Main CLI with subcommands
+- `abtr`: Direct translation shorthand
+
+## Main Commands
+
+### abersetz tr
+
+Translate files or directories.
+
+```bash
+abersetz tr PATH [OPTIONS]
+```
+
+#### Arguments
+
+- `PATH`: File or directory to translate (required)
+
+#### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--to-lang` | Target language code | `en` |
+| `--from-lang` | Source language code | `auto` |
+| `--engine` | Translation engine | `translators/google` |
+| `--output` | Output directory | `<lang>/<filename>` |
+| `--recurse/--no-recurse` | Process subdirectories | `True` |
+| `--overwrite` | Replace original files | `False` |
+| `--include` | File patterns to include | `*.txt,*.md,*.html` |
+| `--exclude` | File patterns to exclude | None |
+| `--chunk-size` | Characters per chunk | `1200` |
+| `--html-chunk-size` | Characters per HTML chunk | `1800` |
+| `--save-voc` | Save vocabulary JSON | `False` |
+| `--dry-run` | Preview without translating | `False` |
+| `--verbose` | Enable debug output | `False` |
+
+### abersetz config
+
+Manage configuration settings.
+
+```bash
+abersetz config COMMAND
+```
+
+#### Subcommands
+
+- `show`: Display current configuration
+- `path`: Show configuration file location
+
+### abersetz version
+
+Display version information.
+
+```bash
+abersetz version
+```
+
+## Shorthand Command
+
+### abtr
+
+Direct translation command equivalent to `abersetz tr`:
+
+```bash
+abtr PATH [OPTIONS]
+```
+
+All options from `abersetz tr` are available.
+
+## Usage Examples
+
+### Basic Translation
+
+Translate a single file:
+
+```bash
+abersetz tr document.txt --to-lang es
+```
+
+Translate to French using shorthand:
+
+```bash
+abtr document.txt --to-lang fr
+```
+
+### Directory Translation
+
+Translate all files in a directory:
+
+```bash
+abersetz tr ./docs --to-lang de --output ./docs_de
+```
+
+With specific patterns:
+
+```bash
+abtr ./project \
+  --include "*.md,*.txt" \
+  --exclude "*test*,.*" \
+  --to-lang ja
+```
+
+### Engine Selection
+
+Use different translation engines:
+
+```bash
+# Google Translate (free)
+abtr file.txt --to-lang pt --engine translators/google
+
+# Bing Translate (free)
+abtr file.txt --to-lang pt --engine translators/bing
+
+# DeepL
+abtr file.txt --to-lang pt --engine deep-translator/deepl
+
+# SiliconFlow LLM
+abtr file.txt --to-lang pt --engine hysf
+
+# Custom LLM profile
+abtr file.txt --to-lang pt --engine ullm/gpt4
+```
+
+### Advanced Options
+
+Overwrite original files:
+
+```bash
+abersetz tr backup.txt --to-lang es --overwrite
+```
+
+Save vocabulary for LLM engines:
+
+```bash
+abtr technical.md \
+  --to-lang de \
+  --engine ullm/default \
+  --save-voc
+```
+
+Dry run to preview:
+
+```bash
+abersetz tr large_project/ \
+  --to-lang fr \
+  --dry-run
+```
+
+Custom chunk sizes:
+
+```bash
+abtr document.html \
+  --to-lang zh-CN \
+  --html-chunk-size 3000
+```
+
+## Language Codes
+
+Common language codes supported:
+
+| Code | Language |
+|------|----------|
+| `en` | English |
+| `es` | Spanish |
+| `fr` | French |
+| `de` | German |
+| `it` | Italian |
+| `pt` | Portuguese |
+| `ru` | Russian |
+| `ja` | Japanese |
+| `ko` | Korean |
+| `zh-CN` | Chinese (Simplified) |
+| `zh-TW` | Chinese (Traditional) |
+| `ar` | Arabic |
+| `hi` | Hindi |
+| `auto` | Auto-detect (source only) |
+
+## Pattern Matching
+
+Include/exclude patterns support wildcards:
+
+- `*.txt` - All .txt files
+- `doc*` - Files starting with "doc"
+- `*test*` - Files containing "test"
+- `.*` - Hidden files
+- `*.{md,txt}` - Multiple extensions
+
+## Environment Variables
+
+Set default behaviors with environment variables:
+
+```bash
+# Default target language
+export ABERSETZ_TO_LANG=es
+
+# Default engine
+export ABERSETZ_ENGINE=translators/bing
+
+# API keys for LLM engines
+export OPENAI_API_KEY=sk-...
+export SILICONFLOW_API_KEY=sk-...
+```
+
+## Output Format
+
+Translation results are printed as file paths:
+
+```
+/path/to/output/file1.txt
+/path/to/output/file2.txt
+```
+
+Use `--verbose` for detailed progress:
+
+```bash
+abersetz tr docs/ --to-lang fr --verbose
+```
+
+## Error Handling
+
+Common errors and solutions:
+
+### Missing API key
+
+```
+Error: Missing API key for engine
+```
+
+Solution: Export the required environment variable:
+
+```bash
+export SILICONFLOW_API_KEY="your-key"
+```
+
+### No files matched
+
+```
+Error: No files matched under /path
+```
+
+Solution: Check your include patterns:
+
+```bash
+abtr . --include "*.md,*.txt"
+```
+
+### Network error
+
+```
+Error: Network error - Connection timeout
+```
+
+Solution: The tool automatically retries. Check your internet connection.
+
+## Tips and Tricks
+
+### Batch translation
+
+Create a script for multiple languages:
+
+```bash
+for lang in es fr de ja; do
+  abersetz tr docs/ --to-lang $lang --output docs_$lang
+done
+```
+
+### Parallel processing
+
+Use GNU parallel for speed:
+
+```bash
+find . -name "*.txt" | parallel -j4 abtr {} --to-lang es
+```
+
+### Progress tracking
+
+For large projects, use verbose mode:
+
+```bash
+abersetz tr large_project/ --to-lang fr --verbose 2>&1 | tee translation.log
+```
+
+### Testing configuration
+
+Always test with dry-run first:
+
+```bash
+abersetz tr important_docs/ --to-lang de --dry-run
+```
+
+## See Also
+
+- [Configuration Guide](configuration/)
+- [Python API Reference](api/)
+- [Translation Engines](engines/)
+</document_content>
+</document>
+
+<document index="24">
+<source>docs/index.md</source>
+<document_content>
+---
+layout: home
+title: Home
+nav_order: 1
+description: "Abersetz is a minimalist file translator that reuses proven machine translation engines"
+permalink: /
+---
+
+# abersetz
+{: .fs-9 }
+
+Minimalist file translator with pluggable engines
+{: .fs-6 .fw-300 }
+
+[Get started](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+[View on GitHub](https://github.com/twardoch/abersetz){: .btn .fs-5 .mb-4 .mb-md-0 }
+
+---
+
+## Why abersetz?
+
+- **File-focused**: Designed for translating documents, not single strings
+- **Multiple engines**: Supports free and paid translation services
+- **Vocabulary consistency**: LLM engines maintain terminology across chunks
+- **Simple CLI**: Clean interface with minimal output
+- **Python API**: Full programmatic access for automation
+
+## Features
+
+- 🔄 **Multiple translation engines**
+  - Free: Google, Bing via `translators` and `deep-translator`
+  - LLM: OpenAI, Anthropic, SiliconFlow, and 20+ providers
+  - Custom endpoints for self-hosted models
+
+- 📁 **Smart file handling**
+  - Recursive directory translation
+  - Pattern matching with include/exclude
+  - HTML markup preservation
+  - Automatic format detection
+
+- 🧩 **Intelligent chunking**
+  - Semantic text splitting
+  - Configurable chunk sizes per engine
+  - Context preservation across chunks
+
+- 📚 **Vocabulary management**
+  - JSON vocabulary propagation
+  - Consistent terminology in long documents
+  - Optional vocabulary export
+
+## Getting Started
+
+### Installation
+
+```bash
+pip install abersetz
+```
+
+### Quick Start
+
+Translate a single file:
+```bash
+abersetz tr document.txt --to-lang es
+```
+
+Or use the shorthand:
+```bash
+abtr document.txt --to-lang es
+```
+
+Translate a directory:
+```bash
+abersetz tr ./docs --to-lang fr --output ./docs_fr
+```
+
+### Configuration
+
+Abersetz stores configuration in your user directory:
+
+```bash
+abersetz config path  # Show config location
+abersetz config show  # Display current settings
+```
+
+## Example Usage
+
+### CLI Examples
+
+```bash
+# Translate with specific engine
+abtr file.txt --to-lang de --engine translators/google
+
+# Translate markdown files only
+abtr . --include "*.md" --to-lang ja --output ./ja
+
+# Dry run to preview
+abersetz tr project/ --to-lang zh-CN --dry-run
+
+# Use LLM with vocabulary
+export SILICONFLOW_API_KEY="your-key"
+abtr technical.md --to-lang es --engine hysf --save-voc
+```
+
+### Python API
+
+```python
+from abersetz import translate_path, TranslatorOptions
+
+# Simple translation
+results = translate_path(
+    "document.txt",
+    TranslatorOptions(
+        to_lang="fr",
+        engine="translators/google"
+    )
+)
+
+# Batch with patterns
+results = translate_path(
+    "docs/",
+    TranslatorOptions(
+        to_lang="de",
+        include=("*.md", "*.txt"),
+        output_dir="docs_de/"
+    )
+)
+```
+
+## Documentation
+
+- [Installation Guide](installation/)
+- [CLI Reference](cli/)
+- [Python API](api/)
+- [Configuration](configuration/)
+- [Translation Engines](engines/)
+- [Examples](examples/)
+
+## License
+
+MIT License - see [LICENSE](https://github.com/twardoch/abersetz/blob/main/LICENSE) for details.
+</document_content>
+</document>
+
+<document index="25">
+<source>docs/installation.md</source>
+<document_content>
+---
+layout: default
+title: Installation
+nav_order: 2
+---
+
+# Installation
+{: .no_toc }
+
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
+
+## Requirements
+
+- Python 3.10 or higher
+- pip or uv package manager
+
+## Installing with pip
+
+The simplest way to install abersetz:
+
+```bash
+pip install abersetz
+```
+
+## Installing with uv
+
+If you use the modern uv package manager:
+
+```bash
+uv pip install abersetz
+```
+
+## Installing from source
+
+To install the latest development version:
+
+```bash
+git clone https://github.com/twardoch/abersetz.git
+cd abersetz
+pip install -e .
+```
+
+## Verifying installation
+
+After installation, verify abersetz is working:
+
+```bash
+# Check version
+abersetz version
+
+# Show help
+abersetz --help
+
+# Test with dry run
+echo "Hello world" > test.txt
+abersetz tr test.txt --to-lang es --dry-run
+```
+
+## Dependencies
+
+Abersetz automatically installs these dependencies:
+
+### Core dependencies
+- **translators** (>=5.9): Multiple free translation APIs
+- **deep-translator** (>=1.11): Alternative translation providers
+- **openai** (>=1.51): LLM-based translation engines
+- **tenacity** (>=8.4): Retry logic for API calls
+
+### Utility dependencies
+- **fire** (>=0.5): CLI interface generation
+- **rich** (>=13.9): Terminal formatting
+- **loguru** (>=0.7): Structured logging
+- **platformdirs** (>=4.3): Cross-platform config paths
+- **semantic-text-splitter** (>=0.7): Intelligent text chunking
+
+## Optional: Setting up API keys
+
+For LLM-based translation engines, you'll need API keys:
+
+```bash
+# OpenAI GPT models
+export OPENAI_API_KEY="sk-..."
+
+# Anthropic Claude models
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# SiliconFlow (Hunyuan translator)
+export SILICONFLOW_API_KEY="sk-..."
+
+# Google Gemini
+export GOOGLE_API_KEY="..."
+
+# Add to your shell profile to persist
+echo 'export OPENAI_API_KEY="sk-..."' >> ~/.bashrc
+```
+
+## Shell completion (optional)
+
+Enable tab completion for bash:
+
+```bash
+# Generate completion script
+python -c "import fire; fire.Fire()" -- --completion > ~/.abersetz-completion.bash
+
+# Add to bashrc
+echo "source ~/.abersetz-completion.bash" >> ~/.bashrc
+
+# Reload shell
+source ~/.bashrc
+```
+
+## Docker installation (alternative)
+
+Run abersetz in a container:
+
+```dockerfile
+FROM python:3.12-slim
+
+RUN pip install abersetz
+
+WORKDIR /data
+
+ENTRYPOINT ["abersetz"]
+```
+
+Build and use:
+
+```bash
+docker build -t abersetz .
+docker run -v $(pwd):/data abersetz tr /data/file.txt --to-lang es
+```
+
+## Troubleshooting
+
+### Command not found
+
+If `abersetz` command is not found after installation:
+
+1. Check pip installed it to PATH:
+   ```bash
+   pip show -f abersetz | grep Location
+   ```
+
+2. Ensure scripts directory is in PATH:
+   ```bash
+   export PATH="$HOME/.local/bin:$PATH"
+   ```
+
+### Permission denied
+
+On Linux/Mac, you may need to add execute permissions:
+
+```bash
+chmod +x ~/.local/bin/abersetz
+chmod +x ~/.local/bin/abtr
+```
+
+### SSL certificate errors
+
+If you encounter SSL errors with API calls:
+
+```bash
+# Update certificates
+pip install --upgrade certifi
+
+# Or disable SSL verification (not recommended)
+export CURL_CA_BUNDLE=""
+```
+
+## Next steps
+
+- [Configure abersetz](configuration/)
+- [Learn CLI commands](cli/)
+- [Explore examples](examples/)
+</document_content>
+</document>
+
+# File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/examples/advanced_api.py
+# Language: python
+
+import asyncio
+import json
+from pathlib import Path
+from abersetz import TranslationResult, TranslatorOptions, translate_path
+from abersetz.config import AbersetzConfig, load_config
+from abersetz.engines import EngineRequest, create_engine
+import sys
+
+class TranslationWorkflow:
+    """Advanced translation workflow with progress tracking."""
+    def __init__((self, config: AbersetzConfig = None)):
+    def translate_project((
+        self, source_dir: str, target_langs: list[str], engine: str = "translators/google"
+    )):
+        """Translate entire project to multiple languages."""
+    def generate_report((self, output_file: str = "translation_report.json")):
+        """Generate detailed translation report."""
+
+class VocabularyManager:
+    """Manage translation vocabularies across projects."""
+    def __init__((self)):
+    def load_vocabulary((self, file_path: str, lang_pair: str)):
+        """Load vocabulary from JSON file."""
+    def merge_vocabularies((self, *lang_pairs: str)) -> dict[str, str]:
+        """Merge multiple vocabularies."""
+    def translate_with_consistency((
+        self, files: list[str], to_lang: str, base_vocabulary: dict[str, str] = None
+    )):
+        """Translate files with consistent terminology."""
+
+class ParallelTranslator:
+    """Translate using multiple engines in parallel for comparison."""
+    def translate_with_engine((self, text: str, engine_name: str, to_lang: str)):
+        """Async translation with a specific engine."""
+    def compare_translations((self, text: str, engines: list[str], to_lang: str)):
+        """Compare translations from multiple engines."""
+
+class IncrementalTranslator:
+    def __init__((self, checkpoint_file: str = ".translation_checkpoint.json")):
+    def load_checkpoint((self)) -> set:
+    def save_checkpoint((self)):
+    def translate_incrementally((self, source_dir: str, to_lang: str)):
+
+def __init__((self, config: AbersetzConfig = None)):
+
+def translate_project((
+        self, source_dir: str, target_langs: list[str], engine: str = "translators/google"
+    )):
+    """Translate entire project to multiple languages."""
+
+def generate_report((self, output_file: str = "translation_report.json")):
+    """Generate detailed translation report."""
+
+def __init__((self)):
+
+def load_vocabulary((self, file_path: str, lang_pair: str)):
+    """Load vocabulary from JSON file."""
+
+def merge_vocabularies((self, *lang_pairs: str)) -> dict[str, str]:
+    """Merge multiple vocabularies."""
+
+def translate_with_consistency((
+        self, files: list[str], to_lang: str, base_vocabulary: dict[str, str] = None
+    )):
+    """Translate files with consistent terminology."""
+
+def translate_with_engine((self, text: str, engine_name: str, to_lang: str)):
+    """Async translation with a specific engine."""
+
+def compare_translations((self, text: str, engines: list[str], to_lang: str)):
+    """Compare translations from multiple engines."""
+
+def example_multi_language(()):
+    """Translate documentation to multiple languages."""
+
+def example_vocabulary_consistency(()):
+    """Maintain consistent terminology across documents."""
+
+def example_parallel_comparison(()):
+    """Compare translations from different engines."""
+
+def example_incremental_translation(()):
+    """Translate large projects incrementally."""
+
+def __init__((self, checkpoint_file: str = ".translation_checkpoint.json")):
+
+def load_checkpoint((self)) -> set:
+
+def save_checkpoint((self)):
+
+def translate_incrementally((self, source_dir: str, to_lang: str)):
+
+
+# File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/examples/basic_api.py
+# Language: python
+
+from pathlib import Path
+from abersetz import TranslatorOptions, translate_path
+from abersetz.config import load_config, save_config
+from abersetz.config import Credential, EngineConfig
+import sys
+
+def example_simple(()):
+    """Translate a single file with default settings."""
+
+def example_batch(()):
+    """Translate multiple files to a specific directory."""
+
+def example_llm_with_vocabulary(()):
+    """Use LLM translation with custom vocabulary."""
+
+def example_dry_run(()):
+    """Test translation without actually calling APIs."""
+
+def example_html(()):
+    """Translate HTML files while preserving markup."""
+
+def example_with_config(()):
+    """Use custom configuration for translation."""
+
+
+<document index="26">
+<source>examples/batch_translate.sh</source>
+<document_content>
+#!/bin/bash
+# this_file: examples/batch_translate.sh
+
+# Advanced batch translation scripts
+
+set -e  # Exit on error
+
+# Configuration
+PROJECT_ROOT="${1:-./docs}"
+OUTPUT_BASE="${2:-./translations}"
+LANGUAGES=("es" "fr" "de" "ja" "zh-CN" "pt" "it" "ru")
+ENGINE="${ABERSETZ_ENGINE:-translators/google}"
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+echo -e "${BLUE}=== Abersetz Batch Translation ===${NC}"
+echo "Source: $PROJECT_ROOT"
+echo "Output: $OUTPUT_BASE"
+echo "Engine: $ENGINE"
+echo ""
+
+# Function to translate to a single language
+translate_lang() {
+    local lang=$1
+    local output_dir="$OUTPUT_BASE/$lang"
+
+    echo -e "${BLUE}Translating to $lang...${NC}"
+
+    if abersetz tr "$PROJECT_ROOT" \
+        --to-lang "$lang" \
+        --engine "$ENGINE" \
+        --output "$output_dir" \
+        --recurse \
+        --include "*.md,*.txt,*.html" \
+        --exclude ".*,*test*,*draft*"; then
+        echo -e "${GREEN}✓ $lang completed${NC}"
+        return 0
+    else
+        echo -e "${RED}✗ $lang failed${NC}"
+        return 1
+    fi
+}
+
+# Create output directory
+mkdir -p "$OUTPUT_BASE"
+
+# Track results
+SUCCESS_COUNT=0
+FAILED_LANGS=()
+
+# Translate to each language
+for lang in "${LANGUAGES[@]}"; do
+    if translate_lang "$lang"; then
+        ((SUCCESS_COUNT++))
+    else
+        FAILED_LANGS+=("$lang")
+    fi
+    echo ""
+done
+
+# Summary
+echo -e "${BLUE}=== Translation Summary ===${NC}"
+echo "Successfully translated to $SUCCESS_COUNT/${#LANGUAGES[@]} languages"
+
+if [ ${#FAILED_LANGS[@]} -gt 0 ]; then
+    echo -e "${RED}Failed languages: ${FAILED_LANGS[*]}${NC}"
+    exit 1
+else
+    echo -e "${GREEN}All translations completed successfully!${NC}"
+fi
+
+# Generate index file
+INDEX_FILE="$OUTPUT_BASE/index.md"
+echo "# Translations" > "$INDEX_FILE"
+echo "" >> "$INDEX_FILE"
+echo "Available translations of $PROJECT_ROOT:" >> "$INDEX_FILE"
+echo "" >> "$INDEX_FILE"
+
+for lang in "${LANGUAGES[@]}"; do
+    if [ -d "$OUTPUT_BASE/$lang" ]; then
+        file_count=$(find "$OUTPUT_BASE/$lang" -type f | wc -l)
+        echo "- [$lang]($lang/) - $file_count files" >> "$INDEX_FILE"
+    fi
+done
+
+echo -e "${GREEN}Index generated at $INDEX_FILE${NC}"
+</document_content>
+</document>
+
+<document index="27">
+<source>examples/config_setup.sh</source>
+<document_content>
+#!/bin/bash
+# this_file: examples/config_setup.sh
+
+# Setup and configure abersetz with various engines
+
+set -e
+
+echo "=== Abersetz Configuration Setup ==="
+echo ""
+
+# Function to check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to setup environment variable
+setup_env_var() {
+    local var_name=$1
+    local var_description=$2
+
+    if [ -z "${!var_name:-}" ]; then
+        echo "⚠ $var_name not set"
+        echo "  Description: $var_description"
+        echo "  To set: export $var_name='your_api_key_here'"
+        return 1
+    else
+        echo "✓ $var_name is configured"
+        return 0
+    fi
+}
+
+# Check abersetz installation
+echo "Checking installation..."
+if command_exists abersetz; then
+    echo "✓ abersetz is installed"
+    abersetz version
+else
+    echo "✗ abersetz not found. Install with: pip install abersetz"
+    exit 1
+fi
+
+echo ""
+
+# Show config location
+echo "Configuration location:"
+abersetz config path
+echo ""
+
+# Check API keys for various engines
+echo "Checking API keys for LLM engines:"
+echo ""
+
+setup_env_var "OPENAI_API_KEY" "OpenAI API for GPT models"
+setup_env_var "ANTHROPIC_API_KEY" "Anthropic API for Claude models"
+setup_env_var "SILICONFLOW_API_KEY" "SiliconFlow API for Hunyuan translation"
+setup_env_var "DEEPSEEK_API_KEY" "DeepSeek API for Chinese models"
+setup_env_var "GROQ_API_KEY" "Groq API for fast inference"
+setup_env_var "GOOGLE_API_KEY" "Google API for Gemini models"
+
+echo ""
+
+# Test available engines
+echo "Testing available engines:"
+echo ""
+
+# Test free engines (no API key required)
+echo "1. Testing free engines..."
+for engine in "translators/google" "translators/bing" "deep-translator/google"; do
+    echo -n "  $engine: "
+    if echo "Hello" | abtr - --to-lang es --engine "$engine" --dry-run >/dev/null 2>&1; then
+        echo "✓"
+    else
+        echo "✗"
+    fi
+done
+
+echo ""
+
+# Create sample configuration
+CONFIG_FILE="$HOME/.config/abersetz/config.json"
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "Creating default configuration..."
+    mkdir -p "$(dirname "$CONFIG_FILE")"
+    cat > "$CONFIG_FILE" <<'EOF'
+{
+  "defaults": {
+    "engine": "translators/google",
+    "from_lang": "auto",
+    "to_lang": "en",
+    "chunk_size": 1200,
+    "html_chunk_size": 1800
+  },
+  "credentials": {
+    "openai": {"env": "OPENAI_API_KEY"},
+    "anthropic": {"env": "ANTHROPIC_API_KEY"},
+    "siliconflow": {"env": "SILICONFLOW_API_KEY"},
+    "deepseek": {"env": "DEEPSEEK_API_KEY"},
+    "groq": {"env": "GROQ_API_KEY"},
+    "google": {"env": "GOOGLE_API_KEY"}
+  },
+  "engines": {
+    "hysf": {
+      "chunk_size": 2400,
+      "credential": {"name": "siliconflow"},
+      "options": {
+        "model": "tencent/Hunyuan-MT-7B",
+        "base_url": "https://api.siliconflow.com/v1",
+        "temperature": 0.3
+      }
+    },
+    "ullm": {
+      "chunk_size": 2400,
+      "options": {
+        "profiles": {
+          "default": {
+            "base_url": "https://api.siliconflow.com/v1",
+            "model": "tencent/Hunyuan-MT-7B",
+            "credential": {"name": "siliconflow"},
+            "temperature": 0.3,
+            "max_input_tokens": 32000
+          },
+          "gpt4": {
+            "base_url": "https://api.openai.com/v1",
+            "model": "gpt-4-turbo-preview",
+            "credential": {"name": "openai"},
+            "temperature": 0.3,
+            "max_input_tokens": 128000
+          },
+          "claude": {
+            "base_url": "https://api.anthropic.com/v1",
+            "model": "claude-3-opus-20240229",
+            "credential": {"name": "anthropic"},
+            "temperature": 0.3,
+            "max_input_tokens": 200000
+          },
+          "deepseek": {
+            "base_url": "https://api.deepseek.com/v1",
+            "model": "deepseek-chat",
+            "credential": {"name": "deepseek"},
+            "temperature": 0.3,
+            "max_input_tokens": 32000
+          }
+        }
+      }
+    }
+  }
+}
+EOF
+    echo "✓ Configuration created at $CONFIG_FILE"
+else
+    echo "Configuration already exists at $CONFIG_FILE"
+fi
+
+echo ""
+
+# Show current configuration
+echo "Current configuration:"
+abersetz config show | head -20
+echo "..."
+
+echo ""
+echo "=== Setup Complete ==="
+echo ""
+echo "Quick test commands:"
+echo "  abersetz tr test.txt --to-lang es                    # Use default engine"
+echo "  abtr test.txt --to-lang fr --engine translators/bing # Use Bing"
+echo "  abtr test.txt --to-lang de --engine hysf             # Use SiliconFlow LLM"
+echo "  abtr test.txt --to-lang ja --engine ullm/gpt4        # Use GPT-4"
+</document_content>
+</document>
+
+<document index="28">
+<source>examples/engines_config.json</source>
+<document_content>
+{
+  "defaults": {
+    "engine": "translators/google",
+    "from_lang": "auto",
+    "to_lang": "en",
+... (file content truncated to first 5 lines)
+</document_content>
+</document>
+
+<document index="29">
+<source>examples/pipeline.sh</source>
+<document_content>
+#!/bin/bash
+# this_file: examples/pipeline.sh
+
+# Complete translation pipeline with preprocessing and postprocessing
+
+set -euo pipefail
+
+# Configuration
+SOURCE_DIR="${1:-.}"
+TARGET_LANG="${2:-es}"
+WORK_DIR="/tmp/abersetz_work_$$"
+FINAL_OUTPUT="${3:-./translated_$TARGET_LANG}"
+
+# Setup work directory
+mkdir -p "$WORK_DIR"
+trap "rm -rf $WORK_DIR" EXIT
+
+echo "=== Abersetz Translation Pipeline ==="
+echo "Source: $SOURCE_DIR"
+echo "Target language: $TARGET_LANG"
+echo "Output: $FINAL_OUTPUT"
+echo ""
+
+# Step 1: Find and copy translatable files
+echo "Step 1: Collecting files..."
+find "$SOURCE_DIR" -type f \( \
+    -name "*.md" -o \
+    -name "*.txt" -o \
+    -name "*.html" -o \
+    -name "*.htm" \
+\) -not -path "*/\.*" -not -path "*/node_modules/*" \
+   -not -path "*/venv/*" -not -path "*/__pycache__/*" | while read -r file; do
+    rel_path="${file#$SOURCE_DIR/}"
+    dest="$WORK_DIR/source/$rel_path"
+    mkdir -p "$(dirname "$dest")"
+    cp "$file" "$dest"
+done
+
+FILE_COUNT=$(find "$WORK_DIR/source" -type f 2>/dev/null | wc -l || echo 0)
+echo "  Found $FILE_COUNT files"
+
+if [ "$FILE_COUNT" -eq 0 ]; then
+    echo "No files to translate!"
+    exit 1
+fi
+
+# Step 2: Preprocess files (optional)
+echo -e "\nStep 2: Preprocessing..."
+# Example: Convert markdown links to absolute URLs
+# find "$WORK_DIR/source" -name "*.md" -exec sed -i.bak 's|\](./|\](https://example.com/|g' {} \;
+echo "  Preprocessing complete"
+
+# Step 3: Translate
+echo -e "\nStep 3: Translating..."
+if abersetz tr "$WORK_DIR/source" \
+    --to-lang "$TARGET_LANG" \
+    --output "$WORK_DIR/translated" \
+    --recurse; then
+    echo "  Translation complete"
+else
+    echo "  Translation failed!"
+    exit 1
+fi
+
+# Step 4: Postprocess translations
+echo -e "\nStep 4: Postprocessing..."
+# Example: Fix common translation issues
+find "$WORK_DIR/translated" -type f -name "*.md" | while read -r file; do
+    # Fix code blocks that might have been translated
+    sed -i.bak 's/```[a-z]*$/```/g' "$file"
+    # Remove backup files
+    rm -f "${file}.bak"
+done
+echo "  Postprocessing complete"
+
+# Step 5: Generate translation report
+echo -e "\nStep 5: Generating report..."
+REPORT_FILE="$WORK_DIR/translated/TRANSLATION_REPORT.md"
+cat > "$REPORT_FILE" <<EOF
+# Translation Report
+
+## Summary
+- **Source Directory**: $SOURCE_DIR
+- **Target Language**: $TARGET_LANG
+- **Date**: $(date)
+- **Files Translated**: $FILE_COUNT
+
+## File List
+EOF
+
+find "$WORK_DIR/translated" -type f -not -name "TRANSLATION_REPORT.md" | while read -r file; do
+    rel_path="${file#$WORK_DIR/translated/}"
+    size=$(wc -c < "$file")
+    echo "- $rel_path ($(numfmt --to=iec-i --suffix=B $size))" >> "$REPORT_FILE"
+done
+
+echo "  Report generated"
+
+# Step 6: Copy to final destination
+echo -e "\nStep 6: Copying to final destination..."
+rm -rf "$FINAL_OUTPUT"
+cp -r "$WORK_DIR/translated" "$FINAL_OUTPUT"
+echo "  Files copied to $FINAL_OUTPUT"
+
+# Step 7: Verification
+echo -e "\nStep 7: Verification..."
+TRANSLATED_COUNT=$(find "$FINAL_OUTPUT" -type f -not -name "TRANSLATION_REPORT.md" | wc -l)
+if [ "$TRANSLATED_COUNT" -eq "$FILE_COUNT" ]; then
+    echo "  ✓ All files translated successfully"
+else
+    echo "  ⚠ Warning: Expected $FILE_COUNT files, found $TRANSLATED_COUNT"
+fi
+
+echo -e "\n=== Pipeline Complete ==="
+echo "Translated files are in: $FINAL_OUTPUT"
+echo "Report available at: $FINAL_OUTPUT/TRANSLATION_REPORT.md"
+</document_content>
+</document>
+
+<document index="30">
 <source>examples/poem_en.txt</source>
 <document_content>
 # this_file: examples/poem_en.txt
@@ -2174,7 +3484,7 @@ And hope feels like a gift.
 </document_content>
 </document>
 
-<document index="23">
+<document index="31">
 <source>examples/poem_pl.txt</source>
 <document_content>
 # this_file: examples/poem_pl.txt
@@ -2187,7 +3497,65 @@ A nadzieja znów czuje się jak dar.
 </document_content>
 </document>
 
-<document index="24">
+<document index="32">
+<source>examples/translate.sh</source>
+<document_content>
+#!/bin/bash
+# this_file: examples/translate.sh
+
+# Basic shell script examples for abersetz CLI
+
+# Example 1: Simple translation
+echo "=== Example 1: Simple translation ==="
+abersetz tr poem_en.txt --to-lang es --engine translators/google
+
+# Example 2: Using shorthand command
+echo -e "\n=== Example 2: Shorthand command ==="
+abtr poem_en.txt --to-lang fr
+
+# Example 3: Translate directory recursively
+echo -e "\n=== Example 3: Directory translation ==="
+abersetz tr ./docs --to-lang de --recurse --output ./docs_de
+
+# Example 4: Translate with specific patterns
+echo -e "\n=== Example 4: Pattern matching ==="
+abtr . --include "*.md,*.txt" --exclude "*test*,.*" --to-lang ja --output ./translations/ja
+
+# Example 5: Overwrite original files (be careful!)
+echo -e "\n=== Example 5: In-place translation ==="
+# abersetz tr backup_first.txt --to-lang es --overwrite
+
+# Example 6: Dry run to test without translating
+echo -e "\n=== Example 6: Dry run mode ==="
+abersetz tr ./project --to-lang zh-CN --dry-run
+
+# Example 7: Using different engines
+echo -e "\n=== Example 7: Different engines ==="
+# Google Translate
+abtr file.txt --to-lang pt --engine translators/google
+
+# Bing Translate
+abtr file.txt --to-lang pt --engine translators/bing
+
+# DeepL via deep-translator
+abtr file.txt --to-lang pt --engine deep-translator/deepl
+
+# Example 8: Save vocabulary for LLM engines
+echo -e "\n=== Example 8: LLM with vocabulary ==="
+# Requires SILICONFLOW_API_KEY environment variable
+# abersetz tr technical.md --to-lang es --engine hysf --save-voc
+
+# Example 9: Verbose mode for debugging
+echo -e "\n=== Example 9: Verbose output ==="
+abersetz tr test.txt --to-lang fr --verbose --dry-run
+
+# Example 10: Check version
+echo -e "\n=== Example 10: Version check ==="
+abersetz version
+</document_content>
+</document>
+
+<document index="33">
 <source>examples/vocab.json</source>
 <document_content>
 {
@@ -2199,7 +3567,7 @@ A nadzieja znów czuje się jak dar.
 </document_content>
 </document>
 
-<document index="25">
+<document index="34">
 <source>examples/walkthrough.md</source>
 <document_content>
 ---
@@ -2221,7 +3589,7 @@ The command writes the translated poem to `examples/out/poem_en.txt` and saves t
 </document_content>
 </document>
 
-<document index="26">
+<document index="35">
 <source>issues/102-review.md</source>
 <document_content>
 ---
@@ -2295,7 +3663,7 @@ The `abersetz` project is a high-quality codebase that meets all the requirement
 </document_content>
 </document>
 
-<document index="27">
+<document index="36">
 <source>issues/103.txt</source>
 <document_content>
 The CLI tool is absurd: 
@@ -2326,7 +3694,7 @@ Then /report and then finally /work on the tasks!
 </document_content>
 </document>
 
-<document index="28">
+<document index="37">
 <source>package.toml</source>
 <document_content>
 # Package configuration
@@ -2343,7 +3711,7 @@ github_actions = true   # Add GitHub Actions workflows
 </document_content>
 </document>
 
-<document index="29">
+<document index="38">
 <source>pyproject.toml</source>
 <document_content>
 # this_file: pyproject.toml
@@ -2495,9 +3863,9 @@ from pathlib import Path
 import fire
 from loguru import logger
 from rich.console import Console
-from rich.table import Table
 from .config import config_path, load_config
 from .pipeline import PipelineError, TranslationResult, TranslatorOptions, translate_path
+from . import __version__
 
 class ConfigCommands:
     """Configuration related helpers."""
@@ -2506,6 +3874,8 @@ class ConfigCommands:
 
 class AbersetzCLI:
     """Abersetz translation tool - translate files between languages."""
+    def version((self)) -> str:
+        """Show version information."""
     def tr((
         self,
         path: str,
@@ -2525,7 +3895,7 @@ class AbersetzCLI:
         prolog: str | None = None,
         vocabulary: str | None = None,
         verbose: bool = False,
-    )) -> list[str]:
+    )) -> None:
     def config((self)) -> ConfigCommands:
 
 def _configure_logging((verbose: bool)) -> None:
@@ -2539,6 +3909,9 @@ def _render_results((results: Iterable[TranslationResult])) -> None:
 def show((self)) -> dict[str, object]:
 
 def path((self)) -> str:
+
+def _validate_language_code((code: str | None, param_name: str)) -> str | None:
+    """Validate language code format."""
 
 def _build_options_from_cli((
     path: str | Path,
@@ -2559,6 +3932,9 @@ def _build_options_from_cli((
     vocabulary: str | None,
 )) -> TranslatorOptions:
 
+def version((self)) -> str:
+    """Show version information."""
+
 def tr((
         self,
         path: str,
@@ -2578,7 +3954,7 @@ def tr((
         prolog: str | None = None,
         vocabulary: str | None = None,
         verbose: bool = False,
-    )) -> list[str]:
+    )) -> None:
 
 def config((self)) -> ConfigCommands:
 
@@ -2592,6 +3968,7 @@ def abtr_main(()) -> None:
 # File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/src/abersetz/config.py
 # Language: python
 
+import copy
 import json
 import os
 from collections.abc import Mapping
@@ -2599,6 +3976,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 from platformdirs import user_config_dir
+import tomllib
+import tomli as tomllib
+import tomli_w
 from loguru import logger
 from loguru import logger
 
@@ -2650,7 +4030,7 @@ def load_config(()) -> AbersetzConfig:
     """Load configuration from disk, creating defaults if needed."""
 
 def save_config((config: AbersetzConfig)) -> None:
-    """Persist configuration to ``config.json``."""
+    """Persist configuration to ``config.toml``."""
 
 def resolve_credential((
     config: AbersetzConfig,
@@ -2824,7 +4204,6 @@ import json
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
-from loguru import logger
 from .chunking import TextFormat, chunk_text, detect_format
 from .config import AbersetzConfig, load_config
 from .engines import Engine, EngineRequest, EngineResult, create_engine
@@ -2967,6 +4346,7 @@ from types import SimpleNamespace
 import pytest
 import abersetz.config as config_module
 from abersetz.engines import EngineRequest, create_engine
+from abersetz.engines import DeepTranslatorEngine
 
 class DummyClient:
     """Simple stub mimicking OpenAI chat completions."""
@@ -3031,6 +4411,12 @@ def test_translate_file_api((tmp_path)) -> None:
 
 def test_html_translation(()) -> None:
     """Test HTML content translation preserves markup."""
+
+def test_translators_bing_real(()) -> None:
+    """Test Bing Translate via translators library (requires network)."""
+
+def test_batch_translation_with_vocabulary(()) -> None:
+    """Test translating multiple chunks with vocabulary propagation."""
 
 def test_retry_on_network_failure(()) -> None:
     """Test that retry mechanism works for real network issues."""

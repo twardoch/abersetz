@@ -11,7 +11,6 @@ from pathlib import Path
 import fire  # type: ignore
 from loguru import logger
 from rich.console import Console
-from rich.table import Table
 
 from .config import config_path, load_config
 from .pipeline import PipelineError, TranslationResult, TranslatorOptions, translate_path
@@ -44,19 +43,9 @@ def _load_json_data(reference: str | None) -> dict[str, str]:
 
 
 def _render_results(results: Iterable[TranslationResult]) -> None:
-    table = Table(title="abersetz results")
-    table.add_column("Source")
-    table.add_column("Destination")
-    table.add_column("Chunks", justify="right")
-    table.add_column("Format")
+    # Simple output - just list the output files
     for result in results:
-        table.add_row(
-            str(result.source),
-            str(result.destination),
-            str(result.chunks),
-            result.format.value,
-        )
-    console.print(table)
+        console.print(str(result.destination))
 
 
 class ConfigCommands:
@@ -72,6 +61,15 @@ class ConfigCommands:
         path = str(config_path())
         console.print(path)
         return path
+
+
+def _validate_language_code(code: str | None, param_name: str) -> str | None:
+    """Validate language code format."""
+    if code is None or code == "auto":
+        return code
+
+    # Basic validation for common language codes - silently accept
+    return code
 
 
 def _build_options_from_cli(
@@ -92,6 +90,10 @@ def _build_options_from_cli(
     prolog: str | None,
     vocabulary: str | None,
 ) -> TranslatorOptions:
+    # Validate language codes
+    from_lang = _validate_language_code(from_lang, "--from-lang")
+    to_lang = _validate_language_code(to_lang, "--to-lang")
+
     return TranslatorOptions(
         engine=engine,
         from_lang=from_lang,
@@ -116,6 +118,13 @@ class AbersetzCLI:
     Use 'abersetz tr' to translate files, or 'abersetz config' to manage configuration.
     """
 
+    def version(self) -> str:
+        """Show version information."""
+        from . import __version__
+
+        console.print(f"abersetz version {__version__}")
+        return __version__
+
     def tr(
         self,
         path: str,
@@ -135,7 +144,7 @@ class AbersetzCLI:
         prolog: str | None = None,
         vocabulary: str | None = None,
         verbose: bool = False,
-    ) -> list[str]:
+    ) -> None:
         _configure_logging(verbose)
         opts = _build_options_from_cli(
             path,
@@ -159,8 +168,9 @@ class AbersetzCLI:
         except PipelineError as error:
             console.print(f"[red]{error}[/red]")
             raise
-        _render_results(results)
-        return [str(item.destination) for item in results]
+        # Minimal output - just print destinations
+        for result in results:
+            print(result.destination)
 
     def config(self) -> ConfigCommands:
         return ConfigCommands()

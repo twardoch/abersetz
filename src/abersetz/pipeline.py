@@ -8,8 +8,6 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from loguru import logger
-
 from .chunking import TextFormat, chunk_text, detect_format
 from .config import AbersetzConfig, load_config
 from .engines import Engine, EngineRequest, EngineResult, create_engine
@@ -69,9 +67,12 @@ def translate_path(
     engine_selector = opts.engine or cfg.defaults.engine
     engine = create_engine(engine_selector, cfg, client=client)
     results: list[TranslationResult] = []
+
+    # Simple translation without progress bar
     for file_path in targets:
         result = _translate_file(file_path, engine, opts, cfg)
         results.append(result)
+
     return results
 
 
@@ -115,7 +116,7 @@ def _translate_file(
     fmt = detect_format(text)
     chunk_size = _select_chunk_size(fmt, engine, opts, config)
     chunks = chunk_text(text, chunk_size, fmt)
-    logger.debug("%s: %s chunk(s) of size %s", source, len(chunks) or 1, chunk_size)
+    # logger.debug("%s: %s chunk(s) of size %s", source, len(chunks) or 1, chunk_size)
     results, vocabulary = _apply_engine(engine, chunks, fmt, opts, config)
     merged_text = "".join(item.text for item in results)
     destination = _persist_output(
@@ -148,7 +149,7 @@ def _apply_engine(
     chunk_list = list(chunks)
     total = len(chunk_list) or 1
     for index, chunk in enumerate(chunk_list):
-        logger.debug("Engine %s chunk %s/%s", engine.name, index + 1, total)
+        # logger.debug("Engine %s chunk %s/%s", engine.name, index + 1, total)
         request = _build_request(chunk, index, total, fmt, opts, config, vocabulary, prolog)
         result = engine.translate(request)
         vocabulary = result.vocabulary

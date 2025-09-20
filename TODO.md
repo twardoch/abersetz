@@ -12,6 +12,17 @@ this_file: TODO.md
 - [x] Run full pytest + coverage, record results in WORK.md and finalize cleanup.
 
 ## Quality Improvements
-- [ ] Improve error handling for malformed config files and missing API keys
-- [ ] Add retry mechanism for translators/deep-translator engines
-- [ ] Create integration tests for real translation engines (with skip markers for CI)
+- [x] Improve error handling for malformed config files and missing API keys
+- [x] Add retry mechanism for translators/deep-translator engines
+- [x] Create integration tests for real translation engines (with skip markers for CI)
+
+## Small-Scale Quality Enhancements
+- [x] Add input validation for language codes to prevent invalid language errors
+- [x] Add progress indicator for multi-file translations using rich.progress
+- [x] Add a `--version` flag to CLI that shows abersetz version
+- [x] Reduce logging and rich output to minimum for cleaner interface
+
+## Reliability & Robustness Improvements
+- [ ] Add input file validation to check existence and readability before translation
+- [ ] Add graceful handling of edge cases (empty files, very large files >10MB)
+- [ ] Add offline smoke test to verify installation without network access

@@ -1,0 +1,144 @@
+#!/usr/bin/env python3
+# this_file: examples/basic_api.py
+
+"""Basic example of using abersetz Python API."""
+
+from pathlib import Path
+
+from abersetz import TranslatorOptions, translate_path
+
+
+# Example 1: Simple translation
+def example_simple():
+    """Translate a single file with default settings."""
+    results = translate_path(
+        "poem_en.txt", TranslatorOptions(to_lang="es", engine="translators/google")
+    )
+    for result in results:
+        print(f"Translated {result.source} -> {result.destination}")
+        print(f"Used {result.chunks} chunks in {result.format.value} format")
+
+
+# Example 2: Batch translation with output directory
+def example_batch():
+    """Translate multiple files to a specific directory."""
+    results = translate_path(
+        ".",  # Current directory
+        TranslatorOptions(
+            from_lang="en",
+            to_lang="fr",
+            engine="deep-translator/google",
+            include=("*.txt", "*.md"),
+            exclude=("*_fr.txt", "*_fr.md"),
+            output_dir=Path("translations/fr"),
+            recurse=False,
+        ),
+    )
+    print(f"Translated {len(results)} files")
+
+
+# Example 3: Using LLM engine with vocabulary
+def example_llm_with_vocabulary():
+    """Use LLM translation with custom vocabulary."""
+    initial_vocab = {
+        "abersetz": "abersetz (translation tool)",
+        "chunk": "fragment",
+        "pipeline": "pipeline",
+    }
+
+    results = translate_path(
+        "technical_doc.md",
+        TranslatorOptions(
+            to_lang="de",
+            engine="hysf",  # or "ullm/default"
+            initial_vocabulary=initial_vocab,
+            save_vocabulary=True,  # Save merged vocabulary
+            chunk_size=2000,
+        ),
+    )
+
+    if results:
+        print(f"Final vocabulary: {results[0].vocabulary}")
+
+
+# Example 4: Dry run mode for testing
+def example_dry_run():
+    """Test translation without actually calling APIs."""
+    results = translate_path(
+        "test_files/",
+        TranslatorOptions(
+            to_lang="ja",
+            engine="translators/bing",
+            recurse=True,
+            dry_run=True,  # Don't actually translate
+        ),
+    )
+    for result in results:
+        print(f"Would translate: {result.source}")
+
+
+# Example 5: HTML file translation
+def example_html():
+    """Translate HTML files while preserving markup."""
+    results = translate_path(
+        "website/index.html",
+        TranslatorOptions(
+            from_lang="en",
+            to_lang="pt",
+            engine="deep-translator/deepl",
+            html_chunk_size=2500,  # Larger chunks for HTML
+            overwrite=False,  # Create new files
+        ),
+    )
+    print(f"HTML translation complete: {results[0].destination}")
+
+
+# Example 6: Custom configuration
+def example_with_config():
+    """Use custom configuration for translation."""
+    from abersetz.config import load_config, save_config
+
+    # Load and modify config
+    config = load_config()
+    config.defaults.to_lang = "es"
+    config.defaults.chunk_size = 1500
+
+    # Add custom engine config
+    from abersetz.config import Credential, EngineConfig
+
+    config.engines["custom_llm"] = EngineConfig(
+        name="custom_llm",
+        chunk_size=3000,
+        credential=Credential(env="CUSTOM_API_KEY"),
+        options={
+            "base_url": "https://api.custom-llm.com/v1",
+            "model": "translation-model-v1",
+            "temperature": 0.3,
+        },
+    )
+    save_config(config)
+
+    # Use the custom configuration
+    results = translate_path("document.txt", config=config)
+    print(f"Translated with custom config: {results}")
+
+
+if __name__ == "__main__":
+    import sys
+
+    examples = {
+        "simple": example_simple,
+        "batch": example_batch,
+        "llm": example_llm_with_vocabulary,
+        "dry": example_dry_run,
+        "html": example_html,
+        "config": example_with_config,
+    }
+
+    if len(sys.argv) > 1 and sys.argv[1] in examples:
+        examples[sys.argv[1]]()
+    else:
+        print(f"Usage: {sys.argv[0]} {{{','.join(examples.keys())}}}")
+        print("\nAvailable examples:")
+        for name, func in examples.items():
+            print(f"  {name}: {func.__doc__.strip()}")

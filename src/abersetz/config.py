@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import os
 from collections.abc import Mapping
@@ -12,7 +13,14 @@ from typing import Any
 
 from platformdirs import user_config_dir
 
-CONFIG_FILENAME = "config.json"
+try:  # Python >= 3.11
+    import tomllib
+except ModuleNotFoundError:  # pragma: no cover - fallback for Python 3.10
+    import tomli as tomllib  # type: ignore
+
+import tomli_w
+
+CONFIG_FILENAME = "config.toml"
 
 
 @dataclass(slots=True)
@@ -195,7 +203,7 @@ DEFAULT_CONFIG_DICT: dict[str, Any] = {
 
 def _default_dict() -> dict[str, Any]:
     """Return a deep copy of the default config mapping."""
-    return json.loads(json.dumps(DEFAULT_CONFIG_DICT))
+    return copy.deepcopy(DEFAULT_CONFIG_DICT)
 
 
 def _default_config() -> AbersetzConfig:
@@ -223,29 +231,12 @@ def load_config() -> AbersetzConfig:
     path = config_path()
     if not path.exists():
         path.parent.mkdir(parents=True, exist_ok=True)
-        save_config(_default_config())
-        return _default_config()
-
-    try:
-        content = path.read_text()
-        data = json.loads(content)
-        return AbersetzConfig.from_dict(data)
-    except json.JSONDecodeError as e:
-        logger.warning(
-            f"Config file at {path} contains invalid JSON: {e}. "
-            f"Resetting to defaults. Backup saved as config.json.backup"
-        )
-        # Save backup of corrupted file
-        backup_path = path.parent / "config.json.backup"
-        try:
-            backup_path.write_text(content)
-        except Exception:
-            pass  # Best effort backup
-
-        # Reset to defaults
         default = _default_config()
         save_config(default)
         return default
+
+    try:
+        content = path.read_text(encoding="utf-8")
     except (OSError, PermissionError) as e:
         logger.warning(
             f"Cannot read config file at {path}: {e}. "
@@ -253,12 +244,39 @@ def load_config() -> AbersetzConfig:
         )
         return _default_config()
 
+    try:
+        data = tomllib.loads(content)
+    except tomllib.TOMLDecodeError as error:
+        try:
+            legacy_data = json.loads(content)
+        except json.JSONDecodeError:
+            logger.warning(
+                f"Config file at {path} contains invalid TOML: {error}. "
+                f"Resetting to defaults. Backup saved as config.toml.backup"
+            )
+            backup_path = path.parent / "config.toml.backup"
+            try:
+                backup_path.write_text(content, encoding="utf-8")
+            except Exception:  # pragma: no cover - best effort backup
+                pass
+            default = _default_config()
+            save_config(default)
+            return default
+
+        logger.info("Detected legacy JSON config. Converting to TOML format.")
+        config = AbersetzConfig.from_dict(legacy_data)
+        save_config(config)
+        return config
+
+    return AbersetzConfig.from_dict(data)
+
 
 def save_config(config: AbersetzConfig) -> None:
-    """Persist configuration to ``config.json``."""
+    """Persist configuration to ``config.toml``."""
     path = config_path()
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(config.to_dict(), indent=2, sort_keys=True))
+    content = tomli_w.dumps(config.to_dict(), sort_keys=True)
+    path.write_text(content, encoding="utf-8")
 
 
 def resolve_credential(

@@ -30,6 +30,29 @@ All notable changes to abersetz will be documented in this file.
 - Updated dependency group configuration to use standard [dependency-groups]
 - Fixed type annotations to use modern Python union syntax (|)
 
+## [0.1.1] - 2025-01-21
+
+### Changed
+- Renamed CLI main command from `translate` to `tr` for brevity
+- Added `abtr` console script as direct shorthand for `abersetz tr`
+- Improved CLI help output by instantiating the Fire class correctly
+- Reduced logging and rich output to minimum for cleaner interface
+- Simplified CLI output to just show destination files
+
+### Added
+- Version command (`abersetz version`) to display tool version
+- Language code validation with silent handling of non-standard codes
+
+### Fixed
+- Fixed Fire CLI to properly expose available commands in help output
+- Updated test suite to match renamed CLI command
+- Fixed deep-translator retry test by properly mocking the provider
+
+### Improved
+- Better error handling for malformed config files with automatic backup
+- Added retry mechanisms with tenacity for all translation engines
+- Created comprehensive integration tests with skip markers for CI
+
 ### Technical Details
 - Python 3.10+ support
 - Semantic chunking with configurable sizes per engine

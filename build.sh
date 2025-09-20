@@ -9,3 +9,4 @@ uvx hatch fmt;
 llms .;
 gitnextver .; 
 uvx hatch build;
+uv publish;
