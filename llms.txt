@@ -392,7 +392,6 @@ jobs:
 !.vscode/tasks.json
 !?*.[Cc]ache/
 !Directory.Build.rsp
-!dist/.gitkeep
 $tf/
 *$py.class
 **/*.DesktopClient/GeneratedArtifacts
@@ -2102,6 +2101,9 @@ dev = [
 
 [tool.hatch.version]
 source = "vcs"
+
+[tool.hatch.build]
+exclude = ["/dist"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/abersetz"]
