@@ -231,6 +231,40 @@ def load_config() -> AbersetzConfig:
     path = config_path()
     if not path.exists():
         path.parent.mkdir(parents=True, exist_ok=True)
+        legacy_path = path.with_suffix(".json")
+        if legacy_path.exists():
+            try:
+                legacy_content = legacy_path.read_text(encoding="utf-8")
+                legacy_data = json.loads(legacy_content)
+            except (OSError, PermissionError, json.JSONDecodeError) as error:
+                logger.warning(
+                    f"Legacy JSON config at {legacy_path} cannot be converted: {error}. "
+                    "Falling back to defaults."
+                )
+                default = _default_config()
+                save_config(default)
+                return default
+
+            config = AbersetzConfig.from_dict(legacy_data)
+            save_config(config)
+
+            backup_path = legacy_path.with_name(f"{legacy_path.name}.backup")
+            try:
+                legacy_path.rename(backup_path)
+            except OSError:
+                try:
+                    backup_path.write_text(legacy_content, encoding="utf-8")
+                except Exception:  # pragma: no cover - best effort backup
+                    backup_path = None
+
+            if backup_path and backup_path.exists():
+                logger.info(
+                    f"Migrated legacy JSON config to TOML. Original stored as {backup_path.name}."
+                )
+            else:
+                logger.info("Migrated legacy JSON config to TOML. Original JSON left in place.")
+            return config
+
         default = _default_config()
         save_config(default)
         return default

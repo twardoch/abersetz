@@ -46,4 +46,4 @@ def test_cli_config_path_outputs(monkeypatch: pytest.MonkeyPatch) -> None:
     cli = AbersetzCLI()
     path = cli.config().path()
     assert captured
-    assert Path(path).name == "config.json"
+    assert Path(path).name == "config.toml"

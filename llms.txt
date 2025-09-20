@@ -6,11 +6,12 @@ Project Structure:
 │       └── 📄 release.yml
 ├── 📁 docs
 │   ├── 📄 _config.yml
+│   ├── 📄 api.md
 │   ├── 📄 cli.md
+│   ├── 📄 configuration.md
 │   ├── 📄 index.md
 │   └── 📄 installation.md
 ├── 📁 examples
-│   ├── 📁 es
 │   ├── 📄 advanced_api.py
 │   ├── 📄 basic_api.py
 │   ├── 📄 batch_translate.sh
@@ -1859,46 +1860,43 @@ abtr ./docs --to-lang pl --engine translators/google --output ./build/pl
 - Engine-specific settings (API endpoints, retry policies, HTML behaviour).
 - Credential entries, each allowing either `{ "env": "ENV_NAME" }` or `{ "value": "actual-secret" }`.
 
-Example snippet (stored in `config.json`):
-```json
-{
-  "defaults": {
-    "engine": "translators/google",
-    "from_lang": "auto",
-    "to_lang": "en",
-    "chunk_size": 1200,
-    "html_chunk_size": 1800
-  },
-  "credentials": {
-    "siliconflow": {"env": "SILICONFLOW_API_KEY"}
-  },
-  "engines": {
-    "hysf": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "model": "tencent/Hunyuan-MT-7B",
-        "base_url": "https://api.siliconflow.com/v1",
-        "temperature": 0.3
-      }
-    },
-    "ullm": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "profiles": {
-          "default": {
-            "base_url": "https://api.siliconflow.com/v1",
-            "model": "tencent/Hunyuan-MT-7B",
-            "temperature": 0.3,
-            "max_input_tokens": 32000,
-            "prolog": {}
-          }
-        }
-      }
-    }
-  }
-}
+Example snippet (stored in `config.toml`):
+```toml
+[defaults]
+engine = "translators/google"
+from_lang = "auto"
+to_lang = "en"
+chunk_size = 1200
+html_chunk_size = 1800
+
+[credentials.siliconflow]
+name = "siliconflow"
+env = "SILICONFLOW_API_KEY"
+
+[engines.hysf]
+chunk_size = 2400
+
+[engines.hysf.credential]
+name = "siliconflow"
+
+[engines.hysf.options]
+model = "tencent/Hunyuan-MT-7B"
+base_url = "https://api.siliconflow.com/v1"
+temperature = 0.3
+
+[engines.ullm]
+chunk_size = 2400
+
+[engines.ullm.credential]
+name = "siliconflow"
+
+[engines.ullm.options.profiles.default]
+base_url = "https://api.siliconflow.com/v1"
+model = "tencent/Hunyuan-MT-7B"
+temperature = 0.3
+max_input_tokens = 32000
+
+[engines.ullm.options.profiles.default.prolog]
 ```
 Use `abersetz config show` and `abersetz config path` to inspect the file.
 
@@ -2291,6 +2289,454 @@ exclude:
 </document>
 
 <document index="23">
+<source>docs/api.md</source>
+<document_content>
+---
+layout: default
+title: Python API
+nav_order: 4
+---
+
+# Python API Reference
+{: .no_toc }
+
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
+
+## Overview
+
+The abersetz Python API provides programmatic access to all translation functionality.
+
+## Main Functions
+
+### translate_path
+
+Main function for translating files or directories.
+
+```python
+from abersetz import translate_path, TranslatorOptions
+
+results = translate_path(
+    path="document.txt",
+    options=TranslatorOptions(to_lang="es"),
+    config=None,  # Optional custom config
+    client=None   # Optional HTTP client
+)
+```
+
+**Parameters:**
+- `path` (str | Path): File or directory to translate
+- `options` (TranslatorOptions): Translation settings
+- `config` (AbersetzConfig, optional): Custom configuration
+- `client` (optional): HTTP client for API calls
+
+**Returns:**
+- List[TranslationResult]: Results for each translated file
+
+## Core Classes
+
+### TranslatorOptions
+
+Configuration for translation operations.
+
+```python
+from abersetz import TranslatorOptions
+
+options = TranslatorOptions(
+    engine="translators/google",
+    from_lang="auto",
+    to_lang="en",
+    recurse=True,
+    overwrite=False,
+    output_dir=Path("output/"),
+    save_vocabulary=False,
+    chunk_size=1200,
+    html_chunk_size=1800,
+    include=("*.txt", "*.md"),
+    exclude=("*test*",),
+    dry_run=False,
+    prolog={"role": "translator"},
+    initial_vocabulary={"term": "translation"}
+)
+```
+
+**Attributes:**
+- `engine` (str): Translation engine name
+- `from_lang` (str): Source language code
+- `to_lang` (str): Target language code
+- `recurse` (bool): Process subdirectories
+- `overwrite` (bool): Replace original files
+- `output_dir` (Path): Output directory path
+- `save_vocabulary` (bool): Save vocabulary JSON
+- `chunk_size` (int): Characters per text chunk
+- `html_chunk_size` (int): Characters per HTML chunk
+- `include` (tuple): File patterns to include
+- `exclude` (tuple): File patterns to exclude
+- `dry_run` (bool): Preview without translating
+- `prolog` (dict): Initial context for LLMs
+- `initial_vocabulary` (dict): Starting vocabulary
+
+### TranslationResult
+
+Result information for a translated file.
+
+```python
+from abersetz import TranslationResult
+
+result = TranslationResult(
+    source=Path("input.txt"),
+    destination=Path("output.txt"),
+    chunks=5,
+    vocabulary={"term": "translation"},
+    format=TextFormat.PLAIN
+)
+```
+
+**Attributes:**
+- `source` (Path): Source file path
+- `destination` (Path): Output file path
+- `chunks` (int): Number of chunks processed
+- `vocabulary` (dict): Final vocabulary (LLM engines)
+- `format` (TextFormat): Detected format (PLAIN, HTML, MARKDOWN)
+
+### PipelineError
+
+Exception raised when translation fails.
+
+```python
+from abersetz import PipelineError
+
+try:
+    results = translate_path("missing.txt")
+except PipelineError as e:
+    print(f"Translation failed: {e}")
+```
+
+## Configuration Management
+
+### Loading Configuration
+
+```python
+from abersetz.config import load_config
+
+config = load_config()
+print(config.defaults.engine)
+print(config.defaults.to_lang)
+```
+
+### Saving Configuration
+
+```python
+from abersetz.config import save_config, AbersetzConfig, Defaults
+
+config = AbersetzConfig(
+    defaults=Defaults(
+        engine="translators/google",
+        to_lang="es",
+        chunk_size=1500
+    )
+)
+
+save_config(config)
+```
+
+### Custom Engine Configuration
+
+```python
+from abersetz.config import EngineConfig, Credential
+
+config.engines["custom"] = EngineConfig(
+    name="custom",
+    chunk_size=2000,
+    credential=Credential(env="CUSTOM_API_KEY"),
+    options={
+        "base_url": "https://api.custom.com/v1",
+        "model": "translation-v1"
+    }
+)
+```
+
+## Engine Management
+
+### Creating Engines
+
+```python
+from abersetz.engines import create_engine
+from abersetz.config import load_config
+
+config = load_config()
+engine = create_engine("translators/google", config)
+```
+
+### Using Engines Directly
+
+```python
+from abersetz.engines import EngineRequest
+
+request = EngineRequest(
+    text="Hello world",
+    source_lang="en",
+    target_lang="es",
+    is_html=False,
+    vocabulary={},
+    prolog={},
+    chunk_index=0,
+    total_chunks=1
+)
+
+result = engine.translate(request)
+print(result.text)  # "Hola mundo"
+```
+
+## Text Processing
+
+### Format Detection
+
+```python
+from abersetz.chunking import detect_format, TextFormat
+
+text = "<h1>Title</h1><p>Content</p>"
+format = detect_format(text)
+# Returns TextFormat.HTML
+```
+
+### Text Chunking
+
+```python
+from abersetz.chunking import chunk_text, TextFormat
+
+chunks = chunk_text(
+    text="Long document...",
+    max_size=1000,
+    format=TextFormat.MARKDOWN
+)
+```
+
+## Complete Examples
+
+### Simple Translation
+
+```python
+from abersetz import translate_path, TranslatorOptions
+
+# Translate a single file
+results = translate_path(
+    "document.txt",
+    TranslatorOptions(
+        to_lang="fr",
+        engine="translators/google"
+    )
+)
+
+for result in results:
+    print(f"Translated: {result.source} -> {result.destination}")
+    print(f"Chunks: {result.chunks}")
+```
+
+### Batch Processing
+
+```python
+from pathlib import Path
+from abersetz import translate_path, TranslatorOptions
+
+def batch_translate(source_dir, languages, engine="translators/google"):
+    """Translate to multiple languages."""
+    results = {}
+
+    for lang in languages:
+        print(f"Translating to {lang}...")
+        lang_results = translate_path(
+            source_dir,
+            TranslatorOptions(
+                to_lang=lang,
+                engine=engine,
+                output_dir=Path(f"output_{lang}"),
+                recurse=True
+            )
+        )
+        results[lang] = lang_results
+
+    return results
+
+# Usage
+results = batch_translate("docs/", ["es", "fr", "de"])
+```
+
+### Custom Workflow
+
+```python
+from abersetz import translate_path, TranslatorOptions
+from abersetz.config import load_config, save_config
+import json
+
+class TranslationWorkflow:
+    def __init__(self):
+        self.config = load_config()
+        self.vocabulary = {}
+
+    def translate_with_vocabulary(self, files, to_lang):
+        """Maintain vocabulary across files."""
+        all_results = []
+
+        for file in files:
+            results = translate_path(
+                file,
+                TranslatorOptions(
+                    to_lang=to_lang,
+                    engine="ullm/default",
+                    initial_vocabulary=self.vocabulary,
+                    save_vocabulary=True
+                ),
+                config=self.config
+            )
+
+            if results:
+                # Update vocabulary
+                self.vocabulary.update(results[0].vocabulary)
+                all_results.extend(results)
+
+        # Save final vocabulary
+        with open(f"vocabulary_{to_lang}.json", "w") as f:
+            json.dump(self.vocabulary, f, indent=2)
+
+        return all_results
+
+# Usage
+workflow = TranslationWorkflow()
+results = workflow.translate_with_vocabulary(
+    ["doc1.md", "doc2.md", "doc3.md"],
+    "es"
+)
+```
+
+### Error Handling
+
+```python
+from abersetz import translate_path, TranslatorOptions, PipelineError
+import logging
+
+def safe_translate(path, **options):
+    """Translate with comprehensive error handling."""
+    try:
+        results = translate_path(
+            path,
+            TranslatorOptions(**options)
+        )
+        return results
+
+    except PipelineError as e:
+        logging.error(f"Translation pipeline error: {e}")
+        return None
+
+    except FileNotFoundError as e:
+        logging.error(f"File not found: {e}")
+        return None
+
+    except Exception as e:
+        logging.error(f"Unexpected error: {e}")
+        raise
+
+# Usage with retry
+import time
+
+for attempt in range(3):
+    results = safe_translate("document.txt", to_lang="es")
+    if results:
+        break
+    time.sleep(2 ** attempt)  # Exponential backoff
+```
+
+### Async Translation
+
+```python
+import asyncio
+from abersetz import translate_path, TranslatorOptions
+
+async def translate_async(path, to_lang):
+    """Async wrapper for translation."""
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(
+        None,
+        translate_path,
+        path,
+        TranslatorOptions(to_lang=to_lang)
+    )
+
+async def translate_multiple(files, to_lang):
+    """Translate multiple files concurrently."""
+    tasks = [translate_async(f, to_lang) for f in files]
+    return await asyncio.gather(*tasks)
+
+# Usage
+files = ["doc1.txt", "doc2.txt", "doc3.txt"]
+results = asyncio.run(translate_multiple(files, "es"))
+```
+
+## Advanced Topics
+
+### Custom Engines
+
+```python
+from abersetz.engines import EngineBase, EngineRequest, EngineResult
+
+class CustomEngine(EngineBase):
+    """Custom translation engine implementation."""
+
+    def __init__(self, config):
+        super().__init__("custom", 1000, 1500)
+        self.config = config
+
+    def translate(self, request: EngineRequest) -> EngineResult:
+        # Your translation logic here
+        translated = self.call_api(request.text)
+        return EngineResult(
+            text=translated,
+            vocabulary={}
+        )
+```
+
+### Vocabulary Management
+
+```python
+from typing import Dict
+import json
+
+class VocabularyManager:
+    """Manage translation vocabularies."""
+
+    def __init__(self):
+        self.vocabularies: Dict[str, Dict[str, str]] = {}
+
+    def load(self, path: str, lang_pair: str):
+        with open(path) as f:
+            self.vocabularies[lang_pair] = json.load(f)
+
+    def merge(self, *lang_pairs: str) -> Dict[str, str]:
+        merged = {}
+        for pair in lang_pairs:
+            if pair in self.vocabularies:
+                merged.update(self.vocabularies[pair])
+        return merged
+
+    def save(self, vocabulary: Dict[str, str], path: str):
+        with open(path, "w") as f:
+            json.dump(vocabulary, f, indent=2, ensure_ascii=False)
+```
+
+## See Also
+
+- [CLI Reference](cli/)
+- [Configuration Guide](configuration/)
+- [Examples](examples/)
+</document_content>
+</document>
+
+<document index="24">
 <source>docs/cli.md</source>
 <document_content>
 ---
@@ -2611,7 +3057,500 @@ abersetz tr important_docs/ --to-lang de --dry-run
 </document_content>
 </document>
 
-<document index="24">
+<document index="25">
+<source>docs/configuration.md</source>
+<document_content>
+---
+layout: default
+title: Configuration
+nav_order: 5
+---
+
+# Configuration
+{: .no_toc }
+
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
+
+## Overview
+
+Abersetz stores configuration in a JSON file managed by `platformdirs`, ensuring cross-platform compatibility.
+
+## Configuration Location
+
+Find your configuration file:
+
+```bash
+abersetz config path
+```
+
+Typical locations:
+- **Linux**: `~/.config/abersetz/config.json`
+- **macOS**: `~/Library/Application Support/abersetz/config.json`
+- **Windows**: `%APPDATA%\abersetz\config.json`
+
+## Configuration Structure
+
+### Complete Example
+
+```json
+{
+  "defaults": {
+    "engine": "translators/google",
+    "from_lang": "auto",
+    "to_lang": "en",
+    "chunk_size": 1200,
+    "html_chunk_size": 1800
+  },
+  "credentials": {
+    "openai": {"env": "OPENAI_API_KEY"},
+    "anthropic": {"env": "ANTHROPIC_API_KEY"},
+    "siliconflow": {"env": "SILICONFLOW_API_KEY"},
+    "deepseek": {"env": "DEEPSEEK_API_KEY"}
+  },
+  "engines": {
+    "hysf": {
+      "chunk_size": 2400,
+      "credential": {"name": "siliconflow"},
+      "options": {
+        "model": "tencent/Hunyuan-MT-7B",
+        "base_url": "https://api.siliconflow.com/v1",
+        "temperature": 0.3
+      }
+    },
+    "ullm": {
+      "chunk_size": 2400,
+      "options": {
+        "profiles": {
+          "default": {
+            "base_url": "https://api.siliconflow.com/v1",
+            "model": "tencent/Hunyuan-MT-7B",
+            "credential": {"name": "siliconflow"},
+            "temperature": 0.3,
+            "max_input_tokens": 32000
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+## Configuration Sections
+
+### defaults
+
+Global default settings for all translations:
+
+```json
+{
+  "defaults": {
+    "engine": "translators/google",  // Default translation engine
+    "from_lang": "auto",             // Source language (auto-detect)
+    "to_lang": "en",                 // Target language
+    "chunk_size": 1200,              // Characters per text chunk
+    "html_chunk_size": 1800          // Characters per HTML chunk
+  }
+}
+```
+
+### credentials
+
+API key storage with environment variable references:
+
+```json
+{
+  "credentials": {
+    "openai": {
+      "env": "OPENAI_API_KEY"        // Read from environment
+    },
+    "custom": {
+      "value": "sk-actual-key-here"  // Direct value (not recommended)
+    }
+  }
+}
+```
+
+### engines
+
+Custom engine configurations:
+
+```json
+{
+  "engines": {
+    "engine_name": {
+      "chunk_size": 2000,
+      "credential": {"name": "credential_name"},
+      "options": {
+        // Engine-specific options
+      }
+    }
+  }
+}
+```
+
+## Setting Up Credentials
+
+### Environment Variables (Recommended)
+
+Store API keys as environment variables:
+
+```bash
+# Add to ~/.bashrc or ~/.zshrc
+export OPENAI_API_KEY="sk-..."
+export ANTHROPIC_API_KEY="sk-ant-..."
+export SILICONFLOW_API_KEY="sk-..."
+```
+
+Then reference in config:
+
+```json
+{
+  "credentials": {
+    "openai": {"env": "OPENAI_API_KEY"}
+  }
+}
+```
+
+### Direct Values (Not Recommended)
+
+Store directly in config (less secure):
+
+```json
+{
+  "credentials": {
+    "openai": {"value": "sk-actual-key-here"}
+  }
+}
+```
+
+## Engine Configuration
+
+### LLM Engine (ullm)
+
+Configure multiple LLM profiles:
+
+```json
+{
+  "engines": {
+    "ullm": {
+      "chunk_size": 2400,
+      "options": {
+        "profiles": {
+          "gpt4": {
+            "base_url": "https://api.openai.com/v1",
+            "model": "gpt-4-turbo-preview",
+            "credential": {"name": "openai"},
+            "temperature": 0.3,
+            "max_input_tokens": 128000,
+            "prolog": {
+              "role": "You are an expert translator"
+            }
+          },
+          "claude": {
+            "base_url": "https://api.anthropic.com/v1",
+            "model": "claude-3-opus-20240229",
+            "credential": {"name": "anthropic"},
+            "temperature": 0.3,
+            "max_input_tokens": 200000
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Usage:
+```bash
+abtr file.txt --engine ullm/gpt4 --to-lang es
+abtr file.txt --engine ullm/claude --to-lang fr
+```
+
+### Custom Endpoints
+
+Configure self-hosted models:
+
+```json
+{
+  "engines": {
+    "local_llm": {
+      "chunk_size": 1500,
+      "options": {
+        "base_url": "http://localhost:8080/v1",
+        "model": "local-model",
+        "temperature": 0.5
+      }
+    }
+  }
+}
+```
+
+## Managing Configuration
+
+### View Current Config
+
+```bash
+abersetz config show
+```
+
+Or pretty-print:
+
+```bash
+abersetz config show | jq '.'
+```
+
+### Edit Configuration
+
+Edit directly:
+
+```bash
+# Find location
+CONFIG_PATH=$(abersetz config path | tail -1)
+
+# Edit with your preferred editor
+nano "$CONFIG_PATH"
+# or
+vim "$CONFIG_PATH"
+```
+
+### Reset Configuration
+
+Remove to reset to defaults:
+
+```bash
+rm "$(abersetz config path | tail -1)"
+```
+
+### Backup Configuration
+
+```bash
+CONFIG_PATH=$(abersetz config path | tail -1)
+cp "$CONFIG_PATH" "$CONFIG_PATH.backup"
+```
+
+## Python Configuration API
+
+### Load Configuration
+
+```python
+from abersetz.config import load_config
+
+config = load_config()
+print(config.defaults.engine)
+print(config.defaults.to_lang)
+```
+
+### Modify Configuration
+
+```python
+from abersetz.config import load_config, save_config
+
+config = load_config()
+
+# Change defaults
+config.defaults.to_lang = "es"
+config.defaults.chunk_size = 1500
+
+# Add credential
+from abersetz.config import Credential
+config.credentials["myapi"] = Credential(env="MY_API_KEY")
+
+# Save changes
+save_config(config)
+```
+
+### Add Custom Engine
+
+```python
+from abersetz.config import load_config, save_config, EngineConfig, Credential
+
+config = load_config()
+
+config.engines["custom"] = EngineConfig(
+    name="custom",
+    chunk_size=2000,
+    credential=Credential(env="CUSTOM_API_KEY"),
+    options={
+        "base_url": "https://api.custom.com/v1",
+        "model": "translation-v1",
+        "temperature": 0.3
+    }
+)
+
+save_config(config)
+```
+
+## Environment Variables
+
+### Abersetz-specific
+
+Override defaults with environment variables:
+
+```bash
+export ABERSETZ_ENGINE="translators/bing"
+export ABERSETZ_TO_LANG="es"
+export ABERSETZ_CHUNK_SIZE="1500"
+```
+
+### API Keys
+
+Standard API key variables:
+
+```bash
+# OpenAI
+export OPENAI_API_KEY="sk-..."
+
+# Anthropic
+export ANTHROPIC_API_KEY="sk-ant-..."
+
+# Google
+export GOOGLE_API_KEY="..."
+
+# SiliconFlow
+export SILICONFLOW_API_KEY="sk-..."
+
+# DeepSeek
+export DEEPSEEK_API_KEY="..."
+
+# Mistral
+export MISTRAL_API_KEY="..."
+
+# Together AI
+export TOGETHERAI_API_KEY="..."
+```
+
+## Configuration Templates
+
+### Minimal Config
+
+```json
+{
+  "defaults": {
+    "engine": "translators/google",
+    "to_lang": "es"
+  }
+}
+```
+
+### Multi-engine Config
+
+```json
+{
+  "defaults": {
+    "engine": "translators/google"
+  },
+  "credentials": {
+    "openai": {"env": "OPENAI_API_KEY"},
+    "anthropic": {"env": "ANTHROPIC_API_KEY"}
+  },
+  "engines": {
+    "gpt": {
+      "chunk_size": 3000,
+      "credential": {"name": "openai"},
+      "options": {
+        "model": "gpt-4-turbo-preview",
+        "base_url": "https://api.openai.com/v1"
+      }
+    },
+    "claude": {
+      "chunk_size": 3000,
+      "credential": {"name": "anthropic"},
+      "options": {
+        "model": "claude-3-opus-20240229",
+        "base_url": "https://api.anthropic.com/v1"
+      }
+    }
+  }
+}
+```
+
+### Enterprise Config
+
+```json
+{
+  "defaults": {
+    "engine": "corporate_llm",
+    "to_lang": "en",
+    "chunk_size": 2000
+  },
+  "credentials": {
+    "corporate": {
+      "env": "CORP_TRANSLATION_KEY"
+    }
+  },
+  "engines": {
+    "corporate_llm": {
+      "chunk_size": 2500,
+      "credential": {"name": "corporate"},
+      "options": {
+        "base_url": "https://translation.company.com/v1",
+        "model": "corp-translator-v2",
+        "temperature": 0.2,
+        "max_retries": 5,
+        "timeout": 30
+      }
+    }
+  }
+}
+```
+
+## Security Best Practices
+
+1. **Never commit API keys**: Add `config.json` to `.gitignore`
+
+2. **Use environment variables**: Store keys in environment, not config
+
+3. **Rotate keys regularly**: Update API keys periodically
+
+4. **Restrict file permissions**:
+   ```bash
+   chmod 600 "$(abersetz config path | tail -1)"
+   ```
+
+5. **Use separate keys**: Different keys for dev/prod environments
+
+## Troubleshooting
+
+### Config not loading
+
+Check file exists and is valid JSON:
+
+```bash
+CONFIG_PATH=$(abersetz config path | tail -1)
+cat "$CONFIG_PATH" | jq '.'
+```
+
+### API key not found
+
+Verify environment variable is set:
+
+```bash
+echo $OPENAI_API_KEY
+```
+
+### Permission denied
+
+Fix file permissions:
+
+```bash
+chmod 644 "$(abersetz config path | tail -1)"
+```
+
+## See Also
+
+- [Translation Engines](engines/)
+- [Python API](api/)
+- [Examples](examples/)
+</document_content>
+</document>
+
+<document index="26">
 <source>docs/index.md</source>
 <document_content>
 ---
@@ -2757,7 +3696,7 @@ MIT License - see [LICENSE](https://github.com/twardoch/abersetz/blob/main/LICEN
 </document_content>
 </document>
 
-<document index="25">
+<document index="27">
 <source>docs/installation.md</source>
 <document_content>
 ---
@@ -3067,7 +4006,7 @@ def example_with_config(()):
     """Use custom configuration for translation."""
 
 
-<document index="26">
+<document index="28">
 <source>examples/batch_translate.sh</source>
 <document_content>
 #!/bin/bash
@@ -3163,7 +4102,7 @@ echo -e "${GREEN}Index generated at $INDEX_FILE${NC}"
 </document_content>
 </document>
 
-<document index="27">
+<document index="29">
 <source>examples/config_setup.sh</source>
 <document_content>
 #!/bin/bash
@@ -3337,7 +4276,7 @@ echo "  abtr test.txt --to-lang ja --engine ullm/gpt4        # Use GPT-4"
 </document_content>
 </document>
 
-<document index="28">
+<document index="30">
 <source>examples/engines_config.json</source>
 <document_content>
 {
@@ -3349,7 +4288,7 @@ echo "  abtr test.txt --to-lang ja --engine ullm/gpt4        # Use GPT-4"
 </document_content>
 </document>
 
-<document index="29">
+<document index="31">
 <source>examples/pipeline.sh</source>
 <document_content>
 #!/bin/bash
@@ -3471,7 +4410,7 @@ echo "Report available at: $FINAL_OUTPUT/TRANSLATION_REPORT.md"
 </document_content>
 </document>
 
-<document index="30">
+<document index="32">
 <source>examples/poem_en.txt</source>
 <document_content>
 # this_file: examples/poem_en.txt
@@ -3484,7 +4423,7 @@ And hope feels like a gift.
 </document_content>
 </document>
 
-<document index="31">
+<document index="33">
 <source>examples/poem_pl.txt</source>
 <document_content>
 # this_file: examples/poem_pl.txt
@@ -3497,7 +4436,7 @@ A nadzieja znów czuje się jak dar.
 </document_content>
 </document>
 
-<document index="32">
+<document index="34">
 <source>examples/translate.sh</source>
 <document_content>
 #!/bin/bash
@@ -3555,7 +4494,7 @@ abersetz version
 </document_content>
 </document>
 
-<document index="33">
+<document index="35">
 <source>examples/vocab.json</source>
 <document_content>
 {
@@ -3567,7 +4506,7 @@ abersetz version
 </document_content>
 </document>
 
-<document index="34">
+<document index="36">
 <source>examples/walkthrough.md</source>
 <document_content>
 ---
@@ -3589,7 +4528,7 @@ The command writes the translated poem to `examples/out/poem_en.txt` and saves t
 </document_content>
 </document>
 
-<document index="35">
+<document index="37">
 <source>issues/102-review.md</source>
 <document_content>
 ---
@@ -3663,7 +4602,7 @@ The `abersetz` project is a high-quality codebase that meets all the requirement
 </document_content>
 </document>
 
-<document index="36">
+<document index="38">
 <source>issues/103.txt</source>
 <document_content>
 The CLI tool is absurd: 
@@ -3694,7 +4633,7 @@ Then /report and then finally /work on the tasks!
 </document_content>
 </document>
 
-<document index="37">
+<document index="39">
 <source>package.toml</source>
 <document_content>
 # Package configuration
@@ -3711,7 +4650,7 @@ github_actions = true   # Add GitHub Actions workflows
 </document_content>
 </document>
 
-<document index="38">
+<document index="40">
 <source>pyproject.toml</source>
 <document_content>
 # this_file: pyproject.toml
@@ -4320,6 +5259,8 @@ import json
 from pathlib import Path
 import pytest
 import abersetz.config as config_module
+import tomllib
+import tomli as tomllib
 import platform
 
 def test_load_config_yields_defaults((tmp_path: Path)) -> None:
@@ -4328,10 +5269,13 @@ def test_save_config_persists_changes((tmp_path: Path)) -> None:
 
 def test_resolve_credential_prefers_environment((monkeypatch: pytest.MonkeyPatch)) -> None:
 
-def test_load_config_handles_malformed_json((
+def test_load_config_handles_malformed_toml((
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 )) -> None:
-    """Test that malformed JSON config files are handled gracefully."""
+    """Test that malformed TOML config files are handled gracefully."""
+
+def test_load_config_converts_legacy_json((tmp_path: Path, monkeypatch: pytest.MonkeyPatch)) -> None:
+    """Ensure legacy JSON configs are migrated to TOML."""
 
 def test_load_config_handles_permission_error((
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch

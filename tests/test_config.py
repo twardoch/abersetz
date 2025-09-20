@@ -10,6 +10,11 @@ import pytest
 
 import abersetz.config as config_module
 
+try:
+    import tomllib
+except ModuleNotFoundError:  # pragma: no cover - Python 3.10 fallback
+    import tomli as tomllib  # type: ignore
+
 
 def test_load_config_yields_defaults(tmp_path: Path) -> None:
     cfg = config_module.load_config()
@@ -23,7 +28,7 @@ def test_save_config_persists_changes(tmp_path: Path) -> None:
     cfg = config_module.load_config()
     cfg.defaults.engine = "deep-translator/google"
     config_module.save_config(cfg)
-    stored = json.loads(Path(config_module.config_path()).read_text())
+    stored = tomllib.loads(Path(config_module.config_path()).read_text(encoding="utf-8"))
     assert stored["defaults"]["engine"] == "deep-translator/google"
 
 
@@ -40,16 +45,16 @@ def test_resolve_credential_prefers_environment(monkeypatch: pytest.MonkeyPatch)
     assert resolved_direct == "direct"
 
 
-def test_load_config_handles_malformed_json(
+def test_load_config_handles_malformed_toml(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Test that malformed JSON config files are handled gracefully."""
+    """Test that malformed TOML config files are handled gracefully."""
     # Set custom config dir to tmp_path
     monkeypatch.setenv("ABERSETZ_CONFIG_DIR", str(tmp_path))
 
-    # Write malformed JSON to config file
-    config_file = tmp_path / "config.json"
-    config_file.write_text("{ invalid json: }")
+    # Write malformed TOML to config file
+    config_file = tmp_path / "config.toml"
+    config_file.write_text('[defaults\nengine = "invalid"', encoding="utf-8")
 
     # Should return defaults with a warning instead of crashing
     cfg = config_module.load_config()
@@ -57,8 +62,37 @@ def test_load_config_handles_malformed_json(
 
     # Config should be reset to defaults
     assert config_file.exists()
-    stored = json.loads(config_file.read_text())
+    stored = tomllib.loads(config_file.read_text(encoding="utf-8"))
     assert stored["defaults"]["engine"] == "translators/google"
+
+
+def test_load_config_converts_legacy_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Ensure legacy JSON configs are migrated to TOML."""
+
+    monkeypatch.setenv("ABERSETZ_CONFIG_DIR", str(tmp_path))
+    legacy_file = tmp_path / "config.json"
+    legacy_file.write_text(
+        json.dumps(
+            {
+                "defaults": {"engine": "translators/bing"},
+                "credentials": {},
+                "engines": {},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    cfg = config_module.load_config()
+    assert cfg.defaults.engine == "translators/bing"
+
+    # TOML should now exist and contain migrated values
+    toml_file = tmp_path / "config.toml"
+    assert toml_file.exists()
+    stored = tomllib.loads(toml_file.read_text(encoding="utf-8"))
+    assert stored["defaults"]["engine"] == "translators/bing"
+
+    backup_file = tmp_path / "config.json.backup"
+    assert backup_file.exists()
 
 
 def test_load_config_handles_permission_error(
@@ -72,8 +106,8 @@ def test_load_config_handles_permission_error(
     import platform
 
     if platform.system() != "Windows":
-        config_file = tmp_path / "config.json"
-        config_file.write_text('{"defaults": {}}')
+        config_file = tmp_path / "config.toml"
+        config_file.write_text("[defaults]", encoding="utf-8")
         config_file.chmod(0o000)
 
         # Should return defaults without crashing

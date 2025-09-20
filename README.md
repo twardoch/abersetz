@@ -54,46 +54,43 @@ abtr ./docs --to-lang pl --engine translators/google --output ./build/pl
 - Engine-specific settings (API endpoints, retry policies, HTML behaviour).
 - Credential entries, each allowing either `{ "env": "ENV_NAME" }` or `{ "value": "actual-secret" }`.
 
-Example snippet (stored in `config.json`):
-```json
-{
-  "defaults": {
-    "engine": "translators/google",
-    "from_lang": "auto",
-    "to_lang": "en",
-    "chunk_size": 1200,
-    "html_chunk_size": 1800
-  },
-  "credentials": {
-    "siliconflow": {"env": "SILICONFLOW_API_KEY"}
-  },
-  "engines": {
-    "hysf": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "model": "tencent/Hunyuan-MT-7B",
-        "base_url": "https://api.siliconflow.com/v1",
-        "temperature": 0.3
-      }
-    },
-    "ullm": {
-      "chunk_size": 2400,
-      "credential": {"name": "siliconflow"},
-      "options": {
-        "profiles": {
-          "default": {
-            "base_url": "https://api.siliconflow.com/v1",
-            "model": "tencent/Hunyuan-MT-7B",
-            "temperature": 0.3,
-            "max_input_tokens": 32000,
-            "prolog": {}
-          }
-        }
-      }
-    }
-  }
-}
+Example snippet (stored in `config.toml`):
+```toml
+[defaults]
+engine = "translators/google"
+from_lang = "auto"
+to_lang = "en"
+chunk_size = 1200
+html_chunk_size = 1800
+
+[credentials.siliconflow]
+name = "siliconflow"
+env = "SILICONFLOW_API_KEY"
+
+[engines.hysf]
+chunk_size = 2400
+
+[engines.hysf.credential]
+name = "siliconflow"
+
+[engines.hysf.options]
+model = "tencent/Hunyuan-MT-7B"
+base_url = "https://api.siliconflow.com/v1"
+temperature = 0.3
+
+[engines.ullm]
+chunk_size = 2400
+
+[engines.ullm.credential]
+name = "siliconflow"
+
+[engines.ullm.options.profiles.default]
+base_url = "https://api.siliconflow.com/v1"
+model = "tencent/Hunyuan-MT-7B"
+temperature = 0.3
+max_input_tokens = 32000
+
+[engines.ullm.options.profiles.default.prolog]
 ```
 Use `abersetz config show` and `abersetz config path` to inspect the file.
 
