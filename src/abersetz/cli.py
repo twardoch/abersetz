@@ -111,9 +111,12 @@ def _build_options_from_cli(
 
 
 class AbersetzCLI:
-    """Fire-powered entrypoint."""
+    """Abersetz translation tool - translate files between languages.
 
-    def translate(
+    Use 'abersetz tr' to translate files, or 'abersetz config' to manage configuration.
+    """
+
+    def tr(
         self,
         path: str,
         *,
@@ -165,7 +168,17 @@ class AbersetzCLI:
 
 def main() -> None:
     """Invoke the Fire CLI."""
-    fire.Fire(AbersetzCLI)
+    fire.Fire(AbersetzCLI())
 
 
-__all__ = ["AbersetzCLI", "ConfigCommands", "main"]
+def abtr_main() -> None:
+    """Direct translation CLI - equivalent to 'abersetz tr'."""
+
+    # Create CLI instance and call tr method directly
+    cli = AbersetzCLI()
+
+    # Use Fire to parse arguments for the tr method specifically
+    fire.Fire(cli.tr)
+
+
+__all__ = ["AbersetzCLI", "ConfigCommands", "main", "abtr_main"]

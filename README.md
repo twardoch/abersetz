@@ -27,7 +27,11 @@ pip install abersetz
 
 ## Quick Start
 ```bash
-abersetz translate ./docs --to-lang pl --engine translators/google --output ./build/pl
+# Using the main CLI
+abersetz tr ./docs --to-lang pl --engine translators/google --output ./build/pl
+
+# Or using the shorthand command
+abtr ./docs --to-lang pl --engine translators/google --output ./build/pl
 ```
 
 ### CLI Options (preview)
@@ -92,6 +96,10 @@ Example snippet (stored in `config.json`):
 }
 ```
 Use `abersetz config show` and `abersetz config path` to inspect the file.
+
+## CLI Tools
+- `abersetz`: Main CLI with `tr` (translate) and `config` commands
+- `abtr`: Direct translation shorthand (equivalent to `abersetz tr`)
 
 ## Python API
 ```python

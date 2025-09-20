@@ -36,6 +36,7 @@ Source = "https://github.com/twardoch/abersetz"
 
 [project.scripts]
 abersetz = "abersetz.cli:main"
+abtr = "abersetz.cli:abtr_main"
 
 [dependency-groups]
 dev = [

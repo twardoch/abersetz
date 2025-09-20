@@ -22,7 +22,7 @@ def test_cli_translate_wires_arguments(monkeypatch: pytest.MonkeyPatch, tmp_path
     monkeypatch.setattr("abersetz.cli.translate_path", fake_translate_path)
 
     cli = AbersetzCLI()
-    cli.translate(
+    cli.tr(
         str(tmp_path),
         engine="translators/google",
         include="*.txt,*.md",
