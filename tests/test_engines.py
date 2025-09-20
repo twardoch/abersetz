@@ -115,13 +115,20 @@ def test_ullm_engine_uses_profile(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_translators_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test that TranslatorsEngine retries on network failures."""
+<<<<<<< Updated upstream
+=======
+    from unittest.mock import Mock
+>>>>>>> Stashed changes
 
     cfg = config_module.load_config()
     engine = create_engine("translators/google", cfg)
 
     # Mock translators to fail twice then succeed
     call_count = 0
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     def fake_translate_with_retry(
         text: str, translator: str, from_language: str, to_language: str, **_: object
     ) -> str:
@@ -151,6 +158,10 @@ def test_translators_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch) ->
 
 def test_deep_translator_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test that DeepTranslatorEngine retries on network failures."""
+<<<<<<< Updated upstream
+=======
+    from unittest.mock import MagicMock
+>>>>>>> Stashed changes
 
     cfg = config_module.load_config()
 
