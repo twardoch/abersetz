@@ -187,8 +187,8 @@ max_input_tokens = 200000
 
 Usage:
 ```bash
-abtr file.txt --engine ullm/gpt4 --to-lang es
-abtr file.txt --engine ullm/claude --to-lang fr
+abtr es file.txt --engine ullm/gpt4
+abtr fr file.txt --engine ullm/claude
 ```
 
 ### Custom Endpoints

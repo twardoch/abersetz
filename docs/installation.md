@@ -59,7 +59,7 @@ abersetz --help
 
 # Test with dry run
 echo "Hello world" > test.txt
-abersetz tr test.txt --to-lang es --dry-run
+abersetz tr es test.txt --dry-run
 ```
 
 ## Dependencies
@@ -133,7 +133,7 @@ Build and use:
 
 ```bash
 docker build -t abersetz .
-docker run -v $(pwd):/data abersetz tr /data/file.txt --to-lang es
+docker run -v $(pwd):/data abersetz tr es /data/file.txt
 ```
 
 ## Troubleshooting

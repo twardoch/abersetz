@@ -59,6 +59,22 @@ def translate_path(
 ) -> list[TranslationResult]:
     """Translate a file or directory tree."""
     resolved = Path(path).resolve()
+
+    # Validate input path exists and is accessible
+    if not resolved.exists():
+        raise PipelineError(f"Path does not exist: {resolved}")
+
+    # Check readability
+    try:
+        if resolved.is_file():
+            # Try to open the file to check read permissions
+            resolved.open("r").close()
+        elif resolved.is_dir():
+            # Try to list directory to check read permissions
+            list(resolved.iterdir())
+    except (PermissionError, OSError) as e:
+        raise PipelineError(f"Cannot read {resolved}: {e}")
+
     cfg = config or load_config()
     opts = _merge_defaults(options, cfg)
     targets = list(_discover_files(resolved, opts))
@@ -113,6 +129,33 @@ def _translate_file(
     config: AbersetzConfig,
 ) -> TranslationResult:
     text = source.read_text(encoding="utf-8")
+
+    # Handle edge cases
+    if not text.strip():
+        # Empty file - just create an empty output
+        destination = _persist_output(
+            source,
+            "",
+            {},
+            TextFormat.PLAIN,
+            opts,
+            opts.to_lang or config.defaults.to_lang,
+        )
+        return TranslationResult(
+            source=source,
+            destination=destination,
+            chunks=0,
+            vocabulary={},
+            format=TextFormat.PLAIN,
+        )
+
+    # Warn about very large files (>10MB)
+    file_size = source.stat().st_size
+    if file_size > 10 * 1024 * 1024:  # 10MB
+        from loguru import logger
+
+        logger.warning(f"Large file detected ({file_size / 1024 / 1024:.1f}MB): {source}")
+
     fmt = detect_format(text)
     chunk_size = _select_chunk_size(fmt, engine, opts, config)
     chunks = chunk_text(text, chunk_size, fmt)

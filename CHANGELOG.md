@@ -10,6 +10,18 @@ All notable changes to abersetz will be documented in this file.
 ### Changed
 - Switched persisted configuration from JSON to TOML with automatic migration for existing installs.
 - Added TOML parser/serializer dependencies (`tomli` fallback and `tomli-w`) to support the new format.
+- Simplified CLI syntax so the target language is the first positional argument (e.g. `abtr de file.md`).
+- Dropped legacy JSON configuration support; only `config.toml` is produced and read.
+
+### Added
+- `abersetz lang` command listing supported language codes and their English names.
+
+### Fixed
+- Fixed `abersetz config path` command double output issue by removing redundant console.print call
+- Fixed `abersetz config show` to output TOML format instead of JSON
+- Fixed `tomli_w.dumps()` call by removing unsupported `sort_keys` parameter
+- Added `__main__.py` to enable `python -m abersetz` execution
+- Fixed CLI test that was calling tr method with incorrect argument order
 
 ## [0.1.0] - 2025-01-20
 

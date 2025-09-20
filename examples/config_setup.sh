@@ -67,7 +67,7 @@ echo ""
 echo "1. Testing free engines..."
 for engine in "translators/google" "translators/bing" "deep-translator/google"; do
     echo -n "  $engine: "
-    if echo "Hello" | abtr - --to-lang es --engine "$engine" --dry-run >/dev/null 2>&1; then
+    if echo "Hello" | abtr es - --engine "$engine" --dry-run >/dev/null 2>&1; then
         echo "✓"
     else
         echo "✗"
@@ -165,7 +165,7 @@ echo ""
 echo "=== Setup Complete ==="
 echo ""
 echo "Quick test commands:"
-echo "  abersetz tr test.txt --to-lang es                    # Use default engine"
-echo "  abtr test.txt --to-lang fr --engine translators/bing # Use Bing"
-echo "  abtr test.txt --to-lang de --engine hysf             # Use SiliconFlow LLM"
-echo "  abtr test.txt --to-lang ja --engine ullm/gpt4        # Use GPT-4"
+echo "  abersetz tr es test.txt                    # Use default engine"
+echo "  abtr fr test.txt --engine translators/bing # Use Bing"
+echo "  abtr de test.txt --engine hysf             # Use SiliconFlow LLM"
+echo "  abtr ja test.txt --engine ullm/gpt4        # Use GPT-4"

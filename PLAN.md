@@ -83,10 +83,36 @@ this_file: PLAN.md
 - CLI smoke tests verifying Fire wiring.
 - Keep coverage ≥80%; enforce via pytest-cov.
 
+## Phase 7: Smart Configuration Setup Command
+- **Goal**: Implement `abersetz setup` command that automatically discovers API keys and initializes optimal configuration.
+- **Discovery Strategy**:
+  - Scan environment variables for known API key patterns (OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.)
+  - Check common API base URL environment variables for custom endpoints
+  - Test discovered endpoints with lightweight /models calls to verify connectivity
+  - Auto-detect which translation engines are available based on found credentials
+- **Implementation Details**:
+  - Reuse provider configuration from `external/dump_models.py` as reference for known providers
+  - Create interactive setup with rich console showing discovered services
+  - Allow user to select which engines to enable from available options
+  - Generate optimized config with proper engine priorities and chunk sizes
+  - Test each configured engine with a minimal translation to verify functionality
+- **User Experience**:
+  - Single command `abersetz setup` to bootstrap entire configuration
+  - Show progress bars and status indicators during discovery
+  - Present discovered services in a table with checkmarks/crosses
+  - Allow optional `--non-interactive` mode for CI/automation
+  - Save configuration with helpful comments explaining each section
+- **Tests**:
+  - Mock environment scanning to test discovery logic
+  - Verify config generation with various provider combinations
+  - Test endpoint validation with mocked HTTP responses
+  - Ensure graceful handling of partial discoveries
+
 ## Deliverables Checklist
 - PLAN.md, TODO.md, README.md, CLAUDE.md updated.
 - Source modules + tests with `this_file` headers.
 - `examples/` folder with runnable demo (input + expected output + instructions).
 - Updated `pyproject.toml` dependencies and console script entry.
 - Passing `python -m pytest --cov` documented in WORK.md.
+- Smart setup command for automatic configuration discovery.
 

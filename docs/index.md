@@ -60,17 +60,17 @@ pip install abersetz
 
 Translate a single file:
 ```bash
-abersetz tr document.txt --to-lang es
+abersetz tr es document.txt
 ```
 
 Or use the shorthand:
 ```bash
-abtr document.txt --to-lang es
+abtr es document.txt
 ```
 
 Translate a directory:
 ```bash
-abersetz tr ./docs --to-lang fr --output ./docs_fr
+abersetz tr fr ./docs --output ./docs_fr
 ```
 
 ### Configuration
@@ -88,17 +88,17 @@ abersetz config show  # Display current settings
 
 ```bash
 # Translate with specific engine
-abtr file.txt --to-lang de --engine translators/google
+abtr de file.txt --engine translators/google
 
 # Translate markdown files only
-abtr . --include "*.md" --to-lang ja --output ./ja
+abtr ja . --include "*.md" --output ./ja
 
 # Dry run to preview
-abersetz tr project/ --to-lang zh-CN --dry-run
+abersetz tr zh-CN project/ --dry-run
 
 # Use LLM with vocabulary
 export SILICONFLOW_API_KEY="your-key"
-abtr technical.md --to-lang es --engine hysf --save-voc
+abtr es technical.md --engine hysf --save-voc
 ```
 
 ### Python API

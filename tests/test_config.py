@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
 import pytest
@@ -64,35 +63,6 @@ def test_load_config_handles_malformed_toml(
     assert config_file.exists()
     stored = tomllib.loads(config_file.read_text(encoding="utf-8"))
     assert stored["defaults"]["engine"] == "translators/google"
-
-
-def test_load_config_converts_legacy_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Ensure legacy JSON configs are migrated to TOML."""
-
-    monkeypatch.setenv("ABERSETZ_CONFIG_DIR", str(tmp_path))
-    legacy_file = tmp_path / "config.json"
-    legacy_file.write_text(
-        json.dumps(
-            {
-                "defaults": {"engine": "translators/bing"},
-                "credentials": {},
-                "engines": {},
-            }
-        ),
-        encoding="utf-8",
-    )
-
-    cfg = config_module.load_config()
-    assert cfg.defaults.engine == "translators/bing"
-
-    # TOML should now exist and contain migrated values
-    toml_file = tmp_path / "config.toml"
-    assert toml_file.exists()
-    stored = tomllib.loads(toml_file.read_text(encoding="utf-8"))
-    assert stored["defaults"]["engine"] == "translators/bing"
-
-    backup_file = tmp_path / "config.json.backup"
-    assert backup_file.exists()
 
 
 def test_load_config_handles_permission_error(

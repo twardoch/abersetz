@@ -30,8 +30,7 @@ translate_lang() {
 
     echo -e "${BLUE}Translating to $lang...${NC}"
 
-    if abersetz tr "$PROJECT_ROOT" \
-        --to-lang "$lang" \
+    if abersetz tr "$lang" "$PROJECT_ROOT" \ \
         --engine "$ENGINE" \
         --output "$output_dir" \
         --recurse \

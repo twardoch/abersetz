@@ -14,6 +14,7 @@ dependencies = [
     "deep-translator>=1.11",
     "fire>=0.5",
     "loguru>=0.7",
+    "langcodes>=3.4",
     "openai>=1.51",
     "platformdirs>=4.3",
     "rich>=13.9",

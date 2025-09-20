@@ -30,12 +30,12 @@ pip install abersetz
 
 ## Quick Start
 ```bash
-abersetz translate ./docs --to-lang pl --engine translators/google --output ./build/pl
+abersetz tr pl ./docs --engine translators/google --output ./build/pl
 ```
 
 ### CLI Options (preview)
+- `to_lang`: first positional argument selecting the target language.
 - `--from-lang`: source language (defaults to `auto`).
-- `--to-lang`: target language (default `en`).
 - `--engine`: one of
   - `translators/<provider>` (e.g. `translators/google`)
   - `deep-translator/<provider>` (e.g. `deep-translator/deepl`)

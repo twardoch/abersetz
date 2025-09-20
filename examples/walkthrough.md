@@ -4,8 +4,7 @@ this_file: examples/walkthrough.md
 # Sample Translation Walkthrough
 
 ```bash
-abersetz translate examples/poem_en.txt \
-  --to-lang pl \
+abersetz tr planslate examples/poem_en.txt \ \
   --engine hysf \
   --output examples/out \
   --save-voc \

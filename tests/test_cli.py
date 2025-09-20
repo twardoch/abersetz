@@ -23,7 +23,8 @@ def test_cli_translate_wires_arguments(monkeypatch: pytest.MonkeyPatch, tmp_path
 
     cli = AbersetzCLI()
     cli.tr(
-        str(tmp_path),
+        to_lang="es",
+        path=str(tmp_path),
         engine="translators/google",
         include="*.txt,*.md",
         exclude="*.tmp",
@@ -38,12 +39,19 @@ def test_cli_translate_wires_arguments(monkeypatch: pytest.MonkeyPatch, tmp_path
     assert opts.dry_run is True
 
 
-def test_cli_config_path_outputs(monkeypatch: pytest.MonkeyPatch) -> None:
-    captured: list[str] = []
-    monkeypatch.setattr(
-        "abersetz.cli.console.print", lambda message, **_: captured.append(str(message))
-    )
+def test_cli_config_path_returns_path() -> None:
     cli = AbersetzCLI()
     path = cli.config().path()
-    assert captured
     assert Path(path).name == "config.toml"
+
+
+def test_cli_lang_lists_languages(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: list[str] = []
+    monkeypatch.setattr("abersetz.cli.console.print", lambda message: captured.append(str(message)))
+
+    cli = AbersetzCLI()
+    rows = cli.lang()
+
+    assert captured  # ensure output emitted
+    assert rows == captured
+    assert rows[0].startswith("af\t")  # alphabetical by code

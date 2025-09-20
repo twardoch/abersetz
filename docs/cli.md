@@ -40,7 +40,7 @@ abersetz tr PATH [OPTIONS]
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `--to-lang` | Target language code | `en` |
+| `to_lang` (positional) | Target language code | — |
 | `--from-lang` | Source language code | `auto` |
 | `--engine` | Translation engine | `translators/google` |
 | `--output` | Output directory | `<lang>/<filename>` |
@@ -82,7 +82,7 @@ abersetz version
 Direct translation command equivalent to `abersetz tr`:
 
 ```bash
-abtr PATH [OPTIONS]
+abtr TO_LANG PATH [OPTIONS]
 ```
 
 All options from `abersetz tr` are available.
@@ -94,13 +94,13 @@ All options from `abersetz tr` are available.
 Translate a single file:
 
 ```bash
-abersetz tr document.txt --to-lang es
+abersetz tr es document.txt
 ```
 
 Translate to French using shorthand:
 
 ```bash
-abtr document.txt --to-lang fr
+abtr fr document.txt
 ```
 
 ### Directory Translation
@@ -108,16 +108,16 @@ abtr document.txt --to-lang fr
 Translate all files in a directory:
 
 ```bash
-abersetz tr ./docs --to-lang de --output ./docs_de
+abersetz tr de ./docs --output ./docs_de
 ```
 
 With specific patterns:
 
 ```bash
-abtr ./project \
+abtr ja ./project \
   --include "*.md,*.txt" \
   --exclude "*test*,.*" \
-  --to-lang ja
+  --output ./translations/ja
 ```
 
 ### Engine Selection
@@ -126,19 +126,19 @@ Use different translation engines:
 
 ```bash
 # Google Translate (free)
-abtr file.txt --to-lang pt --engine translators/google
+abtr pt file.txt --engine translators/google
 
 # Bing Translate (free)
-abtr file.txt --to-lang pt --engine translators/bing
+abtr pt file.txt --engine translators/bing
 
 # DeepL
-abtr file.txt --to-lang pt --engine deep-translator/deepl
+abtr pt file.txt --engine deep-translator/deepl
 
 # SiliconFlow LLM
-abtr file.txt --to-lang pt --engine hysf
+abtr pt file.txt --engine hysf
 
 # Custom LLM profile
-abtr file.txt --to-lang pt --engine ullm/gpt4
+abtr pt file.txt --engine ullm/gpt4
 ```
 
 ### Advanced Options
@@ -146,14 +146,13 @@ abtr file.txt --to-lang pt --engine ullm/gpt4
 Overwrite original files:
 
 ```bash
-abersetz tr backup.txt --to-lang es --overwrite
+abersetz tr es backup.txt --overwrite
 ```
 
 Save vocabulary for LLM engines:
 
 ```bash
-abtr technical.md \
-  --to-lang de \
+abtr de technical.md \
   --engine ullm/default \
   --save-voc
 ```
@@ -161,16 +160,14 @@ abtr technical.md \
 Dry run to preview:
 
 ```bash
-abersetz tr large_project/ \
-  --to-lang fr \
+abersetz tr fr large_project/ \
   --dry-run
 ```
 
 Custom chunk sizes:
 
 ```bash
-abtr document.html \
-  --to-lang zh-CN \
+abtr zh-CN document.html \
   --html-chunk-size 3000
 ```
 
@@ -233,7 +230,7 @@ Translation results are printed as file paths:
 Use `--verbose` for detailed progress:
 
 ```bash
-abersetz tr docs/ --to-lang fr --verbose
+abersetz tr fr docs/ --verbose
 ```
 
 ## Error Handling
@@ -280,7 +277,7 @@ Create a script for multiple languages:
 
 ```bash
 for lang in es fr de ja; do
-  abersetz tr docs/ --to-lang $lang --output docs_$lang
+  abersetz tr $lang docs/ --output docs_$lang
 done
 ```
 
@@ -289,7 +286,7 @@ done
 Use GNU parallel for speed:
 
 ```bash
-find . -name "*.txt" | parallel -j4 abtr {} --to-lang es
+find . -name "*.txt" | parallel -j4 abtr es {}
 ```
 
 ### Progress tracking
@@ -297,7 +294,7 @@ find . -name "*.txt" | parallel -j4 abtr {} --to-lang es
 For large projects, use verbose mode:
 
 ```bash
-abersetz tr large_project/ --to-lang fr --verbose 2>&1 | tee translation.log
+abersetz tr fr large_project/ --verbose 2>&1 | tee translation.log
 ```
 
 ### Testing configuration
@@ -305,7 +302,7 @@ abersetz tr large_project/ --to-lang fr --verbose 2>&1 | tee translation.log
 Always test with dry-run first:
 
 ```bash
-abersetz tr important_docs/ --to-lang de --dry-run
+abersetz tr de important_docs/ --dry-run
 ```
 
 ## See Also

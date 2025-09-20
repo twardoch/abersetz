@@ -13,6 +13,7 @@ this_file: DEPENDENCIES.md
 ### CLI and User Interface
 - **fire** (>=0.5): Google's Python Fire library for automatic CLI generation from functions. Minimal boilerplate, automatic help generation, and intuitive command structure.
 - **rich** (>=13.9): Rich terminal formatting and progress indicators. Provides beautiful console output with tables, progress bars, and colored text.
+- **langcodes** (>=3.4): Mature language metadata with CLDR coverage, powering the `abersetz lang` listing without maintaining custom tables.
 
 ### Core Utilities
 - **loguru** (>=0.7): Simple yet powerful logging with minimal setup. Provides structured logging with automatic rotation, retention, and colored output.

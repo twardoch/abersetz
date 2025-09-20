@@ -23,6 +23,17 @@ this_file: TODO.md
 - [x] Reduce logging and rich output to minimum for cleaner interface
 
 ## Reliability & Robustness Improvements
-- [ ] Add input file validation to check existence and readability before translation
-- [ ] Add graceful handling of edge cases (empty files, very large files >10MB)
-- [ ] Add offline smoke test to verify installation without network access
+- [x] Add input file validation to check existence and readability before translation
+- [x] Add graceful handling of edge cases (empty files, very large files >10MB)
+- [x] Add offline smoke test to verify installation without network access
+
+## Smart Configuration Setup
+- [ ] Implement `abersetz setup` command for automatic configuration discovery
+- [ ] Scan environment variables for API keys (OPENAI_API_KEY, ANTHROPIC_API_KEY, SILICONFLOW_API_KEY, etc.)
+- [ ] Test discovered endpoints with lightweight /models calls
+- [ ] Auto-detect available translation engines based on found credentials
+- [ ] Create interactive setup with rich console showing discovered services
+- [ ] Generate optimized config with proper engine priorities and chunk sizes
+- [ ] Test each configured engine with minimal translation to verify functionality
+- [ ] Allow non-interactive mode for CI/automation with --non-interactive flag
+- [ ] Add provider discovery based on patterns from external/dump_models.py

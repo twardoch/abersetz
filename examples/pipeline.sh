@@ -52,8 +52,7 @@ echo "  Preprocessing complete"
 
 # Step 3: Translate
 echo -e "\nStep 3: Translating..."
-if abersetz tr "$WORK_DIR/source" \
-    --to-lang "$TARGET_LANG" \
+if abersetz tr "$TARGET_LANG" "$WORK_DIR/source" \ \
     --output "$WORK_DIR/translated" \
     --recurse; then
     echo "  Translation complete"
