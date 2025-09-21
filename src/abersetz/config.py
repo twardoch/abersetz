@@ -12,6 +12,13 @@ from typing import Any
 
 from platformdirs import user_config_dir
 
+from .engine_catalog import (
+    DEEP_TRANSLATOR_FREE_PROVIDERS,
+    FREE_TRANSLATOR_PROVIDERS,
+    HYSF_DEFAULT_MODEL,
+    HYSF_DEFAULT_TEMPERATURE,
+)
+
 try:  # Python >= 3.11
     import tomllib
 except ModuleNotFoundError:  # pragma: no cover - fallback for Python 3.10
@@ -163,21 +170,27 @@ DEFAULT_CONFIG_DICT: dict[str, Any] = {
         "translators": {
             "name": "translators",
             "chunk_size": 800,
-            "options": {"provider": "google"},
+            "options": {
+                "provider": "google",
+                "providers": list(FREE_TRANSLATOR_PROVIDERS),
+            },
         },
         "deep-translator": {
             "name": "deep-translator",
             "chunk_size": 800,
-            "options": {"provider": "google"},
+            "options": {
+                "provider": "google",
+                "providers": list(DEEP_TRANSLATOR_FREE_PROVIDERS),
+            },
         },
         "hysf": {
             "name": "hysf",
             "chunk_size": 2400,
             "credential": {"name": "siliconflow"},
             "options": {
-                "model": "tencent/Hunyuan-MT-7B",
+                "model": HYSF_DEFAULT_MODEL,
                 "base_url": "https://api.siliconflow.com/v1",
-                "temperature": 0.9,
+                "temperature": HYSF_DEFAULT_TEMPERATURE,
             },
         },
         "ullm": {
@@ -188,8 +201,8 @@ DEFAULT_CONFIG_DICT: dict[str, Any] = {
                 "profiles": {
                     "default": {
                         "base_url": "https://api.siliconflow.com/v1",
-                        "model": "tencent/Hunyuan-MT-7B",
-                        "temperature": 0.9,
+                        "model": HYSF_DEFAULT_MODEL,
+                        "temperature": HYSF_DEFAULT_TEMPERATURE,
                         "max_input_tokens": 32000,
                         "prolog": {},
                     }

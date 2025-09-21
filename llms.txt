@@ -26,13 +26,6 @@ Project Structure:
 │   ├── 📄 vocab.json
 │   └── 📄 walkthrough.md
 ├── 📁 external
-│   └── 📁 platformdirs
-│       ├── 📁 .github
-│       │   └── 📁 workflows
-│       ├── 📁 docs
-│       ├── 📁 src
-│       │   └── 📁 platformdirs
-│       └── 📁 tests
 ├── 📁 issues
 │   ├── 📄 102-review.md
 │   └── 📄 103.txt
@@ -44,6 +37,7 @@ Project Structure:
 │       ├── 📄 chunking.py
 │       ├── 📄 cli.py
 │       ├── 📄 config.py
+│       ├── 📄 engine_catalog.py
 │       ├── 📄 engines.py
 │       ├── 📄 pipeline.py
 │       └── 📄 setup.py
@@ -4463,24 +4457,77 @@ echo "Report available at: $FINAL_OUTPUT/TRANSLATION_REPORT.md"
 <document index="32">
 <source>examples/pl/poem_en.txt</source>
 <document_content>
-<target>pl</target>
-<output><segment># Fajn rano: Issie plopi pordavuňima,
-Beli cinkuju u magle,
-Susedi se ministruju pozdravima,
-I nada je kao dar.</segment>
+Być lub nie, to jest pytanie: 
+Czy to jest szlachetne w umyśle, by cierpieć 
+Procy i strzały oburzającej fortuny, 
+Lub wziąć broń do morza kłopotów 
+I przeciwstawiając się ich zakończeni. Umrzeć - spać, 
+Więcej nie; i snem, mówiąc, że kończymy 
+Ból serca i tysiące naturalnych wstrząsów 
+To ciało jest spadkobiercą: „to jest konsumpcja 
+Pobożne, aby być życzeniem. Umrzeć, spać; 
+Spać, w stanie marzyć - powie, jest pocieranie: 
+Bo w tym śnie śmierci, jakie sny mogą nadejść, 
+Kiedy odrzuciliśmy tę śmiertelną cewkę, 
+Musi nam się zatrzymać - jest szacunek 
+To powoduje katastrofę tak długiego życia. 
+Bo kto nosiłby bicze i pogardy czasu, 
+Th’ -upresor jest w błędzie, dumny człowiek jest skryty, 
+Błędności z niepoprawami, opóźnienie prawa, 
+Bezczelność urzędu i odmienne 
+Ta zaleca pacjenta z powodu tego, co bierze, 
+Kiedy on sam mógłby zrobić jego ciszy 
+Z gołym bodkinem? Kto by uporządkował niedźwiedzie, 
+Chrząkać i poci się w zmęczonym życiu, 
+Ale ten strach przed czymś po śmierci, 
+Niedopolowy kraj, od którego kouringu 
+Żaden podróżnik nie wraca, zagadnia testament, 
+I sprawia, że ​​raczej nosimy te choroby, które mamy 
+Niż latać do innych, o których nie wiemy?Zatem sumienie, czyni z nas tchórzów, 
+A zatem rodzime odcień rozdzielczości 
+Jest chory z bladą obsadą myśli, 
+Oraz przedsiębiorstwa o wielkim rdzeniu i momencie 
+Z tego powodu ich prądy zmieniają się 
+I stracić nazwę akcji.
 </document_content>
 </document>
 
 <document index="33">
 <source>examples/poem_en.txt</source>
 <document_content>
-# this_file: examples/poem_en.txt
-
-Dawn spills over the rooftops,
-Bells shimmer in the mist,
-Neighbours trade their greetings,
-And hope feels like a gift.
-
+To be, or not to be, that is the question:
+Whether ’tis nobler in the mind to suffer
+The slings and arrows of outrageous fortune,
+Or to take arms against a sea of troubles
+And by opposing end them. To die—to sleep,
+No more; and by a sleep to say we end
+The heart-ache and the thousand natural shocks
+That flesh is heir to: ’tis a consummation
+Devoutly to be wish’d. To die, to sleep;
+To sleep, perchance to dream—ay, there’s the rub:
+For in that sleep of death what dreams may come,
+When we have shuffled off this mortal coil,
+Must give us pause—there’s the respect
+That makes calamity of so long life.
+For who would bear the whips and scorns of time,
+Th’oppressor’s wrong, the proud man’s contumely,
+The pangs of dispriz’d love, the law’s delay,
+The insolence of office, and the spurns
+That patient merit of th’unworthy takes,
+When he himself might his quietus make
+With a bare bodkin? Who would fardels bear,
+To grunt and sweat under a weary life,
+But that the dread of something after death,
+The undiscovere’d country, from whose bourn
+No traveller returns, puzzles the will,
+And makes us rather bear those ills we have
+Than fly to others that we know not of?
+Thus conscience doth make cowards of us all,
+And thus the native hue of resolution
+Is sicklied o’er with the pale cast of thought,
+And enterprises of great pith and moment
+With this regard their currents turn awry
+And lose the name of action.
 </document_content>
 </document>
 
@@ -4872,7 +4919,15 @@ import fire
 import tomli_w
 from loguru import logger
 from rich.console import Console
+from rich.table import Table
 from .config import config_path, load_config
+from .engine_catalog import (
+    DEEP_TRANSLATOR_PAID_PROVIDERS,
+    PAID_TRANSLATOR_PROVIDERS,
+    EngineEntry,
+    collect_deep_translator_providers,
+    collect_translator_providers,
+)
 from .pipeline import PipelineError, TranslationResult, TranslatorOptions, translate_path
 from .setup import setup_command
 from langcodes import get
@@ -4910,6 +4965,8 @@ class AbersetzCLI:
     )) -> None:
     def config((self)) -> ConfigCommands:
     def lang((self)) -> list[str]:
+    def engines((self, include_paid: bool = False)) -> list[EngineEntry]:
+        """List available engines and whether they are configured."""
     def setup((self, non_interactive: bool = False, verbose: bool = False)) -> None:
         """Run the configuration setup wizard."""
 
@@ -4920,6 +4977,10 @@ def _parse_patterns((value: str | Sequence[str] | None)) -> tuple[str, ...]:
 def _load_json_data((reference: str | None)) -> dict[str, str]:
 
 def _render_results((results: Iterable[TranslationResult])) -> None:
+
+def _render_engine_entries((entries: list[EngineEntry])) -> None:
+
+def _collect_engine_entries((include_paid: bool)) -> list[EngineEntry]:
 
 def show((self)) -> str:
 
@@ -4977,6 +5038,9 @@ def config((self)) -> ConfigCommands:
 
 def lang((self)) -> list[str]:
 
+def engines((self, include_paid: bool = False)) -> list[EngineEntry]:
+    """List available engines and whether they are configured."""
+
 def setup((self, non_interactive: bool = False, verbose: bool = False)) -> None:
     """Run the configuration setup wizard."""
 
@@ -4997,6 +5061,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 from platformdirs import user_config_dir
+from .engine_catalog import (
+    DEEP_TRANSLATOR_FREE_PROVIDERS,
+    FREE_TRANSLATOR_PROVIDERS,
+    HYSF_DEFAULT_MODEL,
+    HYSF_DEFAULT_TEMPERATURE,
+)
 import tomllib
 import tomli as tomllib
 import tomli_w
@@ -5060,6 +5130,25 @@ def resolve_credential((
     """Resolve a credential reference to a usable secret."""
 
 
+# File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/src/abersetz/engine_catalog.py
+# Language: python
+
+from collections.abc import Iterable
+from dataclasses import dataclass
+import translators
+
+class EngineEntry:
+    """Descriptor for CLI listing."""
+
+def _filter_available((pool: Iterable[str], allowed: Iterable[str])) -> list[str]:
+
+def collect_translator_providers((*, include_paid: bool = False)) -> list[str]:
+    """Return translator providers available in current environment."""
+
+def collect_deep_translator_providers((*, include_paid: bool = False)) -> list[str]:
+    """Return deep-translator providers supported by abersetz."""
+
+
 # File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/src/abersetz/engines.py
 # Language: python
 
@@ -5078,10 +5167,12 @@ from deep_translator import (  # type: ignore
     MyMemoryTranslator,
     PapagoTranslator,
 )
+from langcodes import get as get_language
 from openai import OpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
 from .chunking import TextFormat
 from .config import AbersetzConfig, EngineConfig, resolve_credential
+from .engine_catalog import HYSF_DEFAULT_MODEL, HYSF_DEFAULT_TEMPERATURE
 
 class EngineError(R, u, n, t, i, m, e, E, r, r, o, r):
     """Raised when an engine cannot be constructed or invoked."""
@@ -5139,6 +5230,11 @@ class LlmEngine(E, n, g, i, n, e, B, a, s, e):
     )) -> list[dict[str, str]]:
     def _parse_payload((self, payload: str)) -> tuple[str, dict[str, str]]:
 
+class HysfEngine(E, n, g, i, n, e, B, a, s, e):
+    """Specialised HYSF engine with fixed prompt semantics."""
+    def __init__((self, config: EngineConfig, client: Any)) -> None:
+    def translate((self, request: EngineRequest)) -> EngineResult:
+
 def translate((self, request: EngineRequest)) -> EngineResult:
     """Translate a chunk."""
 
@@ -5193,6 +5289,14 @@ def _build_messages((
 
 def _parse_payload((self, payload: str)) -> tuple[str, dict[str, str]]:
 
+def __init__((self, config: EngineConfig, client: Any)) -> None:
+
+def _invoke((self, message: str)) -> str:
+
+def translate((self, request: EngineRequest)) -> EngineResult:
+
+def _language_name((code: str)) -> str:
+
 def _make_openai_client((token: str, base_url: str | None)) -> OpenAI:
     """Create an OpenAI client respecting optional base URL."""
 
@@ -5202,6 +5306,14 @@ def _build_llm_engine((
     engine_cfg: EngineConfig,
     *,
     profile: Mapping[str, Any] | None,
+    client: Any | None,
+)) -> Engine:
+
+def _build_hysf_engine((
+    selector: str,
+    config: AbersetzConfig,
+    engine_cfg: EngineConfig,
+    *,
     client: Any | None,
 )) -> Engine:
 
@@ -5308,6 +5420,15 @@ from rich.console import Console
 from rich.progress import Progress
 from rich.table import Table
 from .config import AbersetzConfig, Credential, EngineConfig, save_config
+from .engine_catalog import (
+    DEEP_TRANSLATOR_FREE_PROVIDERS,
+    FREE_TRANSLATOR_PROVIDERS,
+    HYSF_DEFAULT_MODEL,
+    HYSF_DEFAULT_TEMPERATURE,
+    PAID_TRANSLATOR_PROVIDERS,
+    collect_deep_translator_providers,
+    collect_translator_providers,
+)
 import sys
 
 class DiscoveredProvider:
@@ -5386,6 +5507,7 @@ from pathlib import Path
 import pytest
 from abersetz.chunking import TextFormat
 from abersetz.cli import AbersetzCLI
+from abersetz.config import AbersetzConfig, Defaults, EngineConfig
 from abersetz.pipeline import TranslationResult, TranslatorOptions
 
 class DummyLogger:
@@ -5415,6 +5537,8 @@ def add((self, *args, **kwargs)):
 def debug((self, message: str, *args, **kwargs)) -> None:
 
 def fake_translate_path((path: str, options: TranslatorOptions)):
+
+def test_cli_engines_lists_configured_providers((monkeypatch: pytest.MonkeyPatch)) -> None:
 
 
 # File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/tests/test_config.py
@@ -5449,6 +5573,7 @@ def test_load_config_handles_permission_error((
 
 from types import SimpleNamespace
 import pytest
+from langcodes import get as get_language
 import abersetz.config as config_module
 from abersetz.engines import EngineRequest, create_engine
 from abersetz.engines import DeepTranslatorEngine
@@ -5472,7 +5597,7 @@ def fake_translate_text((
         text: str, translator: str, from_language: str, to_language: str, **_: object
     )) -> str:
 
-def test_hysf_engine_parses_voc((monkeypatch: pytest.MonkeyPatch)) -> None:
+def test_hysf_engine_uses_fixed_prompt((monkeypatch: pytest.MonkeyPatch)) -> None:
 
 def test_ullm_engine_uses_profile((monkeypatch: pytest.MonkeyPatch)) -> None:
 

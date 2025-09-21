@@ -19,11 +19,13 @@ from deep_translator import (  # type: ignore
     MyMemoryTranslator,
     PapagoTranslator,
 )
+from langcodes import get as get_language
 from openai import OpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from .chunking import TextFormat
 from .config import AbersetzConfig, EngineConfig, resolve_credential
+from .engine_catalog import HYSF_DEFAULT_MODEL, HYSF_DEFAULT_TEMPERATURE
 
 
 class EngineError(RuntimeError):
@@ -240,6 +242,42 @@ class LlmEngine(EngineBase):
         return text, {}
 
 
+class HysfEngine(EngineBase):
+    """Specialised HYSF engine with fixed prompt semantics."""
+
+    MODEL = HYSF_DEFAULT_MODEL
+    TEMPERATURE = HYSF_DEFAULT_TEMPERATURE
+
+    def __init__(self, config: EngineConfig, client: Any) -> None:
+        super().__init__(config.name, config.chunk_size, config.html_chunk_size)
+        self._client = client
+
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1), reraise=True)
+    def _invoke(self, message: str) -> str:
+        response = self._client.chat.completions.create(
+            model=self.MODEL,
+            messages=[{"role": "user", "content": message}],
+            temperature=self.TEMPERATURE,
+        )
+        return response.choices[0].message.content or ""
+
+    def translate(self, request: EngineRequest) -> EngineResult:
+        language_name = self._language_name(request.target_lang)
+        prompt = (
+            f"Translate the following segment into {language_name}, without additional explanation.\n\n"
+            f"{request.text}"
+        )
+        text = self._invoke(prompt).strip()
+        return EngineResult(text=text, voc=dict(request.voc))
+
+    @staticmethod
+    def _language_name(code: str) -> str:
+        try:
+            return get_language(code).language_name("en") or code
+        except Exception:  # pragma: no cover - unexpected lookup failure
+            return code
+
+
 def _make_openai_client(token: str, base_url: str | None) -> OpenAI:
     """Create an OpenAI client respecting optional base URL."""
     if base_url:
@@ -276,6 +314,21 @@ def _build_llm_engine(
     )
 
 
+def _build_hysf_engine(
+    selector: str,
+    config: AbersetzConfig,
+    engine_cfg: EngineConfig,
+    *,
+    client: Any | None,
+) -> Engine:
+    token = resolve_credential(config, engine_cfg.credential)
+    if token is None:
+        raise EngineError(f"Missing credential for engine {selector}")
+    base_url = engine_cfg.options.get("base_url")
+    openai_client = client or _make_openai_client(token, base_url)
+    return HysfEngine(engine_cfg, openai_client)
+
+
 def _translators_provider(variant: str | None, engine_cfg: EngineConfig) -> str:
     return variant or engine_cfg.options.get("provider", "google")
 
@@ -308,7 +361,7 @@ def create_engine(
         provider = _translators_provider(variant, engine_cfg)
         return DeepTranslatorEngine(provider, engine_cfg)
     if base == "hysf":
-        return _build_llm_engine(selector, config, engine_cfg, profile=None, client=client)
+        return _build_hysf_engine(selector, config, engine_cfg, client=client)
     if base == "ullm":
         profile = _select_profile(engine_cfg, variant)
         return _build_llm_engine(selector, config, engine_cfg, profile=profile, client=client)

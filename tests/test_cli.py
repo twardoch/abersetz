@@ -9,6 +9,7 @@ import pytest
 
 from abersetz.chunking import TextFormat
 from abersetz.cli import AbersetzCLI
+from abersetz.config import AbersetzConfig, Defaults, EngineConfig
 from abersetz.pipeline import TranslationResult, TranslatorOptions
 
 
@@ -116,3 +117,38 @@ def test_cli_verbose_logs_translation_details(
         f"Output: {sample_destination}",
     ]
     assert printed == [str(sample_destination)]
+
+
+def test_cli_engines_lists_configured_providers(monkeypatch: pytest.MonkeyPatch) -> None:
+    cfg = AbersetzConfig(
+        defaults=Defaults(engine="translators/google"),
+        engines={
+            "translators": EngineConfig(
+                name="translators", options={"providers": ["google", "bing"]}
+            ),
+            "deep-translator": EngineConfig(
+                name="deep-translator", options={"providers": ["google"]}
+            ),
+        },
+    )
+
+    monkeypatch.setattr("abersetz.cli.load_config", lambda: cfg)
+    monkeypatch.setattr(
+        "abersetz.cli.collect_translator_providers",
+        lambda include_paid=False: ["google", "bing", "yandex"],
+    )
+    monkeypatch.setattr(
+        "abersetz.cli.collect_deep_translator_providers",
+        lambda include_paid=False: ["google"],
+    )
+
+    printed: list[str] = []
+    monkeypatch.setattr("abersetz.cli.console.print", lambda value: printed.append(str(value)))
+
+    entries = AbersetzCLI().engines()
+
+    selectors = [entry.selector for entry in entries]
+    assert "translators/google" in selectors
+    assert any(entry.configured for entry in entries if entry.selector == "translators/google")
+    assert any(entry.selector == "deep-translator/google" for entry in entries)
+    assert printed  # ensure table rendered

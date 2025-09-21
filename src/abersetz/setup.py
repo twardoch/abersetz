@@ -13,6 +13,15 @@ from rich.progress import Progress
 from rich.table import Table
 
 from .config import AbersetzConfig, Credential, EngineConfig, save_config
+from .engine_catalog import (
+    DEEP_TRANSLATOR_FREE_PROVIDERS,
+    FREE_TRANSLATOR_PROVIDERS,
+    HYSF_DEFAULT_MODEL,
+    HYSF_DEFAULT_TEMPERATURE,
+    PAID_TRANSLATOR_PROVIDERS,
+    collect_deep_translator_providers,
+    collect_translator_providers,
+)
 
 console = Console()
 
@@ -258,29 +267,52 @@ class SetupWizard:
         # Set up engines based on discovered providers
         engines = {}
 
-        # Configure translators engines
-        for provider in self.discovered_providers:
-            if "translators" in str(provider.engine_names):
-                if "translators" not in engines:
-                    engines["translators"] = EngineConfig(
-                        name="translators",
-                        chunk_size=800,
-                        options={"provider": "google"},
-                    )
+        # Configure translators engines with maximum free coverage
+        translator_providers = collect_translator_providers(include_paid=False)
+        if not translator_providers:
+            translator_providers = list(FREE_TRANSLATOR_PROVIDERS)
 
-        # Configure deep-translator engines
+        premium_translators: list[str] = []
         for provider in self.discovered_providers:
-            if "deep-translator" in str(provider.engine_names):
-                if "deep-translator" not in engines:
-                    engines["deep-translator"] = EngineConfig(
-                        name="deep-translator",
-                        chunk_size=800,
-                        options={
-                            "provider": "deepl"
-                            if "deepl" in str(provider.engine_names)
-                            else "google"
-                        },
-                    )
+            if provider.is_available and provider.name in PAID_TRANSLATOR_PROVIDERS:
+                premium_translators.append(provider.name)
+        for item in premium_translators:
+            if item not in translator_providers:
+                translator_providers.append(item)
+
+        if translator_providers:
+            engines["translators"] = EngineConfig(
+                name="translators",
+                chunk_size=800,
+                options={
+                    "provider": translator_providers[0],
+                    "providers": translator_providers,
+                },
+            )
+
+        # Configure deep-translator engines (free first, add premium if keys present)
+        deep_providers = collect_deep_translator_providers(include_paid=False)
+        if not deep_providers:
+            deep_providers = list(DEEP_TRANSLATOR_FREE_PROVIDERS)
+
+        premium_deep_map = {
+            "deepl": "deepl",
+            "microsoft": "microsoft",
+        }
+        for provider in self.discovered_providers:
+            alias = premium_deep_map.get(provider.name)
+            if alias and provider.is_available and alias not in deep_providers:
+                deep_providers.append(alias)
+
+        if deep_providers:
+            engines["deep-translator"] = EngineConfig(
+                name="deep-translator",
+                chunk_size=800,
+                options={
+                    "provider": deep_providers[0],
+                    "providers": deep_providers,
+                },
+            )
 
         # Configure LLM engines
         siliconflow_available = any(
@@ -294,8 +326,8 @@ class SetupWizard:
                 credential=Credential(name="siliconflow"),
                 options={
                     "base_url": "https://api.siliconflow.com/v1",
-                    "model": "tencent/Hunyuan-MT-7B",
-                    "temperature": 0.9,
+                    "model": HYSF_DEFAULT_MODEL,
+                    "temperature": HYSF_DEFAULT_TEMPERATURE,
                 },
             )
 
@@ -307,8 +339,8 @@ class SetupWizard:
                     "profiles": {
                         "default": {
                             "base_url": "https://api.siliconflow.com/v1",
-                            "model": "tencent/Hunyuan-MT-7B",
-                            "temperature": 0.9,
+                            "model": HYSF_DEFAULT_MODEL,
+                            "temperature": HYSF_DEFAULT_TEMPERATURE,
                             "max_input_tokens": 32000,
                             "prolog": {},
                         }

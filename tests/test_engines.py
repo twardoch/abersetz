@@ -6,6 +6,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 
 import pytest
+from langcodes import get as get_language
 
 import abersetz.config as config_module
 from abersetz.engines import EngineRequest, create_engine
@@ -62,10 +63,10 @@ def test_translators_engine_invokes_library(monkeypatch: pytest.MonkeyPatch) -> 
     assert captured["translator"] == "google"
 
 
-def test_hysf_engine_parses_voc(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_hysf_engine_uses_fixed_prompt(monkeypatch: pytest.MonkeyPatch) -> None:
     cfg = config_module.load_config()
     monkeypatch.setenv("SILICONFLOW_API_KEY", "env-key")
-    payload = '<output>cześć</output><voc>{"hi": "cześć"}</voc>'
+    payload = "cześć"
     client = DummyClient(payload)
     engine = create_engine("hysf", cfg, client=client)
 
@@ -74,15 +75,22 @@ def test_hysf_engine_parses_voc(monkeypatch: pytest.MonkeyPatch) -> None:
         source_lang="en",
         target_lang="pl",
         is_html=False,
-        voc={},
-        prolog={"existing": "value"},
+        voc={"existing": "value"},
+        prolog={"ignored": "value"},
         chunk_index=0,
         total_chunks=1,
     )
     result = engine.translate(request)
     assert result.text == "cześć"
-    assert result.voc == {"hi": "cześć"}
+    # HYSF should not mutate vocabulary and should keep existing entries only
+    assert result.voc == {"existing": "value"}
     assert client.calls  # ensure API invoked
+    call = client.calls[0]
+    expected_language = get_language("pl").language_name("en")
+    expected_message = f"Translate the following segment into {expected_language}, without additional explanation.\n\nhi"
+    assert call["model"] == "tencent/Hunyuan-MT-7B"
+    assert call["temperature"] == 0.9
+    assert call["messages"] == [{"role": "user", "content": expected_message}]
 
 
 def test_ullm_engine_uses_profile(monkeypatch: pytest.MonkeyPatch) -> None:

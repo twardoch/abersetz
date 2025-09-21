@@ -12,8 +12,16 @@ import fire  # type: ignore
 import tomli_w
 from loguru import logger
 from rich.console import Console
+from rich.table import Table
 
 from .config import config_path, load_config
+from .engine_catalog import (
+    DEEP_TRANSLATOR_PAID_PROVIDERS,
+    PAID_TRANSLATOR_PROVIDERS,
+    EngineEntry,
+    collect_deep_translator_providers,
+    collect_translator_providers,
+)
 from .pipeline import PipelineError, TranslationResult, TranslatorOptions, translate_path
 from .setup import setup_command
 
@@ -48,6 +56,135 @@ def _render_results(results: Iterable[TranslationResult]) -> None:
     # Simple output - just list the output files
     for result in results:
         console.print(str(result.destination))
+
+
+def _render_engine_entries(entries: list[EngineEntry]) -> None:
+    if not entries:
+        console.print("No engines detected.")
+        return
+    table = Table(title="Available Engines", show_header=True, header_style="bold cyan")
+    table.add_column("Selector", style="white")
+    table.add_column("Configured", style="green")
+    table.add_column("Credential", style="yellow")
+    table.add_column("Notes", style="magenta")
+    for entry in entries:
+        table.add_row(
+            entry.selector,
+            "yes" if entry.configured else "no",
+            "required" if entry.requires_api_key else "optional",
+            entry.notes,
+        )
+    console.print(table)
+
+
+def _collect_engine_entries(include_paid: bool) -> list[EngineEntry]:
+    cfg = load_config()
+    entries: list[EngineEntry] = []
+
+    # translators engine
+    translator_cfg = cfg.engines.get("translators")
+    entries.append(
+        EngineEntry(
+            selector="translators",
+            configured=translator_cfg is not None,
+            requires_api_key=False,
+            notes="use translators/<provider>",
+        )
+    )
+    configured_translators = []
+    if translator_cfg:
+        providers = translator_cfg.options.get("providers") or []
+        if isinstance(providers, list | tuple):
+            configured_translators.extend(str(p) for p in providers)
+        elif translator_cfg.options.get("provider"):
+            configured_translators.append(str(translator_cfg.options["provider"]))
+    available_translators = collect_translator_providers(include_paid=include_paid)
+    translator_candidates = sorted(
+        {
+            *configured_translators,
+            *available_translators,
+        },
+        key=str.lower,
+    )
+    for provider in translator_candidates:
+        selector = f"translators/{provider}"
+        notes = "free" if provider not in PAID_TRANSLATOR_PROVIDERS else "requires API"
+        entries.append(
+            EngineEntry(
+                selector=selector,
+                configured=provider in configured_translators,
+                requires_api_key=provider in PAID_TRANSLATOR_PROVIDERS,
+                notes=notes,
+            )
+        )
+
+    # deep-translator engine
+    deep_cfg = cfg.engines.get("deep-translator")
+    entries.append(
+        EngineEntry(
+            selector="deep-translator",
+            configured=deep_cfg is not None,
+            requires_api_key=False,
+            notes="use deep-translator/<provider>",
+        )
+    )
+    configured_deep = []
+    if deep_cfg:
+        providers = deep_cfg.options.get("providers") or []
+        if isinstance(providers, list | tuple):
+            configured_deep.extend(str(p) for p in providers)
+        elif deep_cfg.options.get("provider"):
+            configured_deep.append(str(deep_cfg.options["provider"]))
+    available_deep = collect_deep_translator_providers(include_paid=include_paid)
+    deep_candidates = sorted({*configured_deep, *available_deep}, key=str.lower)
+    for provider in deep_candidates:
+        selector = f"deep-translator/{provider}"
+        notes = "free" if provider not in DEEP_TRANSLATOR_PAID_PROVIDERS else "requires API"
+        entries.append(
+            EngineEntry(
+                selector=selector,
+                configured=provider in configured_deep,
+                requires_api_key=provider in DEEP_TRANSLATOR_PAID_PROVIDERS,
+                notes=notes,
+            )
+        )
+
+    # hysf engine
+    if "hysf" in cfg.engines:
+        entries.append(
+            EngineEntry(
+                selector="hysf",
+                configured=True,
+                requires_api_key=True,
+                notes="siliconflow",
+            )
+        )
+
+    ullm_cfg = cfg.engines.get("ullm")
+    if ullm_cfg:
+        profiles = ullm_cfg.options.get("profiles", {})
+        if isinstance(profiles, dict):
+            for profile_name in sorted(profiles):
+                selector = f"ullm/{profile_name}"
+                entries.append(
+                    EngineEntry(
+                        selector=selector,
+                        configured=True,
+                        requires_api_key=True,
+                        notes=profiles[profile_name].get("model", ""),
+                    )
+                )
+        else:
+            entries.append(
+                EngineEntry(
+                    selector="ullm/default",
+                    configured=True,
+                    requires_api_key=True,
+                    notes="",
+                )
+            )
+
+    return entries
 
 
 class ConfigCommands:
@@ -204,6 +341,12 @@ class AbersetzCLI:
         for line in rows:
             console.print(line)
         return rows
+
+    def engines(self, include_paid: bool = False) -> list[EngineEntry]:
+        """List available engines and whether they are configured."""
+        entries = _collect_engine_entries(include_paid)
+        _render_engine_entries(entries)
+        return entries
 
     def setup(self, non_interactive: bool = False, verbose: bool = False) -> None:
         """Run the configuration setup wizard.

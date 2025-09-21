@@ -21,6 +21,8 @@ def test_load_config_yields_defaults(tmp_path: Path) -> None:
     assert cfg.defaults.to_lang == "en"
     assert cfg.engines["hysf"].options["model"] == "tencent/Hunyuan-MT-7B"
     assert cfg.credentials["siliconflow"].env == "SILICONFLOW_API_KEY"
+    assert "providers" in cfg.engines["translators"].options
+    assert "providers" in cfg.engines["deep-translator"].options
 
 
 def test_save_config_persists_changes(tmp_path: Path) -> None:
