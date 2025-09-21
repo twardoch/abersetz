@@ -38,7 +38,7 @@ Typical locations:
 
 ```toml
 [defaults]
-engine = "translators/google"
+engine = "tr/google"
 from_lang = "auto"
 to_lang = "en"
 chunk_size = 1200
@@ -88,7 +88,7 @@ Global default settings for all translations:
 
 ```toml
 [defaults]
-engine = "translators/google" # Default translation engine
+engine = "tr/google" # Default translation engine
 from_lang = "auto"             # Source language (auto-detect)
 to_lang = "en"                  # Target language
 chunk_size = 1200              # Characters per text chunk
@@ -308,7 +308,7 @@ save_config(config)
 Override defaults with environment variables:
 
 ```bash
-export ABERSETZ_ENGINE="translators/bing"
+export ABERSETZ_ENGINE="tr/bing"
 export ABERSETZ_TO_LANG="es"
 export ABERSETZ_CHUNK_SIZE="1500"
 ```
@@ -346,7 +346,7 @@ export TOGETHERAI_API_KEY="..."
 
 ```toml
 [defaults]
-engine = "translators/google"
+engine = "tr/google"
 to_lang = "es"
 ```
 
@@ -355,7 +355,7 @@ to_lang = "es"
 
 ```toml
 [defaults]
-engine = "translators/google"
+engine = "tr/google"
 
 [credentials.openai]
 env = "OPENAI_API_KEY"
@@ -452,6 +452,12 @@ Fix file permissions:
 ```bash
 chmod 644 "$(abersetz config path | tail -1)"
 ```
+
+## Validation Selector Tips
+
+- Keep a short list of smoke-test selectors (for example, `tr/google,ll/default`) to avoid hammering every provider when you validate changes.
+- Run `abersetz validate --selectors tr/google,ll/default --no-include-defaults` during CI or offline development; it skips auto-discovered providers while still exercising each engine family.
+- Review the [CLI validate command](cli.html#abersetz-validate) for more usage patterns.
 
 ## See Also
 

@@ -3,17 +3,26 @@
 
 """Basic example of using abersetz Python API."""
 
+from collections.abc import Callable
 from pathlib import Path
 
 from abersetz import TranslatorOptions, translate_path
+
+FALLBACK_DESCRIPTION = "No description provided."
+
+
+def format_example_doc(func: Callable[..., object]) -> str:
+    """Return a human-friendly description for an example function."""
+    doc = func.__doc__
+    if doc:
+        return doc.strip()
+    return FALLBACK_DESCRIPTION
 
 
 # Example 1: Simple translation
 def example_simple():
     """Translate a single file with default settings."""
-    results = translate_path(
-        "poem_en.txt", TranslatorOptions(to_lang="es", engine="translators/google")
-    )
+    results = translate_path("poem_en.txt", TranslatorOptions(to_lang="es", engine="tr/google"))
     for result in results:
         print(f"Translated {result.source} -> {result.destination}")
         print(f"Used {result.chunks} chunks in {result.format.value} format")
@@ -27,7 +36,7 @@ def example_batch():
         TranslatorOptions(
             from_lang="en",
             to_lang="fr",
-            engine="deep-translator/google",
+            engine="dt/google",
             include=("*.txt", "*.md"),
             xclude=("*_fr.txt", "*_fr.md"),
             output_dir=Path("translations/fr"),
@@ -50,7 +59,7 @@ def example_llm_with_voc():
         "technical_doc.md",
         TranslatorOptions(
             to_lang="de",
-            engine="hysf",  # or "ullm/default"
+            engine="hy",  # or "ll/default"
             initial_voc=initial_vocab,
             save_voc=True,  # Save merged voc
             chunk_size=2000,
@@ -68,7 +77,7 @@ def example_dry_run():
         "test_files/",
         TranslatorOptions(
             to_lang="ja",
-            engine="translators/bing",
+            engine="tr/bing",
             recurse=True,
             dry_run=True,  # Don't actually translate
         ),
@@ -85,7 +94,7 @@ def example_html():
         TranslatorOptions(
             from_lang="en",
             to_lang="pt",
-            engine="deep-translator/deepl",
+            engine="dt/deepl",
             html_chunk_size=2500,  # Larger chunks for HTML
             write_over=False,  # Create new files
         ),
@@ -141,4 +150,5 @@ if __name__ == "__main__":
         print(f"Usage: {sys.argv[0]} {{{','.join(examples.keys())}}}")
         print("\nAvailable examples:")
         for name, func in examples.items():
-            print(f"  {name}: {func.__doc__.strip()}")
+            description = format_example_doc(func)
+            print(f"  {name}: {description}")

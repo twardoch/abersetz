@@ -118,9 +118,18 @@ class OpenAI:
 
 
 class Chat:
-    """Chat API namespace."""
+    """Chat API namespace with an optionally populated completions client."""
 
-    pass
+    completions: ChatCompletions | None
+
+    def __init__(self) -> None:
+        self.completions = None
 
 
-__all__ = ["OpenAI", "ChatCompletionResponse", "ChatCompletionChoice", "ChatCompletionMessage"]
+__all__ = [
+    "OpenAI",
+    "ChatCompletionResponse",
+    "ChatCompletionChoice",
+    "ChatCompletionMessage",
+    "Chat",
+]

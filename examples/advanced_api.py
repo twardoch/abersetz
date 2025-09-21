@@ -5,6 +5,7 @@
 
 import asyncio
 import json
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from abersetz import TranslationResult, TranslatorOptions, translate_path
@@ -12,16 +13,66 @@ from abersetz.config import AbersetzConfig, load_config
 from abersetz.engines import EngineRequest, create_engine
 
 
+@dataclass
+class _LanguageStats:
+    files: int = 0
+    chunks: int = 0
+    formats: dict[str, int] = field(default_factory=dict)
+
+    def record(self, result: TranslationResult) -> None:
+        self.files += 1
+        self.chunks += result.chunks
+        fmt = result.format.value
+        self.formats[fmt] = self.formats.get(fmt, 0) + 1
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "files": self.files,
+            "chunks": self.chunks,
+            "formats": dict(self.formats),
+        }
+
+
+@dataclass
+class _ReportFile:
+    source: str
+    destination: str
+    chunks: int
+    format: str
+    voc_size: int
+
+    @classmethod
+    def from_result(cls, result: TranslationResult) -> "_ReportFile":
+        return cls(
+            source=str(result.source),
+            destination=str(result.destination),
+            chunks=result.chunks,
+            format=result.format.value,
+            voc_size=len(result.voc),
+        )
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "source": self.source,
+            "destination": self.destination,
+            "chunks": self.chunks,
+            "format": self.format,
+            "voc_size": self.voc_size,
+        }
+
+
 class TranslationWorkflow:
     """Advanced translation workflow with progress tracking."""
 
-    def __init__(self, config: AbersetzConfig = None):
-        self.config = config or load_config()
+    def __init__(self, config: AbersetzConfig | None = None):
+        if config is None:
+            config = load_config()
+        self.config = config
         self.results: list[TranslationResult] = []
         self.errors: dict[str, str] = {}
 
     def translate_project(
-        self, source_dir: str, target_langs: list[str], engine: str = "translators/google"
+        self, source_dir: str, target_langs: list[str], engine: str = "tr/google"
     ):
         """Translate entire project to multiple languages."""
         source_path = Path(source_dir)
@@ -52,42 +103,29 @@ class TranslationWorkflow:
 
     def generate_report(self, output_file: str = "translation_report.json"):
         """Generate detailed translation report."""
+        languages: dict[str, _LanguageStats] = {}
+        files: list[_ReportFile] = []
+
+        for result in self.results:
+            lang = result.destination.parent.name.split("_")[-1]
+            stats = languages.setdefault(lang, _LanguageStats())
+            stats.record(result)
+            files.append(_ReportFile.from_result(result))
+
         report = {
             "total_files": len(self.results),
             "total_chunks": sum(r.chunks for r in self.results),
-            "languages": {},
-            "errors": self.errors,
-            "files": [],
+            "languages": {key: value.to_dict() for key, value in languages.items()},
+            "errors": dict(self.errors),
+            "files": [file_entry.to_dict() for file_entry in files],
         }
 
-        # Group by language
-        for result in self.results:
-            lang = result.destination.parent.name.split("_")[-1]
-            if lang not in report["languages"]:
-                report["languages"][lang] = {"files": 0, "chunks": 0, "formats": {}}
+        output_path = Path(output_file)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        with output_path.open("w", encoding="utf-8") as handle:
+            json.dump(report, handle, indent=2)
 
-            report["languages"][lang]["files"] += 1
-            report["languages"][lang]["chunks"] += result.chunks
-
-            fmt = result.format.value
-            if fmt not in report["languages"][lang]["formats"]:
-                report["languages"][lang]["formats"][fmt] = 0
-            report["languages"][lang]["formats"][fmt] += 1
-
-            report["files"].append(
-                {
-                    "source": str(result.source),
-                    "destination": str(result.destination),
-                    "chunks": result.chunks,
-                    "format": result.format.value,
-                    "voc_size": len(result.voc),
-                }
-            )
-
-        with open(output_file, "w") as f:
-            json.dump(report, f, indent=2)
-
-        print(f"\nReport saved to {output_file}")
+        print(f"\nReport saved to {output_path}")
         return report
 
 
@@ -111,11 +149,11 @@ class vocManager:
         return merged
 
     def translate_with_consistency(
-        self, files: list[str], to_lang: str, base_voc: dict[str, str] = None
+        self, files: list[str], to_lang: str, base_voc: dict[str, str] | None = None
     ):
         """Translate files with consistent terminology."""
-        accumulated_vocab = base_voc or {}
-        results = []
+        accumulated_vocab = dict(base_voc) if base_voc else {}
+        results: list[TranslationResult] = []
 
         for file_path in files:
             print(f"Translating {file_path} with {len(accumulated_vocab)} terms...")
@@ -124,7 +162,7 @@ class vocManager:
                 file_path,
                 TranslatorOptions(
                     to_lang=to_lang,
-                    engine="ullm/default",  # LLM engine for voc support
+                    engine="ll/default",  # LLM engine for voc support
                     initial_voc=accumulated_vocab,
                     save_voc=True,
                 ),
@@ -189,7 +227,7 @@ def example_multi_language():
     workflow.translate_project(
         source_dir="docs",
         target_langs=["es", "fr", "de", "ja", "zh-CN"],
-        engine="translators/google",
+        engine="tr/google",
     )
     workflow.generate_report()
 
@@ -230,10 +268,10 @@ def example_parallel_comparison():
     """
 
     engines = [
-        "translators/google",
-        "translators/bing",
-        "deep-translator/google",
-        "hysf",  # Requires API key
+        "tr/google",
+        "tr/bing",
+        "dt/google",
+        "hy",  # Requires API key
     ]
 
     # Run async comparison
@@ -300,4 +338,5 @@ if __name__ == "__main__":
         print(f"Usage: {sys.argv[0]} {{{','.join(examples.keys())}}}")
         print("\nAdvanced examples:")
         for name, func in examples.items():
-            print(f"  {name}: {func.__doc__.strip()}")
+            description = (func.__doc__ or "No description provided").strip()
+            print(f"  {name}: {description}")

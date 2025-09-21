@@ -19,6 +19,7 @@ Minimalist file translator that reuses proven machine translation engines while 
 - voc-aware translation pipeline that merges `<voc>` JSON emitted by LLM engines.
 - Offline-friendly dry-run mode for testing and demos.
 - Optional voc sidecar files when `--save-voc` is set.
+- Built-in `abersetz validate` health check that pings each configured engine, reports latency, and surfaces pricing hints from the research catalog.
 
 ## Installation
 ```bash
@@ -31,6 +32,9 @@ pip install abersetz
 ```bash
 # Automatically discover and configure available translation services
 abersetz setup
+
+# Smoke-test configured engines with a single command
+abersetz validate --target-lang es
 ```
 
 This will scan your environment for API keys, test endpoints, and create an optimized configuration.
@@ -38,25 +42,33 @@ This will scan your environment for API keys, test endpoints, and create an opti
 ### Basic Translation
 ```bash
 # Using the main CLI
-abersetz tr pl ./docs --engine translators/google --output ./build/pl
+abersetz tr pl ./docs --engine tr/google --output ./build/pl
 
 # Or using the shorthand command
-abtr pl ./docs --engine translators/google --output ./build/pl
+abtr pl ./docs --engine tr/google --output ./build/pl
 ```
 
 ### CLI Options (preview)
 - `to_lang`: first positional argument selecting the target language.
 - `--from-lang`: source language (defaults to `auto`).
 - `--engine`: one of
-  - `translators/<provider>` (e.g. `translators/google`)
-  - `deep-translator/<provider>` (e.g. `deep-translator/deepl`)
-  - `hysf`
-  - `ullm/<profile>` where profiles are defined in config.
+  - `tr/<provider>` (e.g. `tr/google`)
+  - `dt/<provider>` (e.g. `dt/deepl`)
+  - `hy`
+  - `ll/<profile>` where profiles are defined in config.
+    - Legacy selectors such as `translators/google` remain accepted and are auto-normalized.
 - `--recurse/--no-recurse`: recurse into subdirectories (defaults to on).
 - `--write_over`: replace input files instead of writing to output dir.
 - `--save-voc`: drop merged voc JSON next to each translated file.
 - `--chunk-size` / `--html-chunk-size`: override default chunk lengths.
 - `--verbose`: enable debug logging via loguru.
+- `abersetz engines` extras:
+  - `--family tr|dt|ll|hy`: filter listing to a single engine family.
+  - `--configured-only`: show only configured engines.
+- `abersetz validate` extras:
+  - `--selectors tr/google,ll/default`: limit validation to specific selectors (comma-separated).
+  - `--target-lang es`: override the default sample translation language (`es`).
+  - `--sample-text "Hello!"`: supply a custom validation snippet.
 
 ## Configuration
 `abersetz` stores runtime configuration under the user config path determined by `platformdirs`. The config file keeps:
@@ -67,7 +79,7 @@ abtr pl ./docs --engine translators/google --output ./build/pl
 Example snippet (stored in `config.toml`):
 ```toml
 [defaults]
-engine = "translators/google"
+engine = "tr/google"
 from_lang = "auto"
 to_lang = "en"
 chunk_size = 1200
@@ -105,8 +117,8 @@ max_input_tokens = 32000
 Use `abersetz config show` and `abersetz config path` to inspect the file.
 
 ## CLI Tools
-- `abersetz`: Main CLI with `tr` (translate) and `config` commands
-- `abtr`: Direct translation shorthand (equivalent to `abersetz tr`)
+- `abersetz`: Main CLI exposing `tr` (translate), `validate`, and `config` commands.
+- `abtr`: Direct translation shorthand (equivalent to `abersetz tr`).
 
 ## Python API
 ```python
@@ -114,7 +126,7 @@ from abersetz import translate_path, TranslatorOptions
 
 translate_path(
     path="docs",
-    options=TranslatorOptions(to_lang="de", engine="translators/google"),
+    options=TranslatorOptions(to_lang="de", engine="tr/google"),
 )
 ```
 
@@ -124,6 +136,7 @@ The `examples/` directory holds ready-to-run demos:
 - `poem_pl.txt`: translated sample output.
 - `vocab.json`: voc generated during translation.
 - `walkthrough.md`: step-by-step CLI invocation log.
+- `validate_report.sh`: captures the validation summary table for quick audits.
 
 ## Development Workflow
 ```bash

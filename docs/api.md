@@ -55,7 +55,7 @@ Configuration for translation operations.
 from abersetz import TranslatorOptions
 
 options = TranslatorOptions(
-    engine="translators/google",
+    engine="tr/google",
     from_lang="auto",
     to_lang="en",
     recurse=True,
@@ -143,7 +143,7 @@ from abersetz.config import save_config, AbersetzConfig, Defaults
 
 config = AbersetzConfig(
     defaults=Defaults(
-        engine="translators/google",
+        engine="tr/google",
         to_lang="es",
         chunk_size=1500
     )
@@ -177,7 +177,7 @@ from abersetz.engines import create_engine
 from abersetz.config import load_config
 
 config = load_config()
-engine = create_engine("translators/google", config)
+engine = create_engine("tr/google", config)
 ```
 
 ### Using Engines Directly
@@ -236,7 +236,7 @@ results = translate_path(
     "document.txt",
     TranslatorOptions(
         to_lang="fr",
-        engine="translators/google"
+        engine="tr/google"
     )
 )
 
@@ -251,7 +251,7 @@ for result in results:
 from pathlib import Path
 from abersetz import translate_path, TranslatorOptions
 
-def batch_translate(source_dir, languages, engine="translators/google"):
+def batch_translate(source_dir, languages, engine="tr/google"):
     """Translate to multiple languages."""
     results = {}
 
@@ -295,7 +295,7 @@ class TranslationWorkflow:
                 file,
                 TranslatorOptions(
                     to_lang=to_lang,
-                    engine="ullm/default",
+                    engine="ll/default",
                     initial_voc=self.voc,
                     save_voc=True
                 ),

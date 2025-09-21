@@ -21,9 +21,11 @@ from .engine_catalog import (
     EngineEntry,
     collect_deep_translator_providers,
     collect_translator_providers,
+    normalize_selector,
 )
 from .pipeline import PipelineError, TranslationResult, TranslatorOptions, translate_path
 from .setup import setup_command
+from .validation import ValidationResult, validate_engines
 
 console = Console()
 
@@ -64,32 +66,16 @@ def _render_engine_entries(entries: list[EngineEntry]) -> None:
         return
     table = Table(title="Available Translation Engines", show_header=True, header_style="bold cyan")
     table.add_column("Selector", style="white")
-    table.add_column("Shortcut", style="cyan")
+    table.add_column("Family", style="cyan")
     table.add_column("Configured", style="green")
     table.add_column("Credential", style="yellow")
     table.add_column("Notes", style="magenta")
 
-    # Map of shortcuts
-    shortcuts = {
-        "translators": "tr",
-        "deep-translator": "dt",
-        "ullm": "ll",
-    }
-
     for entry in entries:
-        # Determine shortcut
-        base = entry.selector.split("/")[0]
-        shortcut = ""
-        if base in shortcuts:
-            if "/" in entry.selector:
-                provider = entry.selector.split("/", 1)[1]
-                shortcut = f"{shortcuts[base]}/{provider}"
-            else:
-                shortcut = shortcuts[base]
-
+        base = entry.selector.split("/", 1)[0]
         table.add_row(
             entry.selector,
-            shortcut,
+            base,
             "✓" if entry.configured else "✗",
             "required" if entry.requires_api_key else "free",
             entry.notes,
@@ -97,7 +83,34 @@ def _render_engine_entries(entries: list[EngineEntry]) -> None:
     console.print(table)
 
 
-def _collect_engine_entries(include_paid: bool) -> list[EngineEntry]:
+def _render_validation_entries(results: list[ValidationResult]) -> None:
+    if not results:
+        console.print("No engines available for validation.")
+        return
+
+    table = Table(title="Engine Validation", show_header=True, header_style="bold cyan")
+    table.add_column("Selector", style="white")
+    table.add_column("Status", style="green")
+    table.add_column("Latency (s)", justify="right", style="yellow")
+    table.add_column("Sample Output", style="magenta")
+    table.add_column("Error", style="red")
+
+    for result in results:
+        status = "[green]✓[/green]" if result.success else "[red]✗[/red]"
+        latency = f"{result.latency:.2f}"
+        sample = result.translation[:80]
+        error = result.error or ""
+        table.add_row(result.selector, status, latency, sample, error)
+
+    console.print(table)
+
+
+def _collect_engine_entries(
+    include_paid: bool,
+    *,
+    family: str | None = None,
+    configured_only: bool = False,
+) -> list[EngineEntry]:
     cfg = load_config()
     entries: list[EngineEntry] = []
 
@@ -105,19 +118,22 @@ def _collect_engine_entries(include_paid: bool) -> list[EngineEntry]:
     translator_cfg = cfg.engines.get("translators")
     entries.append(
         EngineEntry(
-            selector="translators",
+            selector=str(normalize_selector("translators")),
             configured=translator_cfg is not None,
             requires_api_key=False,
-            notes="use translators/<provider>",
+            notes="use tr/<provider>",
         )
     )
-    configured_translators = []
+    configured_translators: list[str] = []
     if translator_cfg:
-        providers = translator_cfg.options.get("providers") or []
-        if isinstance(providers, list | tuple):
-            configured_translators.extend(str(p) for p in providers)
-        elif translator_cfg.options.get("provider"):
-            configured_translators.append(str(translator_cfg.options["provider"]))
+        providers_value = translator_cfg.options.get("providers")
+        if isinstance(providers_value, list | tuple):
+            configured_translators.extend(str(p).strip() for p in providers_value if str(p).strip())
+        elif isinstance(providers_value, str) and providers_value.strip():
+            configured_translators.append(providers_value.strip())
+        single_provider = translator_cfg.options.get("provider")
+        if isinstance(single_provider, str) and single_provider.strip():
+            configured_translators.append(single_provider.strip())
     available_translators = collect_translator_providers(include_paid=include_paid)
     translator_candidates = sorted(
         {
@@ -127,7 +143,7 @@ def _collect_engine_entries(include_paid: bool) -> list[EngineEntry]:
         key=str.lower,
     )
     for provider in translator_candidates:
-        selector = f"translators/{provider}"
+        selector = str(normalize_selector(f"translators/{provider}"))
         notes = "free" if provider not in PAID_TRANSLATOR_PROVIDERS else "requires API"
         entries.append(
             EngineEntry(
@@ -142,23 +158,26 @@ def _collect_engine_entries(include_paid: bool) -> list[EngineEntry]:
     deep_cfg = cfg.engines.get("deep-translator")
     entries.append(
         EngineEntry(
-            selector="deep-translator",
+            selector=str(normalize_selector("deep-translator")),
             configured=deep_cfg is not None,
             requires_api_key=False,
-            notes="use deep-translator/<provider>",
+            notes="use dt/<provider>",
         )
     )
-    configured_deep = []
+    configured_deep: list[str] = []
     if deep_cfg:
-        providers = deep_cfg.options.get("providers") or []
-        if isinstance(providers, list | tuple):
-            configured_deep.extend(str(p) for p in providers)
-        elif deep_cfg.options.get("provider"):
-            configured_deep.append(str(deep_cfg.options["provider"]))
+        providers_value = deep_cfg.options.get("providers")
+        if isinstance(providers_value, list | tuple):
+            configured_deep.extend(str(p).strip() for p in providers_value if str(p).strip())
+        elif isinstance(providers_value, str) and providers_value.strip():
+            configured_deep.append(providers_value.strip())
+        single_provider = deep_cfg.options.get("provider")
+        if isinstance(single_provider, str) and single_provider.strip():
+            configured_deep.append(single_provider.strip())
     available_deep = collect_deep_translator_providers(include_paid=include_paid)
     deep_candidates = sorted({*configured_deep, *available_deep}, key=str.lower)
     for provider in deep_candidates:
-        selector = f"deep-translator/{provider}"
+        selector = str(normalize_selector(f"deep-translator/{provider}"))
         notes = "free" if provider not in DEEP_TRANSLATOR_PAID_PROVIDERS else "requires API"
         entries.append(
             EngineEntry(
@@ -173,7 +192,7 @@ def _collect_engine_entries(include_paid: bool) -> list[EngineEntry]:
     if "hysf" in cfg.engines:
         entries.append(
             EngineEntry(
-                selector="hysf",
+                selector=str(normalize_selector("hysf")),
                 configured=True,
                 requires_api_key=True,
                 notes="siliconflow",
@@ -185,7 +204,7 @@ def _collect_engine_entries(include_paid: bool) -> list[EngineEntry]:
         profiles = ullm_cfg.options.get("profiles", {})
         if isinstance(profiles, dict):
             for profile_name in sorted(profiles):
-                selector = f"ullm/{profile_name}"
+                selector = str(normalize_selector(f"ullm/{profile_name}"))
                 entries.append(
                     EngineEntry(
                         selector=selector,
@@ -197,12 +216,20 @@ def _collect_engine_entries(include_paid: bool) -> list[EngineEntry]:
         else:
             entries.append(
                 EngineEntry(
-                    selector="ullm/default",
+                    selector=str(normalize_selector("ullm/default")),
                     configured=True,
                     requires_api_key=True,
                     notes="",
                 )
             )
+
+    if family:
+        family_selector = normalize_selector(family)
+        base = (family_selector or family).split("/", 1)[0].strip().lower()
+        entries = [entry for entry in entries if entry.selector.split("/", 1)[0] == base]
+
+    if configured_only:
+        entries = [entry for entry in entries if entry.configured]
 
     return entries
 
@@ -235,10 +262,10 @@ def _build_options_from_cli(
     *,
     engine: str | None,
     from_lang: str | None,
-    to_lang: str,
+    to_lang: str | None,
     recurse: bool,
     write_over: bool,
-    output: str | None,
+    output: str | Path | None,
     save_voc: bool,
     chunk_size: int | None,
     html_chunk_size: int | None,
@@ -249,16 +276,23 @@ def _build_options_from_cli(
     voc: str | None,
 ) -> TranslatorOptions:
     # Validate language codes
-    from_lang = _validate_language_code(from_lang, "--from-lang")
-    to_lang = _validate_language_code(to_lang, "target language")
+    validated_from_lang = _validate_language_code(from_lang, "--from-lang")
+    validated_to_lang = _validate_language_code(to_lang, "target language")
+    if validated_to_lang is None:
+        raise ValueError("Target language is required")
+
+    normalized_engine = normalize_selector(engine) if engine else None
+
+    output_dir: Path | None
+    output_dir = None if output is None else Path(output).resolve()
 
     return TranslatorOptions(
-        to_lang=to_lang,
-        engine=engine,
-        from_lang=from_lang,
+        to_lang=validated_to_lang,
+        engine=normalized_engine,
+        from_lang=validated_from_lang,
         recurse=recurse,
         write_over=write_over,
-        output_dir=Path(output).resolve() if output else None,
+        output_dir=output_dir,
         save_voc=save_voc,
         chunk_size=chunk_size,
         html_chunk_size=html_chunk_size,
@@ -279,6 +313,9 @@ def _iter_language_rows() -> list[str]:
         name = get(code).language_name("en")
         rows.append(f"{code}\t{name}")
     return rows
+
+
+POPULAR_LANG_CODES = ("en", "es", "fr", "de", "ja", "zh-CN", "pl")
 
 
 class AbersetzCLI:
@@ -357,14 +394,36 @@ class AbersetzCLI:
         return ConfigCommands()
 
     def lang(self) -> list[str]:
-        rows = _iter_language_rows()
+        from langcodes import get
+
+        popular: list[str] = []
+        for code in POPULAR_LANG_CODES:
+            try:
+                name = get(code).language_name("en")
+            except Exception:  # pragma: no cover - unexpected lookup failure
+                name = code
+            popular.append(f"{code} ({name})")
+        header = "Popular targets: " + ", ".join(popular)
+
+        rows = [header]
+        rows.extend(_iter_language_rows())
         for line in rows:
             console.print(line)
         return rows
 
-    def engines(self, include_paid: bool = False) -> None:
+    def engines(
+        self,
+        include_paid: bool = False,
+        *,
+        family: str | None = None,
+        configured_only: bool = False,
+    ) -> None:
         """List available engines and whether they are configured."""
-        entries = _collect_engine_entries(include_paid)
+        entries = _collect_engine_entries(
+            include_paid,
+            family=family,
+            configured_only=configured_only,
+        )
         _render_engine_entries(entries)
 
     def setup(self, non_interactive: bool = False, verbose: bool = False) -> None:
@@ -375,6 +434,30 @@ class AbersetzCLI:
             verbose: Enable verbose output with detailed logging
         """
         setup_command(non_interactive=non_interactive, verbose=verbose)
+
+    def validate(
+        self,
+        *,
+        selectors: str | Sequence[str] | None = None,
+        target_lang: str = "es",
+        source_lang: str = "auto",
+        sample_text: str = "Hello, world!",
+        include_defaults: bool = True,
+    ) -> list[ValidationResult]:
+        """Validate configured engines by translating a short phrase."""
+
+        cfg = load_config()
+        selector_tuple = _parse_patterns(selectors)
+        results = validate_engines(
+            cfg,
+            selectors=selector_tuple or None,
+            target_lang=target_lang,
+            source_lang=source_lang,
+            sample_text=sample_text,
+            include_defaults=include_defaults,
+        )
+        _render_validation_entries(results)
+        return results
 
 
 def main() -> None:

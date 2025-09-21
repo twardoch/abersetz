@@ -34,7 +34,7 @@ def test_dry_run_works_offline() -> None:
 
         options = TranslatorOptions(
             to_lang="es",
-            engine="translators/google",
+            engine="tr/google",
             dry_run=True,  # Dry run mode should work offline
             output_dir=Path(tmpdir) / "output",
         )
@@ -63,7 +63,7 @@ def test_empty_file_handling_works_offline() -> None:
 
         options = TranslatorOptions(
             to_lang="fr",
-            engine="translators/google",
+            engine="tr/google",
             dry_run=True,
             output_dir=Path(tmpdir) / "output",
         )
@@ -83,13 +83,13 @@ def test_import_works_offline() -> None:
     from abersetz.pipeline import PipelineError, TranslationResult
 
     # Basic assertions to verify imports worked
-    assert abersetz.__version__
-    assert TranslatorOptions
-    assert translate_path
-    assert AbersetzCLI
-    assert AbersetzConfig
-    assert PipelineError
-    assert TranslationResult
+    assert isinstance(abersetz.__version__, str) and abersetz.__version__
+    assert isinstance(TranslatorOptions, type)
+    assert callable(translate_path)
+    assert isinstance(AbersetzCLI, type)
+    assert isinstance(AbersetzConfig, type)
+    assert isinstance(PipelineError, type)
+    assert isinstance(TranslationResult, type)
 
 
 @pytest.mark.parametrize(

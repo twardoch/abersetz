@@ -37,7 +37,7 @@ this_file: DEPENDENCIES.md
 
 1. **Multiple Translation Backends**: Having both `translators` and `deep-translator` provides redundancy and access to different translation providers. Users can choose based on availability, quality, or cost.
 
-2. **LLM Support**: The `openai` client enables advanced LLM-based translation with voc management, providing higher quality for specialized content.
+2. **LLM Support**: The lightweight httpx-based client layer (no heavyweight SDKs) keeps LLM-driven translation profiles available without slowing startup or bloating dependencies.
 
 3. **Developer Experience**: `fire` and `rich` create an intuitive CLI with minimal code. `loguru` simplifies debugging without complex logging configuration.
 
@@ -46,3 +46,17 @@ this_file: DEPENDENCIES.md
 5. **Cross-Platform**: `platformdirs` ensures the tool works correctly on Windows, macOS, and Linux without platform-specific code.
 
 6. **Code Quality**: The development dependencies ensure high code quality through testing (91% coverage) and automatic formatting/linting.
+
+## Verification Log
+- 2025-09-21 11:03 UTC — /work reliability polish sweep (pytest, coverage, mypy, bandit) confirmed no dependency changes; improvements limited to tests and typing helpers.
+- 2025-09-21 08:46 UTC — /report QA sweep (pytest, coverage, mypy, bandit) confirmed dependency roster unchanged; no new packages introduced.
+- 2025-09-21 10:38 UTC — /work iteration adjusted tests only; dependency roster remains unchanged after QA sweep.
+- 2025-09-21 10:29 UTC — /report QA sweep (pytest, coverage, mypy, bandit) confirmed dependency roster unchanged; no new packages introduced.
+- 2025-09-21 08:06 UTC — Post-/work QA sweep (pytest, coverage, mypy, bandit) introduced only tests; dependency roster remains unchanged.
+- 2025-09-21 07:59 UTC — /report sweep reran full QA (pytest, coverage, mypy, bandit); dependency roster unchanged with no new packages introduced.
+- 2025-09-21 05:38 UTC — Reviewed dependency roster during /report; no additions or removals required.
+- 2025-09-21 05:50 UTC — Revalidated after quality guardrails sprint; no dependency changes introduced by new tests or helpers.
+- 2025-09-21 06:19 UTC — /report sweep confirmed dependency list remains accurate; no additions or removals required for latest verification run.
+- 2025-09-21 06:27 UTC — Post-/work regression tests touched only test code; dependency roster unchanged.
+- 2025-09-21 06:38 UTC — /report verification: reran full test/coverage/mypy/bandit sweep; dependency lineup unchanged with no new packages introduced.
+- 2025-09-21 06:46 UTC — Configuration hardening tests added without altering dependencies; latest verification sweep confirms package set remains stable.

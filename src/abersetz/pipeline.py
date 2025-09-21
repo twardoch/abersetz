@@ -10,6 +10,7 @@ from pathlib import Path
 
 from .chunking import TextFormat, chunk_text, detect_format
 from .config import AbersetzConfig, load_config
+from .engine_catalog import normalize_selector
 from .engines import Engine, EngineRequest, EngineResult, create_engine
 
 DEFAULT_PATTERNS = ("*.txt", "*.md", "*.mdx", "*.html", "*.htm")
@@ -84,7 +85,7 @@ def translate_path(
     targets = list(_discover_files(resolved, opts))
     if not targets:
         raise PipelineError(f"No files matched under {resolved}")
-    engine_selector = opts.engine or cfg.defaults.engine
+    engine_selector = normalize_selector(opts.engine or cfg.defaults.engine) or cfg.defaults.engine
     engine = create_engine(engine_selector, cfg, client=client)
     results: list[TranslationResult] = []
 
@@ -100,6 +101,10 @@ def _merge_defaults(options: TranslatorOptions | None, config: AbersetzConfig) -
     opts = options or TranslatorOptions()
     if opts.engine is None:
         opts.engine = config.defaults.engine
+    else:
+        normalized_engine = normalize_selector(opts.engine)
+        if normalized_engine:
+            opts.engine = normalized_engine
     if opts.from_lang is None:
         opts.from_lang = config.defaults.from_lang
     if opts.to_lang is None:
@@ -135,6 +140,7 @@ def _translate_file(
     text = source.read_text(encoding="utf-8")
 
     engine_selector = opts.engine or config.defaults.engine
+    engine_selector = normalize_selector(engine_selector) or engine_selector
     source_lang = opts.from_lang or config.defaults.from_lang
     target_lang = opts.to_lang or config.defaults.to_lang
 

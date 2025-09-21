@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import os
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 
 import httpx
@@ -21,7 +22,9 @@ from .engine_catalog import (
     PAID_TRANSLATOR_PROVIDERS,
     collect_deep_translator_providers,
     collect_translator_providers,
+    normalize_selector,
 )
+from .validation import ValidationResult, validate_engines
 
 console = Console()
 
@@ -37,6 +40,7 @@ class DiscoveredProvider:
     model_count: int = 0
     error: str | None = None
     engine_names: list[str] = field(default_factory=list)
+    pricing_hint: str = "Unknown"
 
 
 # Provider configuration based on external/dump_models.py patterns
@@ -61,6 +65,26 @@ KNOWN_PROVIDERS = [
     ("openrouter", "OPENROUTER_API_KEY", "https://openrouter.ai/api/v1"),
 ]
 
+PROVIDER_METADATA: dict[str, dict[str, str]] = {
+    # Pricing summaries sourced from provider documentation snapshots under external/
+    "openai": {"pricing": "Usage-based billing"},
+    "anthropic": {"pricing": "Usage-based billing"},
+    "google": {"pricing": "Community/free via translators; Cloud API is paid"},
+    "deepl": {"pricing": "Paid with limited free tier"},
+    "microsoft": {"pricing": "Paid (Azure Cognitive Services)"},
+    "groq": {"pricing": "Free tier available; paid for higher quotas"},
+    "mistral": {"pricing": "Free community tier; paid enterprise plans"},
+    "deepseek": {"pricing": "Free research access; usage caps apply"},
+    "togetherai": {"pricing": "Usage-based aggregation"},
+    "siliconflow": {"pricing": "Free tier available"},
+    "deepinfra": {"pricing": "Usage-based aggregation"},
+    "fireworks": {"pricing": "Usage-based billing"},
+    "sambanova": {"pricing": "Paid enterprise plans"},
+    "cerebras": {"pricing": "Free tier available"},
+    "hyperbolic": {"pricing": "Usage-based with free tier"},
+    "openrouter": {"pricing": "Usage-based marketplace"},
+}
+
 
 class SetupWizard:
     """Interactive setup wizard for abersetz configuration."""
@@ -69,6 +93,7 @@ class SetupWizard:
         self.non_interactive = non_interactive
         self.verbose = verbose
         self.discovered_providers: list[DiscoveredProvider] = []
+        self.validation_results: list[ValidationResult] | None = None
 
     def run(self) -> bool:
         """Run the setup wizard."""
@@ -93,6 +118,7 @@ class SetupWizard:
         # Phase 5: Save configuration
         if config:
             save_config(config)
+            self._validate_config(config)
             config_path = os.path.join(
                 os.path.expanduser("~"), "Library", "Application Support", "abersetz", "config.toml"
             )
@@ -113,6 +139,36 @@ class SetupWizard:
 
         return False
 
+    def _validate_config(self, config: AbersetzConfig) -> None:
+        """Run validation after configuration is saved."""
+
+        results = validate_engines(config, include_defaults=True)
+        self.validation_results = results
+
+        if not results:
+            return
+
+        failures = [item for item in results if not item.success]
+
+        if not self.non_interactive:
+            console.print("\n[bold cyan]Validating configured engines...\n")
+            table = Table(title="Validation Summary")
+            table.add_column("Selector", style="cyan")
+            table.add_column("Status", style="green")
+            table.add_column("Latency (s)", justify="right")
+            table.add_column("Error", style="red")
+
+            for item in results:
+                status = "✓" if item.success else "✗"
+                latency = f"{item.latency:.2f}"
+                error_message = item.error or ""
+                table.add_row(item.selector, status, latency, error_message)
+
+            console.print(table)
+
+        for item in failures:
+            logger.warning("Validation failed for %s: %s", item.selector, item.error)
+
     def _discover_providers(self) -> None:
         """Scan environment for API keys."""
         for name, env_key, base_url in KNOWN_PROVIDERS:
@@ -124,19 +180,26 @@ class SetupWizard:
                     base_url=base_url,
                     is_available=True,
                 )
+                metadata = PROVIDER_METADATA.get(name, {})
+                provider.pricing_hint = metadata.get("pricing", "Unknown")
 
                 # Map to available engines
                 if name in ["google", "microsoft"]:
-                    provider.engine_names.append(f"translators/{name}")
+                    provider.engine_names.append(str(normalize_selector(f"translators/{name}")))
                 if name == "deepl":
-                    provider.engine_names.append("deep-translator/deepl")
+                    provider.engine_names.append(str(normalize_selector("deep-translator/deepl")))
                 if name in ["openai", "anthropic"]:
-                    provider.engine_names.append("ullm/default")
+                    provider.engine_names.append(str(normalize_selector("ullm/default")))
                 if name == "siliconflow":
-                    provider.engine_names.extend(["hysf", "ullm/default"])
+                    provider.engine_names.extend(
+                        [
+                            str(normalize_selector("hysf")),
+                            str(normalize_selector("ullm/default")),
+                        ]
+                    )
                 if base_url and "openai" in base_url:
                     # OpenAI-compatible endpoints
-                    provider.engine_names.append(f"ullm/{name}")
+                    provider.engine_names.append(str(normalize_selector(f"ullm/{name}")))
 
                 self.discovered_providers.append(provider)
 
@@ -231,6 +294,7 @@ class SetupWizard:
         table.add_column("Provider", style="cyan")
         table.add_column("Status", style="green")
         table.add_column("Engines", style="yellow")
+        table.add_column("Pricing", style="magenta")
         table.add_column("Models", justify="right")
 
         for provider in self.discovered_providers:
@@ -242,7 +306,13 @@ class SetupWizard:
             engines = ", ".join(provider.engine_names) if provider.engine_names else "N/A"
             models = str(provider.model_count) if provider.model_count > 0 else "-"
 
-            table.add_row(provider.name.capitalize(), status, engines, models)
+            table.add_row(
+                provider.name.capitalize(),
+                status,
+                engines,
+                provider.pricing_hint,
+                models,
+            )
 
         console.print(table)
 
@@ -373,23 +443,31 @@ class SetupWizard:
         config.engines = engines
 
         # Set default engine based on priority
-        if "deep-translator" in engines and any(
-            p.name == "deepl" for p in self.discovered_providers
-        ):
-            config.defaults.engine = "deep-translator/deepl"
-        elif "translators" in engines:
-            config.defaults.engine = "translators/google"
-        elif "hysf" in engines:
-            config.defaults.engine = "hysf"
-        elif "ullm" in engines:
-            config.defaults.engine = "ullm/default"
-        else:
-            # Fallback to first available engine
-            if engines:
-                first_engine = list(engines.keys())[0]
-                config.defaults.engine = first_engine
+        default_engine = _select_default_engine(engines, self.discovered_providers)
+        if default_engine:
+            config.defaults.engine = default_engine
 
         return config
+
+
+def _select_default_engine(
+    engines: dict[str, EngineConfig],
+    providers: Sequence[DiscoveredProvider],
+) -> str | None:
+    """Choose the default engine based on configured priorities."""
+    if "deep-translator" in engines and any(
+        provider.name == "deepl" and provider.is_available for provider in providers
+    ):
+        return "deep-translator/deepl"
+    if "translators" in engines:
+        return "tr/google"
+    if "hysf" in engines:
+        return "hysf"
+    if "ullm" in engines:
+        return "ullm/default"
+    if engines:
+        return next(iter(engines))
+    return None
 
 
 def setup_command(

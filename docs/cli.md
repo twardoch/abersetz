@@ -19,7 +19,7 @@ nav_order: 3
 
 Abersetz provides two command-line tools:
 
-- `abersetz`: Main CLI with subcommands
+- `abersetz`: Main CLI with subcommands (`tr`, `validate`, `config`, `engines`, `version`)
 - `abtr`: Direct translation shorthand
 
 ## Main Commands
@@ -42,7 +42,7 @@ abersetz tr PATH [OPTIONS]
 |--------|-------------|---------|
 | `to_lang` (positional) | Target language code | — |
 | `--from-lang` | Source language code | `auto` |
-| `--engine` | Translation engine | `translators/google` |
+| `--engine` | Translation engine | `tr/google` (legacy names auto-normalized) |
 | `--output` | Output directory | `<lang>/<filename>` |
 | `--recurse/--no-recurse` | Process subdirectories | `True` |
 | `--write_over` | Replace original files | `False` |
@@ -74,6 +74,42 @@ Display version information.
 ```bash
 abersetz version
 ```
+
+### abersetz engines
+
+List available engine families and providers.
+
+```bash
+abersetz engines [--include-paid] [--family tr|dt|ll|hy] [--configured-only]
+```
+
+- `--family`: filter to a single engine family (short alias or legacy name).
+- `--configured-only`: show only engines currently configured.
+
+### abersetz validate
+
+Exercise each configured engine with a short translation and report status, latency, and pricing hints.
+
+```bash
+abersetz validate [--selectors tr/google,ll/default] [--target-lang es] [--sample-text "Hello"]
+```
+
+- `--selectors`: comma-separated list of selectors to validate (defaults to every configured selector).
+- `--target-lang`: target language for the sample translation (defaults to `es`).
+- `--sample-text`: override the default sample prompt (`Hello, world!`).
+- `--include-defaults/--no-include-defaults`: toggle whether the default engine from config is forced into the run.
+
+{: .note }
+Running validation hits live translation APIs. When you are offline—or when you only need a smoke test—use `--selectors` to limit the run to a handful of engines and add `--no-include-defaults` to skip automatically discovered selectors. For example:
+
+```bash
+abersetz validate \
+  --selectors tr/google,ll/default \
+  --no-include-defaults \
+  --sample-text "Ping"
+```
+
+This checks only the Google free tier and your primary LLM profile, keeping the run under a few seconds and avoiding throttled providers.
 
 ## Shorthand Command
 
@@ -139,6 +175,14 @@ abtr pt file.txt --engine hysf
 
 # Custom LLM profile
 abtr pt file.txt --engine ullm/gpt4
+```
+
+### Validate Engines
+
+Generate a quick health report for every configured engine:
+
+```bash
+abersetz validate --target-lang de --selectors tr/google,ll/default
 ```
 
 ### Advanced Options

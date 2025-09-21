@@ -22,7 +22,7 @@ pytestmark = pytest.mark.skipif(
 def test_translators_google_real() -> None:
     """Test Google Translate via translators library (requires network)."""
     config = load_config()
-    engine = create_engine("translators/google", config)
+    engine = create_engine("tr/google", config)
 
     request = EngineRequest(
         text="Hello, world!",
@@ -44,7 +44,7 @@ def test_translators_google_real() -> None:
 def test_deep_translator_google_real() -> None:
     """Test Google Translate via deep-translator library (requires network)."""
     config = load_config()
-    engine = create_engine("deep-translator/google", config)
+    engine = create_engine("dt/google", config)
 
     request = EngineRequest(
         text="Good morning",
@@ -101,10 +101,11 @@ def test_translate_file_api(tmp_path) -> None:
     options = TranslatorOptions(
         from_lang="en",
         to_lang="de",
-        engine="translators/google",
+        engine="tr/google",
+        output_dir=output_dir,
     )
 
-    result = translate_path(str(input_file), options, output=str(output_dir))
+    result = translate_path(str(input_file), options)
 
     assert result
     assert len(result) == 1
@@ -122,7 +123,7 @@ def test_translate_file_api(tmp_path) -> None:
 def test_html_translation() -> None:
     """Test HTML content translation preserves markup."""
     config = load_config()
-    engine = create_engine("translators/google", config)
+    engine = create_engine("tr/google", config)
 
     html_text = "<p>Hello <strong>world</strong>!</p>"
     request = EngineRequest(
@@ -149,7 +150,7 @@ def test_translators_bing_real() -> None:
     """Test Bing Translate via translators library (requires network)."""
     config = load_config()
     try:
-        engine = create_engine("translators/bing", config)
+        engine = create_engine("tr/bing", config)
     except Exception:
         pytest.skip("Bing translator not available")
         return
@@ -178,7 +179,7 @@ def test_translators_bing_real() -> None:
 def test_batch_translation_with_voc() -> None:
     """Test translating multiple chunks with voc propagation."""
     config = load_config()
-    engine = create_engine("translators/google", config)
+    engine = create_engine("tr/google", config)
 
     # First chunk with technical terms
     request1 = EngineRequest(
@@ -219,7 +220,7 @@ def test_retry_on_network_failure() -> None:
     import requests
 
     config = load_config()
-    engine = create_engine("translators/google", config)
+    engine = create_engine("tr/google", config)
 
     # Simulate intermittent network failures
     original_get = requests.get

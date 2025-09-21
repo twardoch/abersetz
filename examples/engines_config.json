@@ -1,6 +1,6 @@
 {
   "defaults": {
-    "engine": "translators/google",
+    "engine": "tr/google",
     "from_lang": "auto",
     "to_lang": "en",
     "chunk_size": 1200,

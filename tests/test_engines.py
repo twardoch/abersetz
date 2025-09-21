@@ -3,13 +3,16 @@
 
 from __future__ import annotations
 
+import sys
 from types import SimpleNamespace
 
 import pytest
 from langcodes import get as get_language
 
 import abersetz.config as config_module
-from abersetz.engines import EngineRequest, create_engine
+import abersetz.engines as engines_module
+from abersetz.chunking import TextFormat
+from abersetz.engines import EngineBase, EngineError, EngineRequest, create_engine
 
 
 class DummyClient:
@@ -29,8 +32,6 @@ class DummyClient:
 
 def test_translators_engine_invokes_library(monkeypatch: pytest.MonkeyPatch) -> None:
     cfg = config_module.load_config()
-    engine = create_engine("translators/google", cfg)
-
     captured: dict[str, object] = {}
 
     def fake_translate_text(
@@ -46,8 +47,14 @@ def test_translators_engine_invokes_library(monkeypatch: pytest.MonkeyPatch) -> 
         )
         return "translated"
 
-    # Patch the instance's _translators module's translate_text method
-    monkeypatch.setattr(engine._translators, "translate_text", fake_translate_text)
+    fake_module = SimpleNamespace(
+        translate_text=fake_translate_text,
+        translate_html=lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("translate_html should not be used")
+        ),
+    )
+    monkeypatch.setitem(sys.modules, "translators", fake_module)
+    engine = create_engine("tr/google", cfg)
 
     request = EngineRequest(
         text="hello",
@@ -62,6 +69,50 @@ def test_translators_engine_invokes_library(monkeypatch: pytest.MonkeyPatch) -> 
     result = engine.translate(request)
     assert result.text == "translated"
     assert captured["translator"] == "google"
+
+
+def test_translators_engine_handles_html_requests(monkeypatch: pytest.MonkeyPatch) -> None:
+    cfg = config_module.load_config()
+    captured: dict[str, object] = {}
+
+    def fake_translate_html(
+        text: str, translator: str, from_language: str, to_language: str, **_: object
+    ) -> str:
+        captured.update(
+            {
+                "text": text,
+                "translator": translator,
+                "from_language": from_language,
+                "to_language": to_language,
+            }
+        )
+        return "html-result"
+
+    fake_module = SimpleNamespace(
+        translate_text=lambda *_, **__: (_ for _ in ()).throw(
+            AssertionError("translate_text should not be used for HTML")
+        ),
+        translate_html=fake_translate_html,
+    )
+    monkeypatch.setitem(sys.modules, "translators", fake_module)
+    engine = create_engine("tr/google", cfg)
+
+    request = EngineRequest(
+        text="<p>Hello</p>",
+        source_lang="en",
+        target_lang="es",
+        is_html=True,
+        voc={},
+        prolog={},
+        chunk_index=0,
+        total_chunks=1,
+    )
+
+    result = engine.translate(request)
+
+    assert result.text == "html-result"
+    assert captured["translator"] == "google"
+    assert captured["text"] == "<p>Hello</p>"
 
 
 def test_hysf_engine_uses_fixed_prompt(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -92,6 +143,16 @@ def test_hysf_engine_uses_fixed_prompt(monkeypatch: pytest.MonkeyPatch) -> None:
     assert call["model"] == "tencent/Hunyuan-MT-7B"
     assert call["temperature"] == 0.9
     assert call["messages"] == [{"role": "user", "content": expected_message}]
+
+
+def test_engine_base_chunk_size_prefers_html_then_plain() -> None:
+    engine = EngineBase(name="stub", chunk_size=800, html_chunk_size=1200)
+
+    assert engine.chunk_size_for(TextFormat.HTML) == 1200
+    assert engine.chunk_size_for(TextFormat.PLAIN) == 800
+
+    fallback = EngineBase(name="fallback", chunk_size=None, html_chunk_size=None)
+    assert fallback.chunk_size_for(TextFormat.HTML) is None
 
 
 def test_ullm_engine_uses_profile(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -126,8 +187,6 @@ def test_translators_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch) ->
     """Test that TranslatorsEngine retries on network failures."""
 
     cfg = config_module.load_config()
-    engine = create_engine("translators/google", cfg)
-
     # Mock translators to fail twice then succeed
     call_count = 0
 
@@ -140,8 +199,14 @@ def test_translators_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch) ->
             raise ConnectionError("Network error")
         return "Translated after retries"
 
-    # Patch the instance's _translators module's translate_text method
-    monkeypatch.setattr(engine._translators, "translate_text", fake_translate_with_retry)
+    fake_module = SimpleNamespace(
+        translate_text=fake_translate_with_retry,
+        translate_html=lambda *args, **kwargs: (_ for _ in ()).throw(
+            AssertionError("translate_html should not be used")
+        ),
+    )
+    monkeypatch.setitem(sys.modules, "translators", fake_module)
+    engine = create_engine("tr/google", cfg)
 
     request = EngineRequest(
         text="hello",
@@ -157,6 +222,12 @@ def test_translators_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch) ->
     result = engine.translate(request)
     assert result.text == "Translated after retries"
     assert call_count == 3  # Two failures + one success
+
+
+def test_create_engine_accepts_legacy_selector() -> None:
+    cfg = config_module.load_config()
+    engine = create_engine("translators/google", cfg)
+    assert engine.name == "translators"
 
 
 def test_deep_translator_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -183,12 +254,12 @@ def test_deep_translator_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch
     from abersetz.engines import DeepTranslatorEngine
 
     # Force providers to be loaded first, then patch
-    original_providers = DeepTranslatorEngine._get_providers().copy()
+    original_providers = dict(DeepTranslatorEngine._get_providers())
     DeepTranslatorEngine.PROVIDERS = {**original_providers, "google": MockTranslator}
 
     try:
         # Now create the engine after the mock is in place
-        engine = create_engine("deep-translator/google", cfg)
+        engine = create_engine("dt/google", cfg)
 
         request = EngineRequest(
             text="hello",
@@ -207,3 +278,142 @@ def test_deep_translator_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch
     finally:
         # Restore original PROVIDERS
         DeepTranslatorEngine.PROVIDERS = original_providers
+
+
+def test_deep_translator_engine_rejects_unknown_provider(monkeypatch: pytest.MonkeyPatch) -> None:
+    cfg = config_module.load_config()
+
+    with pytest.raises(EngineError, match="Unsupported deep-translator provider: unknown"):
+        create_engine("dt/unknown", cfg)
+
+
+def test_build_llm_engine_without_model_raises_engine_error() -> None:
+    cfg = config_module.load_config()
+    engine_cfg = cfg.engines["ullm"]
+    profile = engine_cfg.options["profiles"]["default"]
+    profile.pop("model", None)
+    engine_cfg.options.pop("model", None)
+
+    with pytest.raises(EngineError, match="No model configured"):
+        create_engine("ullm/default", cfg)
+
+
+def test_build_llm_engine_without_credential_raises_engine_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    cfg = config_module.load_config()
+    engine_cfg = cfg.engines["ullm"]
+    engine_cfg.options["profiles"]["default"].setdefault("model", "stub-model")
+    engine_cfg.credential = config_module.Credential(name="missing")
+    cfg.credentials.pop("missing", None)
+    monkeypatch.delenv("SILICONFLOW_API_KEY", raising=False)
+
+    with pytest.raises(EngineError, match="Missing credential"):
+        create_engine("ullm/default", cfg)
+
+
+def test_build_hysf_engine_without_credential_raises(monkeypatch: pytest.MonkeyPatch) -> None:
+    cfg = config_module.AbersetzConfig(
+        credentials={},
+        engines={},
+    )
+    engine_cfg = config_module.EngineConfig(
+        name="hysf",
+        credential=config_module.Credential(name="siliconflow"),
+        options={},
+    )
+    monkeypatch.delenv("SILICONFLOW_API_KEY", raising=False)
+
+    with pytest.raises(EngineError, match="Missing credential for engine hysf"):
+        engines_module._build_hysf_engine("hysf", cfg, engine_cfg, client=None)
+
+
+def test_select_profile_defaults_to_default_variant() -> None:
+    cfg = config_module.load_config()
+    engine_cfg = cfg.engines["ullm"]
+
+    profile = engines_module._select_profile(engine_cfg, None)
+
+    assert profile is engine_cfg.options["profiles"]["default"]
+
+
+def test_select_profile_without_profiles_returns_none() -> None:
+    engine_cfg = config_module.EngineConfig(name="ullm")
+
+    assert engines_module._select_profile(engine_cfg, None) is None
+
+
+def test_select_profile_unknown_variant_raises_engine_error() -> None:
+    cfg = config_module.load_config()
+    engine_cfg = cfg.engines["ullm"]
+
+    with pytest.raises(EngineError, match="Unknown profile 'missing'"):
+        engines_module._select_profile(engine_cfg, "missing")
+
+
+def test_make_openai_client_respects_base_url() -> None:
+    client = engines_module._make_openai_client("token", "https://example.com/api")
+
+    assert client.base_url == "https://example.com/api"
+    assert client.api_key == "token"
+
+
+def test_make_openai_client_defaults_to_openai_url() -> None:
+    client = engines_module._make_openai_client("token", None)
+
+    assert client.base_url == "https://api.openai.com/v1"
+
+
+def test_create_engine_with_unknown_configured_base_raises_engine_error() -> None:
+    cfg = config_module.load_config()
+    cfg.engines["custom"] = config_module.EngineConfig(name="custom")
+
+    with pytest.raises(EngineError, match="Unsupported engine 'custom'"):
+        create_engine("custom", cfg)
+
+
+def _make_llm_engine() -> engines_module.LlmEngine:
+    cfg = config_module.EngineConfig(name="llm-test")
+    client = DummyClient(payload="")
+    return engines_module.LlmEngine(
+        cfg,
+        client,
+        model="stub-model",
+        temperature=0.0,
+        static_prolog={"Term": "Value"},
+    )
+
+
+def test_llm_engine_parse_payload_without_vocab() -> None:
+    engine = _make_llm_engine()
+
+    text, vocab = engine._parse_payload("<output>Hello</output>")
+
+    assert text == "Hello"
+    assert vocab == {}
+
+
+def test_llm_engine_parse_payload_with_malformed_vocab() -> None:
+    engine = _make_llm_engine()
+
+    text, vocab = engine._parse_payload("<output>Hi</output><voc>{invalid}</voc>")
+
+    assert text == "Hi"
+    assert vocab == {}
+
+
+def test_llm_engine_parse_payload_with_non_mapping_vocab() -> None:
+    engine = _make_llm_engine()
+
+    text, vocab = engine._parse_payload('<output>Hi</output><voc>["bad", "data"]</voc>')
+
+    assert text == "Hi"
+    assert vocab == {}
+
+
+def test_create_engine_raises_when_config_missing_selector() -> None:
+    cfg = config_module.load_config()
+    cfg.engines.pop("translators", None)
+
+    with pytest.raises(EngineError, match="No configuration found for engine 'translators'"):
+        create_engine("tr/google", cfg)

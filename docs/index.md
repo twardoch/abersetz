@@ -47,6 +47,10 @@ Minimalist file translator with pluggable engines
   - JSON voc propagation
   - Consistent terminology in long documents
   - Optional voc export
+- ✅ **Engine validation**
+  - `abersetz validate` smoke-tests each selector
+  - Latency and pricing hints pulled from the research catalog
+  - Ideal for CI smoke tests and onboarding checks
 
 ## Getting Started
 
@@ -58,12 +62,14 @@ pip install abersetz
 
 ### Quick Start
 
-Translate a single file:
+Run setup, validate engines, and translate a file:
 ```bash
+abersetz setup
+abersetz validate --target-lang es
 abersetz tr es document.txt
 ```
 
-Or use the shorthand:
+Or use the shorthand for translation:
 ```bash
 abtr es document.txt
 ```
@@ -88,7 +94,7 @@ abersetz config show  # Display current settings
 
 ```bash
 # Translate with specific engine
-abtr de file.txt --engine translators/google
+abtr de file.txt --engine tr/google
 
 # Translate markdown files only
 abtr ja . --include "*.md" --output ./ja
@@ -96,9 +102,12 @@ abtr ja . --include "*.md" --output ./ja
 # Dry run to preview
 abersetz tr zh-CN project/ --dry-run
 
+# Validate configured engines
+abersetz validate --selectors tr/google,ll/default
+
 # Use LLM with voc
 export SILICONFLOW_API_KEY="your-key"
-abtr es technical.md --engine hysf --save-voc
+abtr es technical.md --engine hy --save-voc
 ```
 
 ### Python API
@@ -111,7 +120,7 @@ results = translate_path(
     "document.txt",
     TranslatorOptions(
         to_lang="fr",
-        engine="translators/google"
+        engine="tr/google"
     )
 )
 

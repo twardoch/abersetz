@@ -65,7 +65,7 @@ echo ""
 
 # Test free engines (no API key required)
 echo "1. Testing free engines..."
-for engine in "translators/google" "translators/bing" "deep-translator/google"; do
+for engine in "tr/google" "tr/bing" "dt/google"; do
     echo -n "  $engine: "
     if echo "Hello" | abtr es - --engine "$engine" --dry-run >/dev/null 2>&1; then
         echo "✓"
@@ -83,7 +83,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
     mkdir -p "$(dirname "$CONFIG_FILE")"
     cat > "$CONFIG_FILE" <<'EOF'
 [defaults]
-engine = "translators/google"
+engine = "tr/google"
 from_lang = "auto"
 to_lang = "en"
 chunk_size = 1200
@@ -166,6 +166,6 @@ echo "=== Setup Complete ==="
 echo ""
 echo "Quick test commands:"
 echo "  abersetz tr es test.txt                    # Use default engine"
-echo "  abtr fr test.txt --engine translators/bing # Use Bing"
-echo "  abtr de test.txt --engine hysf             # Use SiliconFlow LLM"
+echo "  abtr fr test.txt --engine tr/bing # Use Bing"
+echo "  abtr de test.txt --engine hy             # Use SiliconFlow LLM"
 echo "  abtr ja test.txt --engine ullm/gpt4        # Use GPT-4"

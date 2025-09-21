@@ -22,6 +22,7 @@ Minimalist file translator that reuses proven machine translation engines while 
 - voc-aware translation pipeline that merges `<voc>` JSON emitted by LLM engines.
 - Offline-friendly dry-run mode for testing and demos.
 - Optional voc sidecar files when `--save-voc` is set.
+- Built-in `abersetz validate` health check that pings each configured engine, reports latency, and surfaces pricing hints from the research catalog.
 
 ## Installation
 ```bash
@@ -30,22 +31,37 @@ pip install abersetz
 
 ## Quick Start
 ```bash
-abersetz tr pl ./docs --engine translators/google --output ./build/pl
+# Discover and configure available services
+abersetz setup
+
+# Validate configured engines and review pricing hints
+abersetz validate --target-lang es
+
+# Translate files
+abersetz tr pl ./docs --engine tr/google --output ./build/pl
 ```
 
 ### CLI Options (preview)
 - `to_lang`: first positional argument selecting the target language.
 - `--from-lang`: source language (defaults to `auto`).
 - `--engine`: one of
-  - `translators/<provider>` (e.g. `translators/google`)
-  - `deep-translator/<provider>` (e.g. `deep-translator/deepl`)
-  - `hysf`
-  - `ullm/<profile>` where profiles are defined in config.
+  - `tr/<provider>` (e.g. `tr/google`)
+  - `dt/<provider>` (e.g. `dt/deepl`)
+  - `hy`
+  - `ll/<profile>` where profiles are defined in config.
+    - Legacy selectors such as `translators/google` remain accepted and are auto-normalized.
 - `--recurse/--no-recurse`: recurse into subdirectories (defaults to on).
 - `--write_over`: replace input files instead of writing to output dir.
 - `--save-voc`: drop merged voc JSON next to each translated file.
 - `--chunk-size` / `--html-chunk-size`: override default chunk lengths.
 - `--verbose`: enable debug logging via loguru.
+- `abersetz engines` extras:
+  - `--family tr|dt|ll|hy`: filter listing to a single engine family.
+  - `--configured-only`: show only configured engines.
+- `abersetz validate` extras:
+  - `--selectors tr/google,ll/default`: limit validation to specific selectors (comma-separated).
+  - `--target-lang es`: override the sample translation language used during validation.
+  - `--sample-text "Hello!"`: supply a custom validation snippet.
 
 ## Configuration
 `abersetz` stores runtime configuration under the user config path determined by `platformdirs`. The config file keeps:
@@ -56,7 +72,7 @@ abersetz tr pl ./docs --engine translators/google --output ./build/pl
 Example snippet (stored in `config.toml`):
 ```toml
 [defaults]
-engine = "translators/google"
+engine = "tr/google"
 from_lang = "auto"
 to_lang = "en"
 chunk_size = 1200
@@ -100,7 +116,7 @@ from abersetz import translate_path, TranslatorOptions
 
 translate_path(
     path="docs",
-    options=TranslatorOptions(to_lang="de", engine="translators/google"),
+    options=TranslatorOptions(to_lang="de", engine="tr/google"),
 )
 ```
 

@@ -9,7 +9,7 @@ set -e  # Exit on error
 PROJECT_ROOT="${1:-./docs}"
 OUTPUT_BASE="${2:-./translations}"
 LANGUAGES=("es" "fr" "de" "ja" "zh-CN" "pt" "it" "ru")
-ENGINE="${ABERSETZ_ENGINE:-translators/google}"
+ENGINE="${ABERSETZ_ENGINE:-tr/google}"
 
 # Colors for output
 RED='\033[0;31m'

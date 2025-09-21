@@ -13,7 +13,12 @@ from tenacity import retry, stop_after_attempt, wait_exponential
 
 from .chunking import TextFormat
 from .config import AbersetzConfig, EngineConfig, resolve_credential
-from .engine_catalog import HYSF_DEFAULT_MODEL, HYSF_DEFAULT_TEMPERATURE
+from .engine_catalog import (
+    HYSF_DEFAULT_MODEL,
+    HYSF_DEFAULT_TEMPERATURE,
+    normalize_selector,
+    resolve_engine_reference,
+)
 
 # Use lightweight OpenAI client for fast imports
 from .openai_lite import OpenAI
@@ -364,25 +369,10 @@ def create_engine(
     *,
     client: Any | None = None,
 ) -> Engine:
-    """Factory that builds the requested engine.
+    """Factory that builds the requested engine supporting short aliases."""
 
-    Supports shortcuts:
-    - tr/* -> translators/*
-    - dt/* -> deep-translator/*
-    - ll/* -> ullm/*
-    """
-    # Handle engine shortcuts
-    ENGINE_SHORTCUTS = {
-        "tr": "translators",
-        "dt": "deep-translator",
-        "ll": "ullm",
-    }
-
-    base, _, variant = selector.partition("/")
-    base = ENGINE_SHORTCUTS.get(base, base)
-
-    # Reconstruct selector with expanded name
-    selector = f"{base}/{variant}" if variant else base
+    normalized = normalize_selector(selector) or selector
+    base, variant = resolve_engine_reference(normalized)
 
     engine_cfg = config.engines.get(base)
     if engine_cfg is None:
@@ -394,10 +384,10 @@ def create_engine(
         provider = _translators_provider(variant, engine_cfg)
         return DeepTranslatorEngine(provider, engine_cfg)
     if base == "hysf":
-        return _build_hysf_engine(selector, config, engine_cfg, client=client)
+        return _build_hysf_engine(normalized, config, engine_cfg, client=client)
     if base == "ullm":
         profile = _select_profile(engine_cfg, variant)
-        return _build_llm_engine(selector, config, engine_cfg, profile=profile, client=client)
+        return _build_llm_engine(normalized, config, engine_cfg, profile=profile, client=client)
     raise EngineError(f"Unsupported engine '{base}'")
 
 

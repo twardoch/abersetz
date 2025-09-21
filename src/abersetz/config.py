@@ -17,6 +17,7 @@ from .engine_catalog import (
     FREE_TRANSLATOR_PROVIDERS,
     HYSF_DEFAULT_MODEL,
     HYSF_DEFAULT_TEMPERATURE,
+    normalize_selector,
 )
 
 try:  # Python >= 3.11
@@ -33,11 +34,16 @@ CONFIG_FILENAME = "config.toml"
 class Defaults:
     """Runtime defaults for translation."""
 
-    engine: str = "translators/google"
+    engine: str = "tr/google"
     from_lang: str = "auto"
     to_lang: str = "en"
     chunk_size: int = 1200
     html_chunk_size: int = 1800
+
+    def __setattr__(self, name: str, value: Any) -> None:  # noqa: D401 - dataclass override
+        if name == "engine" and isinstance(value, str):
+            value = normalize_selector(value) or value.strip()
+        object.__setattr__(self, name, value)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -52,12 +58,13 @@ class Defaults:
     def from_dict(cls, raw: Mapping[str, Any] | None) -> Defaults:
         if raw is None:
             return cls()
+        defaults = cls()
         return cls(
-            engine=str(raw.get("engine", cls.engine)),
-            from_lang=str(raw.get("from_lang", cls.from_lang)),
-            to_lang=str(raw.get("to_lang", cls.to_lang)),
-            chunk_size=int(raw.get("chunk_size", cls.chunk_size)),
-            html_chunk_size=int(raw.get("html_chunk_size", cls.html_chunk_size)),
+            engine=str(raw.get("engine", defaults.engine)),
+            from_lang=str(raw.get("from_lang", defaults.from_lang)),
+            to_lang=str(raw.get("to_lang", defaults.to_lang)),
+            chunk_size=int(raw.get("chunk_size", defaults.chunk_size)),
+            html_chunk_size=int(raw.get("html_chunk_size", defaults.html_chunk_size)),
         )
 
 
@@ -298,7 +305,7 @@ def resolve_credential(
         return None
     if credential.name:
         stored = config.credentials.get(credential.name)
-        if stored and stored != credential:
+        if stored is not None and stored is not credential:
             return resolve_credential(config, stored)
     if credential.env:
         env_value = os.getenv(credential.env)
@@ -311,9 +318,6 @@ def resolve_credential(
             )
     if credential.value:
         return credential.value
-    if credential.name and credential.name in config.credentials:
-        return resolve_credential(config, config.credentials[credential.name])
-
     # Log helpful message when no credential found
     if credential.env:
         logger.info(

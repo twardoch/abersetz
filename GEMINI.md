@@ -30,22 +30,26 @@ pip install abersetz
 
 ## Quick Start
 ```bash
-abersetz tr pl ./docs --engine translators/google --output ./build/pl
+abersetz tr pl ./docs --engine tr/google --output ./build/pl
 ```
 
 ### CLI Options (preview)
 - `to_lang`: first positional argument selecting the target language.
 - `--from-lang`: source language (defaults to `auto`).
 - `--engine`: one of
-  - `translators/<provider>` (e.g. `translators/google`)
-  - `deep-translator/<provider>` (e.g. `deep-translator/deepl`)
-  - `hysf`
-  - `ullm/<profile>` where profiles are defined in config.
+  - `tr/<provider>` (e.g. `tr/google`)
+  - `dt/<provider>` (e.g. `dt/deepl`)
+  - `hy`
+  - `ll/<profile>` where profiles are defined in config.
+    - Legacy selectors such as `translators/google` remain accepted and are auto-normalized.
 - `--recurse/--no-recurse`: recurse into subdirectories (defaults to on).
 - `--write_over`: replace input files instead of writing to output dir.
 - `--save-voc`: drop merged voc JSON next to each translated file.
 - `--chunk-size` / `--html-chunk-size`: override default chunk lengths.
 - `--verbose`: enable debug logging via loguru.
+- `abersetz engines` extras:
+  - `--family tr|dt|ll|hy`: filter listing to a single engine family.
+  - `--configured-only`: show only configured engines.
 
 ## Configuration
 `abersetz` stores runtime configuration under the user config path determined by `platformdirs`. The config file keeps:
@@ -56,7 +60,7 @@ abersetz tr pl ./docs --engine translators/google --output ./build/pl
 Example snippet (stored in `config.toml`):
 ```toml
 [defaults]
-engine = "translators/google"
+engine = "tr/google"
 from_lang = "auto"
 to_lang = "en"
 chunk_size = 1200
@@ -100,7 +104,7 @@ from abersetz import translate_path, TranslatorOptions
 
 translate_path(
     path="docs",
-    options=TranslatorOptions(to_lang="de", engine="translators/google"),
+    options=TranslatorOptions(to_lang="de", engine="tr/google"),
 )
 ```
 
