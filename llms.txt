@@ -30,7 +30,8 @@ Project Structure:
 ├── 📁 issues
 │   ├── 📄 102-review.md
 │   ├── 📄 103.txt
-│   └── 📄 105.txt
+│   ├── 📄 105.txt
+│   └── 📄 200.txt
 ├── 📁 src
 │   └── 📁 abersetz
 │       ├── 📄 __init__.py
@@ -5154,6 +5155,38 @@ Shorten `translators` to `tr` and `deep-translator` to `dt`, and `ullm` to `ll`.
 </document>
 
 <document index="42">
+<source>issues/200.txt</source>
+<document_content>
+Run `llms .` and then analyze the codebase snapshot in `llms.txt`. Then think hard. Completely remove from @WORK.md @TODO.md @PLAN.md all tasks that have been completed. Then make a very detailed /plan into @PLAN.md on how we should evolve this package. I don’t want this: 
+
+```
+$ abersetz engines
+                                      Available Translation Engines
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Selector                  ┃ Shortcut        ┃ Configured ┃ Credential ┃ Notes                          ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ translators               │ tr              │ ✓          │ free       │ use translators/<provider>     │
+```
+
+I want to completely replace the current long selectors with the short ones. We may keep shortcuts ('aliases') as a concept. 
+
+I want a proper, better validation in a standalone CLI command (and also called when calling 'setup') of every available translator engine, and better reporting and auto-configuration. The validation truly should translate something very short. 
+
+I want other quality of life improvements, more examples, better tests, better documentation. I want vibrant development, not LAZY stuff. 
+
+Regularly update the @CLAUDE.md file so that it contains accurate, appropriate development instructions for the codebase. 
+
+Consult with outside sources. Make the app beautiful and easy to use, fast, versatile. 
+
+Research all engines in detail, consult the codebase snapshots in @external for relevant info. 
+
+Always use @PLAN.md and @TODO.md and @WORK.md 
+
+Always /report then /cleanup then /plan next steps then /work and then test 
+</document_content>
+</document>
+
+<document index="43">
 <source>package.toml</source>
 <document_content>
 # Package configuration
@@ -5170,7 +5203,7 @@ github_actions = true   # Add GitHub Actions workflows
 </document_content>
 </document>
 
-<document index="43">
+<document index="44">
 <source>pyproject.toml</source>
 <document_content>
 # this_file: pyproject.toml
