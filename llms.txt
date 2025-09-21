@@ -13,7 +13,8 @@ Project Structure:
 │   └── 📄 installation.md
 ├── 📁 examples
 │   ├── 📁 pl
-│   │   └── 📄 poem_en.txt
+│   │   ├── 📄 poem_en.txt
+│   │   └── 📄 poem_pl.txt
 │   ├── 📄 advanced_api.py
 │   ├── 📄 basic_api.py
 │   ├── 📄 batch_translate.sh
@@ -4760,31 +4761,43 @@ echo "Report available at: $FINAL_OUTPUT/TRANSLATION_REPORT.md"
 <document index="32">
 <source>examples/pl/poem_en.txt</source>
 <document_content>
-Być albo nie być – o to właśnie chodzi:  
-Czy jest szlachetniejsze w sercu znosić ciosy i strzały okrutnego losu,  
-czy wziąć broń i sprzeciwić się morzu nieszczęść, by je pokonać? Umrzeć… Zasnąć…  
-I przez ten sen powiedzieć, że konczymy ból serca,  
-tysiące naturalnych cierpień, które to ciało musi przenieść…  
-To jest coś, czego z pokorą pragniemy. Umrzeć… Zasnąć…  
-Może przysnią się sny… Ale w tym śnie śmierci jakie sny mogą się zdarzyć?  
-Gdy odejdziemy z tego świata śmierci,  
-co nas powinno zastanowić… To właśnie czyni tak długie życie takim cierpieniem…  
-Kto bowiem chce znosić kary czasu, zniewagę ludzi, ból od odrzuconej miłości,  
-zwłóczki władzy, pogardę…  
-Kto chce ciągnąć ciężary życia, mrzać i pocierać się potem…  
-Jeśli tylko strach przed tym, co czeka po śmierci,  
-ten nieznany świat, z którego nikt nie powraca, nie pokonuje naszej woli…  
-Czemu wtedy nie radzić sobie z tą samą złą,  
-zamiast uciekać przed niewiadomymi zagrożeniami?Tak sumienie czyni z nas wszystkich tchórych;  
-Pierwotna, naturalna determinacja  
-zaciemnia się bladym, pesymistycznym spojrzeniem na świat;  
-A przedsięwzięcia o wielkim znaczeniu  
-z powodu tego odchylają się od swojego celu  
-i tracą charakter prawdziwych działań.
+Być lub nie, to jest pytanie: 
+Czy to jest szlachetne w umyśle, by cierpieć 
+Procy i strzały oburzającej fortuny, 
+Lub wziąć broń do morza kłopotówI przeciwstawiając się ich zakończeni. Umrzeć - spać, 
+Więcej nie; i snem, mówiąc, że kończymy 
+Ból serca i tysiące naturalnych wstrząsów 
+To ciało jest spadkobiercą: „to jest konsumpcjaPobożne, aby być życzeniem. Umrzeć, spać; 
+Spać, w stanie marzyć - powie, jest pocieranie: 
+Bo w tym śnie śmierci, jakie sny mogą nadejść, 
+Kiedy odrzuciliśmy tę śmiertelną cewkę,Musi nam się zatrzymać - jest szacunek 
+To powoduje katastrofę tak długiego życia. 
+Bo kto nosiłby bicze i pogardy czasu, 
+Th’ -upresor jest w błędzie, dumny człowiek jest skryty,Błędności z niepoprawami, opóźnienie prawa, 
+Bezczelność urzędu i odmienne 
+Ta zaleca pacjenta z powodu tego, co bierze, 
+Kiedy on sam mógłby zrobić jego ciszyZ gołym bodkinem? Kto by uporządkował niedźwiedzie, 
+Chrząkać i poci się w zmęczonym życiu, 
+Ale ten strach przed czymś po śmierci, 
+Niedopolowy kraj, od którego kouringuŻaden podróżnik nie wraca, zagadnia testament, 
+I sprawia, że ​​raczej nosimy te choroby, które mamy 
+Niż latać do innych, o których nie wiemy? 
+Zatem sumienie, czyni z nas tchórzów,A zatem rodzime odcień rozdzielczości 
+Jest chory z bladą obsadą myśli, 
+Oraz przedsiębiorstwa o wielkim rdzeniu i momencie 
+Z tego powodu ich prądy zmieniają się 
+I stracić nazwę akcji.
 </document_content>
 </document>
 
 <document index="33">
+<source>examples/pl/poem_pl.txt</source>
+<document_content>
+# this_file: examples/poem_pl.txtŚwit spływa po dachach,Dzwony lśnią w porannej mgle,Sąsiedzi wymieniają pozdrowienia,A nadzieja znów czuje się jak dar.
+</document_content>
+</document>
+
+<document index="34">
 <source>examples/poem_en.txt</source>
 <document_content>
 To be, or not to be, that is the question:
@@ -4823,7 +4836,7 @@ And lose the name of action.
 </document_content>
 </document>
 
-<document index="34">
+<document index="35">
 <source>examples/poem_pl.txt</source>
 <document_content>
 # this_file: examples/poem_pl.txt
@@ -4836,7 +4849,7 @@ A nadzieja znów czuje się jak dar.
 </document_content>
 </document>
 
-<document index="35">
+<document index="36">
 <source>examples/translate.sh</source>
 <document_content>
 #!/bin/bash
@@ -4894,7 +4907,7 @@ abersetz version
 </document_content>
 </document>
 
-<document index="36">
+<document index="37">
 <source>examples/vocab.json</source>
 <document_content>
 {
@@ -4906,7 +4919,7 @@ abersetz version
 </document_content>
 </document>
 
-<document index="37">
+<document index="38">
 <source>examples/walkthrough.md</source>
 <document_content>
 ---
@@ -4927,7 +4940,7 @@ The command writes the translated poem to `examples/out/poem_en.txt` and saves t
 </document_content>
 </document>
 
-<document index="38">
+<document index="39">
 <source>issues/102-review.md</source>
 <document_content>
 ---
@@ -5001,7 +5014,7 @@ The `abersetz` project is a high-quality codebase that meets all the requirement
 </document_content>
 </document>
 
-<document index="39">
+<document index="40">
 <source>issues/103.txt</source>
 <document_content>
 The CLI tool is absurd: 
@@ -5032,7 +5045,7 @@ Then /report and then finally /work on the tasks!
 </document_content>
 </document>
 
-<document index="40">
+<document index="41">
 <source>issues/105.txt</source>
 <document_content>
 ## `abersetz engines`
@@ -5140,7 +5153,7 @@ Shorten `translators` to `tr` and `deep-translator` to `dt`, and `ullm` to `ll`.
 </document_content>
 </document>
 
-<document index="41">
+<document index="42">
 <source>package.toml</source>
 <document_content>
 # Package configuration
@@ -5157,7 +5170,7 @@ github_actions = true   # Add GitHub Actions workflows
 </document_content>
 </document>
 
-<document index="42">
+<document index="43">
 <source>pyproject.toml</source>
 <document_content>
 # this_file: pyproject.toml
