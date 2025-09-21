@@ -13,9 +13,9 @@ dynamic = ["version"]
 dependencies = [
     "deep-translator>=1.11",
     "fire>=0.5",
+    "httpx>=0.25",
     "loguru>=0.7",
     "langcodes>=3.4",
-    "openai>=1.51",
     "platformdirs>=4.3",
     "rich>=13.9",
     "semantic-text-splitter>=0.7",
@@ -38,7 +38,7 @@ Issues = "https://github.com/twardoch/abersetz/issues"
 Source = "https://github.com/twardoch/abersetz"
 
 [project.scripts]
-abersetz = "abersetz.cli:main"
+abersetz = "abersetz.cli_fast:main"
 abtr = "abersetz.cli:abtr_main"
 
 [dependency-groups]

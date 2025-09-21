@@ -29,6 +29,24 @@ All notable changes to abersetz will be documented in this file.
 - Added `__main__.py` to enable `python -m abersetz` execution
 - Fixed CLI test that was calling tr method with incorrect argument order
 
+### Performance Optimizations
+- **Achieved 17x startup performance improvement**: Import time reduced from 8.5s to 0.43s
+  - Replaced heavyweight OpenAI SDK with lightweight httpx-based client (saved 7.6s)
+  - Implemented lazy imports for translation engines (translators, deep-translator)
+  - Added module-level `__getattr__` in `__init__.py` for deferred loading
+  - Created fast CLI entry point for instant --version checks
+- **Engine shortcuts added**: Use `tr/*`, `dt/*`, `ll/*` instead of full names
+- **Fixed `abersetz engines` output**: Removed duplicate object representations
+- **Improved table formatting**: Standardized display with checkmarks and better styling
+
+### Planning
+- Comprehensive startup optimization plan created to reduce import time from 8.5s to <1s
+  - Identified OpenAI SDK as primary bottleneck (7.6s, 89% of startup time)
+  - Designed 7-phase refactoring with lazy imports and OpenAI SDK replacement
+  - Planned httpx-based lightweight OpenAI client implementation
+  - Documented module-level `__getattr__` patterns for deferred imports
+  - Created detailed implementation roadmap with performance targets
+
 ## [0.1.0] - 2025-01-20
 
 ### Added

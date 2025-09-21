@@ -8,7 +8,7 @@ this_file: DEPENDENCIES.md
 ### Translation Engines
 - **translators** (>=5.9): Provides access to multiple free translation APIs (Google, Bing, Baidu, etc.) through a unified interface. Core requirement for free translation capabilities.
 - **deep-translator** (>=1.11): Alternative translation library with support for additional providers including DeepL. Provides fallback options and file translation utilities.
-- **openai** (>=1.51): Official OpenAI client library, used for custom LLM-based translation engines (hysf, ullm) that connect to Siliconflow and other OpenAI-compatible endpoints.
+- **httpx** (>=0.25): Modern HTTP client with sync/async support. Replaces the heavyweight OpenAI SDK with a lightweight implementation, reducing import time by 7.6 seconds.
 
 ### CLI and User Interface
 - **fire** (>=0.5): Google's Python Fire library for automatic CLI generation from functions. Minimal boilerplate, automatic help generation, and intuitive command structure.

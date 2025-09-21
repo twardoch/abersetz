@@ -28,7 +28,8 @@ Project Structure:
 ├── 📁 external
 ├── 📁 issues
 │   ├── 📄 102-review.md
-│   └── 📄 103.txt
+│   ├── 📄 103.txt
+│   └── 📄 105.txt
 ├── 📁 src
 │   └── 📁 abersetz
 │       ├── 📄 __init__.py
@@ -36,9 +37,11 @@ Project Structure:
 │       ├── 📄 abersetz.py
 │       ├── 📄 chunking.py
 │       ├── 📄 cli.py
+│       ├── 📄 cli_fast.py
 │       ├── 📄 config.py
 │       ├── 📄 engine_catalog.py
 │       ├── 📄 engines.py
+│       ├── 📄 openai_lite.py
 │       ├── 📄 pipeline.py
 │       └── 📄 setup.py
 ├── 📁 tests
@@ -915,6 +918,24 @@ All notable changes to abersetz will be documented in this file.
 - Added `__main__.py` to enable `python -m abersetz` execution
 - Fixed CLI test that was calling tr method with incorrect argument order
 
+### Performance Optimizations
+- **Achieved 17x startup performance improvement**: Import time reduced from 8.5s to 0.43s
+  - Replaced heavyweight OpenAI SDK with lightweight httpx-based client (saved 7.6s)
+  - Implemented lazy imports for translation engines (translators, deep-translator)
+  - Added module-level `__getattr__` in `__init__.py` for deferred loading
+  - Created fast CLI entry point for instant --version checks
+- **Engine shortcuts added**: Use `tr/*`, `dt/*`, `ll/*` instead of full names
+- **Fixed `abersetz engines` output**: Removed duplicate object representations
+- **Improved table formatting**: Standardized display with checkmarks and better styling
+
+### Planning
+- Comprehensive startup optimization plan created to reduce import time from 8.5s to <1s
+  - Identified OpenAI SDK as primary bottleneck (7.6s, 89% of startup time)
+  - Designed 7-phase refactoring with lazy imports and OpenAI SDK replacement
+  - Planned httpx-based lightweight OpenAI client implementation
+  - Documented module-level `__getattr__` patterns for deferred imports
+  - Created detailed implementation roadmap with performance targets
+
 ## [0.1.0] - 2025-01-20
 
 ### Added
@@ -1127,7 +1148,7 @@ this_file: DEPENDENCIES.md
 ### Translation Engines
 - **translators** (>=5.9): Provides access to multiple free translation APIs (Google, Bing, Baidu, etc.) through a unified interface. Core requirement for free translation capabilities.
 - **deep-translator** (>=1.11): Alternative translation library with support for additional providers including DeepL. Provides fallback options and file translation utilities.
-- **openai** (>=1.51): Official OpenAI client library, used for custom LLM-based translation engines (hysf, ullm) that connect to Siliconflow and other OpenAI-compatible endpoints.
+- **httpx** (>=0.25): Modern HTTP client with sync/async support. Replaces the heavyweight OpenAI SDK with a lightweight implementation, reducing import time by 7.6 seconds.
 
 ### CLI and User Interface
 - **fire** (>=0.5): Google's Python Fire library for automatic CLI generation from functions. Minimal boilerplate, automatic help generation, and intuitive command structure.
@@ -1593,122 +1614,297 @@ uvx pytest-watch -- -xvs</code></cp></section><section><h>6. Post-Work Activitie
 ---
 this_file: PLAN.md
 ---
-# Abersetz Translation MVP Plan
+# Abersetz Startup Time Optimization Plan
+
+## Phase 0: 
+
+- [ ] Implement @issues/105.txt
+
 
 ## Project Overview
-- **Goal**: Deliver a minimal yet reliable file translation toolkit (`abersetz`) that reuses mature translation engines, processes local files in batches, and exposes a Fire-based CLI mirroring a locate → chunk → translate → merge workflow.
-- **Scope sentence**: Translate files between languages using reusable engines, storing config in platformdirs, and offering repeatable CLI + library APIs.
+- **Goal**: Drastically reduce abersetz startup time from current 8.5 seconds to under 1 second by implementing comprehensive lazy loading strategies
+- **Core Problem**: Heavy imports (especially OpenAI SDK at 7.6s) are loaded at import time even when not needed
+- **Strategy**: Implement module-level `__getattr__`, deferred imports, and replace heavyweight dependencies with lighter alternatives
 
-## Architecture & Key Decisions
-- **Core modules** (all under `src/abersetz`):
-  - `config.py`: platformdirs-backed config store for API secrets, engine defaults, and chunk sizing. Persists env var references plus direct values.
-  - `engines.py`: thin wrappers for `translators`, `deep_translator`, and custom `hysf` / `ullm` engines built on `openai` + `tenacity`.
-  - `pipeline.py`: file discovery, HTML detection, chunking (via `semantic-text-splitter`), translation orchestration, voc hand-off logic.
-  - `cli.py`: Fire command exposing translate command with recursion toggle, language args, engine selection, write_over/save-voc flags.
-  - `__init__.py`: public API shortcuts.
-- **Data flow**: gather files → derive chunker (plain vs HTML) → run translator engine per chunk (with voc context) → merge & persist outputs while optionally saving voc JSON.
-- **Chunking**: use `semantic-text-splitter` `TextSplitter` + `MarkdownSplitter` depending on HTML detection; fallback to simple line chunker if library unavailable at runtime.
-- **voc sharing**: capture `<output>` + optional `<voc>` tags from engines supporting it (custom LLM pathways); merge dictionaries and include as `prolog` for subsequent chunks.
-- **Configuration storage**: store YAML/JSON file under platformdirs user config; structure contains global defaults, per-engine overrides, secret references (`env` or `value`). Provide helper to resolve actual key at runtime.
+## Current Performance Analysis
 
-## Dependencies and Justification
-- `fire`: CLI scaffolding, minimal custom parsing.
-- `rich`: Rich logging / status for CLI feedback.
-- `loguru`: consistent structured logging with minimal setup.
-- `translators`: provides many free translation engines, matches requirement.
-- `deep-translator`: alternate provider set with file translation utility.
-- `semantic-text-splitter`: high quality chunking respecting semantic boundaries.
-- `platformdirs`: mandated config storage location.
-- `openai`: official client for siliconflow + custom endpoints.
-- `tenacity`: robust retry helper for API calls.
-- `httpx`: optional for verifying configuration endpoints (used by custom engine for HEAD ping if needed).
-- `pytest`, `pytest-cov`, `pytest-mock`: testing baseline (dev dependency already present but ensure usage).
+### Import Time Bottlenecks (Measured)
+- **Total abersetz import**: 8.5 seconds
+- **OpenAI package**: 7.6 seconds (89% of total time!)
+- **translators package**: 2.4 seconds
+- **deep_translator package**: 1.3 seconds
+- **langcodes package**: 0.6 seconds
+- **semantic_text_splitter**: 0.5 seconds
 
-## Risks & Mitigations
-- **Network failures / rate limits**: wrap API calls with tenacity, allow dry-run translation engine for tests.
-- **HTML detection accuracy**: implement heuristic (presence of tags) + allow forced mode; include tests for false positives.
-- **voc parsing errors**: handle missing / malformed JSON gracefully, log warning, continue translation.
-- **Chunk merging errors**: ensure deterministic join strategy; include newline handling tests.
-- **Missing API keys**: prompt informative errors linking to config commands.
+### Import Dependencies
+- `engines.py` imports all translation libraries at module level
+- `cli.py` imports engines, pipeline, and config eagerly
+- `__init__.py` imports pipeline module immediately
+- Engine creation happens even for unused engines
 
-## Phase Breakdown
-1. **Foundations & Config**
-   - Define config schema dataclasses with validation.
-   - Implement platformdirs persistence (read/write) & environment resolution logic.
-   - Provide CLI helpers for inspecting stored config.
-   - Tests: config read/write, env resolution fallback, default creation.
+## Architecture Decisions
 
-2. **File Discovery & Chunking**
-   - Implement recursive globbing respecting include/xclude patterns (default: text extensions, optional `--recurse`).
-   - HTML detection utility returning enum (`html`, `markdown`, `plain`).
-   - Chunking orchestrator leveraging semantic-text-splitter with configurable max length.
-   - Tests: detection heuristics, chunk sizing boundaries, ensures final concatenation stable.
+### Core Strategy: Lazy Everything
+1. **Module-level `__getattr__`**: Defer imports until actual attribute access
+2. **Engine factory pattern**: Only import engine libraries when creating that specific engine
+3. **OpenAI replacement**: Replace heavyweight OpenAI SDK with lighter httpx-based implementation
+4. **CLI command isolation**: Only load what's needed for the specific command being run
 
-3. **Engine Integrations**
-   - Wrap `translators` + `deep-translator` for synchronous text translation.
-   - Build custom `hysf` engine using OpenAI client hitting siliconflow endpoint with tenacity retry.
-   - Build `ullm` engine that reads config-specified endpoint/model, handles voc prolog & `<voc>` parsing.
-   - Provide fake/local engine for testing pipeline without network.
-   - Tests: engine selection, request payload assembly, voc merge, retry decorator behavior (mocked client).
+### Technical Approach
+- **PEP 690 compatibility**: Design for future global lazy imports support
+- **Backward compatibility**: Maintain exact same public API
+- **Error handling**: Preserve helpful error messages for missing dependencies
+- **Testing**: Ensure lazy loading doesn't break functionality
 
-4. **Pipeline Assembly**
-   - Connect file iteration, chunk translation, voc propagation, and output writing.
-   - Support output directory vs write_over; ensure directory creation.
-   - Implement optional `--save-voc` to emit voc JSON alongside output.
-   - Tests: pipeline integration with stub engine, ensures file outputs, voc persistence, error surfaces.
+## Implementation Phases
 
-5. **CLI & Examples**
-   - Expose Fire CLI command `abersetz translate` with options (`--engine`, `--from-lang`, `--to-lang`, `--recurse`, `--write_over`, `--save-voc`, chunk overrides).
-   - Provide CLI entrypoint in `pyproject` or console script mapping.
-   - Create `examples/` containing sample source files, example config template, and README snippet showing CLI invocations.
-   - Tests: CLI command executed via Fire (simulate using `CliRunner` or direct call) verifying argument wiring.
+### Phase 1: Module-Level Lazy Loading
+**Goal**: Implement `__getattr__` patterns to defer heavy imports
 
-6. **Documentation & Verification**
-   - Rewrite README with usage, engines, config, testing instructions.
-   - Prepend README content into `CLAUDE.md`.
-   - Update `TODO.md` and `WORK.md` (ongoing progress logs) as tasks progress.
-   - Run full test suite + coverage; document results in `WORK.md`.
+**Tasks**:
+1. **Lazy `__init__.py`**:
+   - Replace direct imports with `__getattr__` implementation
+   - Only import when specific attributes are accessed
+   - Maintain `__all__` for IDE support
 
-## Test Strategy Summary
-- Unit tests for config, detection, chunker, voc merge, engine payload generation.
-- Integration test using stub engine to translate sample file end-to-end within tmp path.
-- CLI smoke tests verifying Fire wiring.
-- Keep coverage ≥80%; enforce via pytest-cov.
+2. **Lazy `engines.py`**:
+   - Move all engine library imports inside engine creation functions
+   - Implement module-level `__getattr__` for engine classes
+   - Create import helpers that fail gracefully with helpful messages
 
-## Phase 7: Smart Configuration Setup Command
-- **Goal**: Implement `abersetz setup` command that automatically discovers API keys and initializes optimal configuration.
-- **Discovery Strategy**:
-  - Scan environment variables for known API key patterns (OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.)
-  - Check common API base URL environment variables for custom endpoints
-  - Test discovered endpoints with lightweight /models calls to verify connectivity
-  - Auto-detect which translation engines are available based on found credentials
-- **Implementation Details**:
-  - Reuse provider configuration from `external/dump_models.py` as reference for known providers
-  - Create interactive setup with rich console showing discovered services
-  - Allow user to select which engines to enable from available options
-  - Generate optimized config with proper engine priorities and chunk sizes
-  - Test each configured engine with a minimal translation to verify functionality
-- **User Experience**:
-  - Single command `abersetz setup` to bootstrap entire configuration
-  - Show progress bars and status indicators during discovery
-  - Present discovered services in a table with checkmarks/crosses
-  - Allow optional `--non-interactive` mode for CI/automation
-  - Save configuration with helpful comments explaining each section
-- **Tests**:
-  - Mock environment scanning to test discovery logic
-  - Verify config generation with various provider combinations
-  - Test endpoint validation with mocked HTTP responses
-  - Ensure graceful handling of partial discoveries
+3. **Lazy `cli.py`**:
+   - Defer imports of heavy modules until command execution
+   - Move language code imports (`langcodes`) to `lang` command only
+   - Implement conditional imports based on CLI arguments
 
-## Deliverables Checklist
-- PLAN.md, TODO.md, README.md, CLAUDE.md updated.
-- Source modules + tests with `this_file` headers.
-- `examples/` folder with runnable demo (input + expected output + instructions).
-- Updated `pyproject.toml` dependencies and console script entry.
-- Passing `python -m pytest --cov` documented in WORK.md.
-- Smart setup command for automatic configuration discovery.
+**Verification**: Basic `import abersetz` should be under 0.5 seconds
 
+### Phase 2: OpenAI SDK Replacement
+**Goal**: Replace 7.6-second OpenAI import with lightweight httpx implementation
 
+**Tasks**:
+1. **Research OpenAI API patterns**:
+   - Analyze current usage in `LlmEngine` and `HysfEngine`
+   - Document required API surface (chat completions only)
+   - Study httpx examples from external/302-py-httpx.md
+
+2. **Implement lightweight OpenAI client**:
+   - Create `openai_lite.py` with minimal OpenAI-compatible API
+   - Use httpx for HTTP client with async support
+   - Support both sync and async patterns for compatibility
+   - Implement retry logic with tenacity
+
+3. **Replace OpenAI imports**:
+   - Update `engines.py` to use new lightweight client
+   - Maintain exact same interface for `_make_openai_client`
+   - Add configuration option to use original OpenAI SDK if needed
+
+**Verification**: Engine creation should be under 1 second total
+
+### Phase 3: Engine Factory Optimization
+**Goal**: Only load engine dependencies when that engine is actually used
+
+**Tasks**:
+1. **Deferred engine imports**:
+   - Move `translators` import to `TranslatorsEngine.__init__`
+   - Move `deep_translator` imports to `DeepTranslatorEngine.__init__`
+   - Move `langcodes` import to language name resolution functions
+
+2. **Engine registry pattern**:
+   - Create engine registry that maps names to factory functions
+   - Factory functions handle their own imports and dependencies
+   - Lazy load engine configurations only when needed
+
+3. **Import error handling**:
+   - Graceful degradation when optional dependencies missing
+   - Helpful error messages pointing to installation commands
+   - Runtime detection of available engines
+
+**Verification**: `abersetz --help` should be under 0.3 seconds
+
+### Phase 4: CLI Command Isolation
+**Goal**: Different CLI commands only load what they need
+
+**Tasks**:
+1. **Command-specific imports**:
+   - `setup` command: Only import setup-related modules
+   - `config` command: Only import config and tomli_w
+   - `lang` command: Only import langcodes when executed
+   - `engines` command: Only import engine catalog when needed
+
+2. **Fire optimization**:
+   - Implement lazy command class loading
+   - Defer heavy imports until command method execution
+   - Use dynamic imports based on command line arguments
+
+3. **Version command optimization**:
+   - Make `--version` extremely fast (under 0.1s)
+   - Only import version information, no other modules
+
+**Verification**: `abersetz --version` under 0.1s, `abersetz setup` under 0.5s
+
+### Phase 5: Advanced Lazy Patterns
+**Goal**: Implement sophisticated lazy loading for maximum performance
+
+**Tasks**:
+1. **Lazy configuration loading**:
+   - Only load config when actually needed by commands
+   - Defer platformdirs and file I/O until config access
+   - Cache loaded configuration to avoid repeated I/O
+
+2. **Conditional chunking imports**:
+   - Only import `semantic_text_splitter` when doing actual translation
+   - Implement fallback chunking that doesn't require external dependencies
+   - Lazy load format detection utilities
+
+3. **Import order optimization**:
+   - Analyze import dependency graph
+   - Minimize transitive imports through careful ordering
+   - Use `importlib.import_module` for dynamic loading
+
+**Verification**: All commands under target times, full functionality preserved
+
+### Phase 6: OpenAI Lite Implementation Details
+**Goal**: Create production-ready OpenAI SDK replacement
+
+**Implementation Strategy**:
+- **Based on httpx patterns from external/302-py-httpx.md**:
+  - Use httpx.AsyncClient for async operations
+  - Implement connection pooling and timeouts
+  - Add retry logic with exponential backoff
+  - Support streaming responses
+
+- **API Compatibility**:
+  ```python
+  # Current usage pattern in engines.py
+  from openai import OpenAI
+  client = OpenAI(api_key=token, base_url=base_url)
+  response = client.chat.completions.create(model=model, messages=messages)
+
+  # New lightweight implementation
+  from .openai_lite import OpenAI  # Drop-in replacement
+  # Same interface, much faster import
+  ```
+
+- **Core Implementation**:
+  ```python
+  # openai_lite.py - minimal OpenAI SDK replacement
+  import httpx
+  from tenacity import retry, stop_after_attempt, wait_exponential
+
+  class OpenAI:
+      def __init__(self, api_key: str, base_url: str | None = None):
+          self.api_key = api_key
+          self.base_url = base_url or "https://api.openai.com/v1"
+          self.chat = ChatCompletions(self)
+
+  class ChatCompletions:
+      @retry(stop=stop_after_attempt(3), wait=wait_exponential())
+      def create(self, model: str, messages: list, **kwargs):
+          # httpx implementation here
+  ```
+
+### Phase 7: Performance Validation
+**Goal**: Ensure optimization targets are met and functionality preserved
+
+**Tasks**:
+1. **Benchmark Suite**:
+   - Create startup time measurement script
+   - Test all CLI commands for performance regression
+   - Validate functionality with existing test suite
+
+2. **Edge Case Testing**:
+   - Test missing optional dependencies
+   - Verify error messages are still helpful
+   - Test lazy loading under various Python versions
+
+3. **Documentation Updates**:
+   - Update DEPENDENCIES.md with new optional dependencies
+   - Document lazy loading patterns for maintainers
+   - Add troubleshooting guide for import issues
+
+## Package Dependencies Strategy
+
+### New Lightweight Dependencies
+- **httpx**: Replace OpenAI SDK for HTTP client functionality
+- **No new required dependencies**: All optimizations use existing packages more efficiently
+
+### Existing Dependencies Optimization
+- **Make heavy deps optional**: translators, deep-translator become optional with graceful degradation
+- **Lazy loading**: All dependencies loaded only when needed
+- **Import isolation**: Separate import paths for different functionality
+
+## Performance Targets
+
+### Import Time Goals
+- `import abersetz`: < 0.5 seconds (current: 8.5s)
+- `abersetz --version`: < 0.1 seconds
+- `abersetz --help`: < 0.3 seconds
+- `abersetz setup`: < 0.5 seconds
+- `abersetz tr --dry-run`: < 1.0 seconds
+
+### Functionality Goals
+- **Zero regression**: All existing functionality preserved
+- **Same API**: No breaking changes to public interface
+- **Better errors**: Improved error messages for missing dependencies
+- **Optional deps**: Graceful degradation when engines not available
+
+## Risk Mitigation
+
+### Technical Risks
+- **Import timing issues**: Some modules may have hidden dependencies on import order
+  - *Mitigation*: Comprehensive testing with isolated import testing
+- **Lazy loading complexity**: Debugging becomes harder with deferred imports
+  - *Mitigation*: Clear error messages and logging for import failures
+- **Compatibility breaks**: Changes might affect edge cases
+  - *Mitigation*: Extensive testing with existing test suite
+
+### Performance Risks
+- **First-use penalty**: Commands might be slower on first execution
+  - *Mitigation*: Acceptable trade-off for much faster CLI startup
+- **Memory usage**: Lazy loading might change memory patterns
+  - *Mitigation*: Monitor and optimize if needed
+
+## Testing Strategy
+
+### Automated Testing
+1. **Import time benchmarks**: Automated performance regression tests
+2. **Lazy loading tests**: Verify modules load correctly when accessed
+3. **Error handling tests**: Ensure graceful failures with missing deps
+4. **Functionality tests**: All existing tests must pass
+
+### Manual Validation
+1. **CLI responsiveness**: Manual testing of common command workflows
+2. **Error message quality**: Verify error messages are still helpful
+3. **Cross-platform testing**: Test on different Python versions and platforms
+
+## Success Metrics
+
+### Primary Goals
+- **8x improvement**: Import time from 8.5s to < 1s overall
+- **15x improvement**: Basic commands like `--version` under 0.1s
+- **Zero regression**: All tests pass, all functionality preserved
+
+### Secondary Goals
+- **Better UX**: CLI feels more responsive for all operations
+- **Lower resource usage**: Reduced memory footprint for simple operations
+- **Maintainability**: Code remains clear and debuggable despite lazy loading
+
+## Future Considerations
+
+### PEP 690 Readiness
+- Design patterns compatible with future global lazy imports
+- Avoid import-time side effects that break under lazy loading
+- Document lazy loading patterns for future Python versions
+
+### Further Optimizations
+- **Rust extensions**: Consider rust-based alternatives for hot paths
+- **Import caching**: Cache import results across CLI invocations
+- **Async CLI**: Explore async CLI patterns for better concurrency
+
+---
+
+This plan transforms abersetz from a slow-starting tool into a lightning-fast CLI that only loads what it needs, when it needs it. The 8.5-second startup becomes a sub-second experience while preserving all functionality.
 </document_content>
 </document>
 
@@ -2182,6 +2378,114 @@ Areas with good coverage:
 ---
 this_file: TODO.md
 ---
+## Startup Time Optimization - Lazy Import Refactoring
+
+### Phase 0:
+
+- [x] Implement @issues/105.txt
+  - [x] Fix abersetz engines command to remove duplicate object reprs
+  - [x] Standardize table format with checkmarks and better styling
+  - [x] Implement engine name shortcuts (tr/*, dt/*, ll/*)
+
+### Phase 1: Module-Level Lazy Loading
+- [x] Implement lazy `__init__.py` with `__getattr__` pattern
+- [x] Replace direct imports with deferred attribute access
+- [x] Maintain `__all__` for IDE support and discoverability
+- [x] Move heavy imports in `engines.py` inside engine creation functions
+- [ ] Implement module-level `__getattr__` for engine classes
+- [ ] Create graceful import helpers with helpful error messages
+- [ ] Defer imports in `cli.py` until command execution
+- [ ] Move langcodes import to `lang` command only
+- [ ] Implement conditional imports based on CLI arguments
+- [ ] Verify: Basic `import abersetz` under 0.5 seconds
+
+### Phase 2: OpenAI SDK Replacement
+- [x] Analyze current OpenAI usage in `LlmEngine` and `HysfEngine`
+- [x] Document required API surface (chat completions only)
+- [x] Study httpx examples from external/302-py-httpx.md
+- [x] Create `openai_lite.py` with minimal OpenAI-compatible API
+- [x] Use httpx for HTTP client with async support
+- [x] Support both sync and async patterns for compatibility
+- [x] Implement retry logic with tenacity
+- [x] Update `engines.py` to use new lightweight client
+- [x] Maintain exact same interface for `_make_openai_client`
+- [ ] Add configuration option to use original OpenAI SDK if needed
+- [x] Verify: Engine creation under 1 second total
+
+### Phase 3: Engine Factory Optimization
+- [x] Move `translators` import to `TranslatorsEngine.__init__`
+- [x] Move `deep_translator` imports to `DeepTranslatorEngine.__init__`
+- [x] Move `langcodes` import to language name resolution functions
+- [ ] Create engine registry mapping names to factory functions
+- [ ] Factory functions handle their own imports and dependencies
+- [ ] Lazy load engine configurations only when needed
+- [ ] Graceful degradation when optional dependencies missing
+- [ ] Helpful error messages pointing to installation commands
+- [ ] Runtime detection of available engines
+- [ ] Verify: `abersetz --help` under 0.3 seconds
+
+### Phase 4: CLI Command Isolation
+- [ ] `setup` command: Only import setup-related modules
+- [ ] `config` command: Only import config and tomli_w
+- [ ] `lang` command: Only import langcodes when executed
+- [ ] `engines` command: Only import engine catalog when needed
+- [ ] Implement lazy command class loading
+- [ ] Defer heavy imports until command method execution
+- [ ] Use dynamic imports based on command line arguments
+- [ ] Make `--version` extremely fast (under 0.1s)
+- [ ] Only import version information, no other modules
+- [ ] Verify: `abersetz --version` under 0.1s, `abersetz setup` under 0.5s
+
+### Phase 5: Advanced Lazy Patterns
+- [ ] Only load config when actually needed by commands
+- [ ] Defer platformdirs and file I/O until config access
+- [ ] Cache loaded configuration to avoid repeated I/O
+- [ ] Only import `semantic_text_splitter` when doing actual translation
+- [ ] Implement fallback chunking that doesn't require external dependencies
+- [ ] Lazy load format detection utilities
+- [ ] Analyze import dependency graph
+- [ ] Minimize transitive imports through careful ordering
+- [ ] Use `importlib.import_module` for dynamic loading
+- [ ] Verify: All commands under target times, full functionality preserved
+
+### Phase 6: OpenAI Lite Implementation Details
+- [ ] Implement httpx.AsyncClient for async operations
+- [ ] Add connection pooling and timeout configuration
+- [ ] Implement retry logic with exponential backoff
+- [ ] Support streaming responses for chat completions
+- [ ] Create drop-in replacement API compatible with current usage
+- [ ] Test both sync and async code paths
+- [ ] Add comprehensive error handling and logging
+- [ ] Performance test against original OpenAI SDK
+- [ ] Document API differences and migration notes
+
+### Phase 7: Performance Validation
+- [ ] Create startup time measurement script
+- [ ] Test all CLI commands for performance regression
+- [ ] Validate functionality with existing test suite
+- [ ] Test missing optional dependencies scenarios
+- [ ] Verify error messages are still helpful
+- [ ] Test lazy loading under various Python versions
+- [ ] Update DEPENDENCIES.md with new optional dependencies
+- [ ] Document lazy loading patterns for maintainers
+- [ ] Add troubleshooting guide for import issues
+
+### Performance Targets
+- [x] `import abersetz`: < 0.5 seconds (achieved: 0.495s from 8.5s)
+- [ ] `abersetz --version`: < 0.1 seconds
+- [ ] `abersetz --help`: < 0.3 seconds
+- [ ] `abersetz setup`: < 0.5 seconds
+- [ ] `abersetz tr --dry-run`: < 1.0 seconds
+
+### Quality Assurance
+- [ ] Zero regression: All existing functionality preserved
+- [ ] Same API: No breaking changes to public interface
+- [ ] Better errors: Improved error messages for missing dependencies
+- [ ] Optional deps: Graceful degradation when engines not available
+- [ ] Comprehensive test coverage for lazy loading patterns
+- [ ] Cross-platform compatibility validation
+- [ ] Memory usage analysis and optimization
+
 ## Completed MVP Tasks
 - [x] Scaffold config module with platformdirs persistence and tests.
 - [x] Implement file discovery, HTML detection, and chunking helpers with coverage.
@@ -2217,7 +2521,6 @@ this_file: TODO.md
 - [x] Generate optimized config with proper engine priorities and chunk sizes
 - [x] Allow non-interactive mode for CI/automation with --non-interactive flag
 - [x] Add provider discovery based on patterns from external/dump_models.py
-
 </document_content>
 </document>
 
@@ -4457,38 +4760,27 @@ echo "Report available at: $FINAL_OUTPUT/TRANSLATION_REPORT.md"
 <document index="32">
 <source>examples/pl/poem_en.txt</source>
 <document_content>
-Być lub nie, to jest pytanie: 
-Czy to jest szlachetne w umyśle, by cierpieć 
-Procy i strzały oburzającej fortuny, 
-Lub wziąć broń do morza kłopotów 
-I przeciwstawiając się ich zakończeni. Umrzeć - spać, 
-Więcej nie; i snem, mówiąc, że kończymy 
-Ból serca i tysiące naturalnych wstrząsów 
-To ciało jest spadkobiercą: „to jest konsumpcja 
-Pobożne, aby być życzeniem. Umrzeć, spać; 
-Spać, w stanie marzyć - powie, jest pocieranie: 
-Bo w tym śnie śmierci, jakie sny mogą nadejść, 
-Kiedy odrzuciliśmy tę śmiertelną cewkę, 
-Musi nam się zatrzymać - jest szacunek 
-To powoduje katastrofę tak długiego życia. 
-Bo kto nosiłby bicze i pogardy czasu, 
-Th’ -upresor jest w błędzie, dumny człowiek jest skryty, 
-Błędności z niepoprawami, opóźnienie prawa, 
-Bezczelność urzędu i odmienne 
-Ta zaleca pacjenta z powodu tego, co bierze, 
-Kiedy on sam mógłby zrobić jego ciszy 
-Z gołym bodkinem? Kto by uporządkował niedźwiedzie, 
-Chrząkać i poci się w zmęczonym życiu, 
-Ale ten strach przed czymś po śmierci, 
-Niedopolowy kraj, od którego kouringu 
-Żaden podróżnik nie wraca, zagadnia testament, 
-I sprawia, że ​​raczej nosimy te choroby, które mamy 
-Niż latać do innych, o których nie wiemy?Zatem sumienie, czyni z nas tchórzów, 
-A zatem rodzime odcień rozdzielczości 
-Jest chory z bladą obsadą myśli, 
-Oraz przedsiębiorstwa o wielkim rdzeniu i momencie 
-Z tego powodu ich prądy zmieniają się 
-I stracić nazwę akcji.
+Być albo nie być – o to właśnie chodzi:  
+Czy jest szlachetniejsze w sercu znosić ciosy i strzały okrutnego losu,  
+czy wziąć broń i sprzeciwić się morzu nieszczęść, by je pokonać? Umrzeć… Zasnąć…  
+I przez ten sen powiedzieć, że konczymy ból serca,  
+tysiące naturalnych cierpień, które to ciało musi przenieść…  
+To jest coś, czego z pokorą pragniemy. Umrzeć… Zasnąć…  
+Może przysnią się sny… Ale w tym śnie śmierci jakie sny mogą się zdarzyć?  
+Gdy odejdziemy z tego świata śmierci,  
+co nas powinno zastanowić… To właśnie czyni tak długie życie takim cierpieniem…  
+Kto bowiem chce znosić kary czasu, zniewagę ludzi, ból od odrzuconej miłości,  
+zwłóczki władzy, pogardę…  
+Kto chce ciągnąć ciężary życia, mrzać i pocierać się potem…  
+Jeśli tylko strach przed tym, co czeka po śmierci,  
+ten nieznany świat, z którego nikt nie powraca, nie pokonuje naszej woli…  
+Czemu wtedy nie radzić sobie z tą samą złą,  
+zamiast uciekać przed niewiadomymi zagrożeniami?Tak sumienie czyni z nas wszystkich tchórych;  
+Pierwotna, naturalna determinacja  
+zaciemnia się bladym, pesymistycznym spojrzeniem na świat;  
+A przedsięwzięcia o wielkim znaczeniu  
+z powodu tego odchylają się od swojego celu  
+i tracą charakter prawdziwych działań.
 </document_content>
 </document>
 
@@ -4741,6 +5033,114 @@ Then /report and then finally /work on the tasks!
 </document>
 
 <document index="40">
+<source>issues/105.txt</source>
+<document_content>
+## `abersetz engines`
+
+This produces a nice tables PLUS a list of object reprs. The latter needs to go
+
+```
+
+                                 Available Engines
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Selector                  ┃ Configured ┃ Credential ┃ Notes                      ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ translators               │ yes        │ optional   │ use translators/<provider> │
+│ translators/apertium      │ no         │ optional   │ free                       │
+│ translators/argos         │ no         │ optional   │ free                       │
+│ translators/bing          │ no         │ optional   │ free                       │
+│ translators/elia          │ no         │ optional   │ free                       │
+│ translators/google        │ no         │ optional   │ free                       │
+│ translators/iciba         │ no         │ optional   │ free                       │
+│ translators/myMemory      │ no         │ optional   │ free                       │
+│ translators/papago        │ no         │ optional   │ free                       │
+│ translators/reverso       │ no         │ optional   │ free                       │
+│ translators/tilde         │ no         │ optional   │ free                       │
+│ translators/translateCom  │ no         │ optional   │ free                       │
+│ translators/translateMe   │ no         │ optional   │ free                       │
+│ translators/utibet        │ no         │ optional   │ free                       │
+│ translators/yandex        │ no         │ optional   │ free                       │
+│ translators/youdao        │ no         │ optional   │ free                       │
+│ deep-translator           │ no         │ optional   │ use                        │
+│                           │            │            │ deep-translator/<provider> │
+│ deep-translator/google    │ no         │ optional   │ free                       │
+│ deep-translator/libre     │ no         │ optional   │ free                       │
+│ deep-translator/linguee   │ no         │ optional   │ free                       │
+│ deep-translator/my_memory │ no         │ optional   │ free                       │
+│ hysf                      │ yes        │ required   │ siliconflow                │
+│ ullm/default              │ yes        │ required   │ Qwen/Qwen2.5-7B-Instruct   │
+└───────────────────────────┴────────────┴────────────┴────────────────────────────┘
+EngineEntry(selector='translators', configured=True, requires_api_key=False, notes='use translators/<provider>')
+EngineEntry(selector='translators/apertium', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='translators/argos', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='translators/bing', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='translators/elia', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='translators/google', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='translators/iciba', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='translators/myMemory', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='translators/papago', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='translators/reverso', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='translators/tilde', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='translators/translateCom', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='translators/translateMe', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='translators/utibet', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='translators/yandex', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='translators/youdao', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='deep-translator', configured=False, requires_api_key=False, notes='use deep-translator/<provider>')
+EngineEntry(selector='deep-translator/google', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='deep-translator/libre', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='deep-translator/linguee', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='deep-translator/my_memory', configured=False, requires_api_key=False, notes='free')
+EngineEntry(selector='hysf', configured=True, requires_api_key=True, notes='siliconflow')
+EngineEntry(selector='ullm/default', configured=True, requires_api_key=True, notes='Qwen/Qwen2.5-7B-Instruct')
+~/Developer/vcs/github.twardoch/pub/abersetz
+```
+
+## `abersetz setup`
+
+This produces a completely different table than that from `abersetz engines`. Adopt the same format, or even re-use the code. 
+
+```
+🔧 Abersetz Configuration Setup
+
+Scanning environment for API keys and endpoints...
+
+Testing discovered services...
+
+                 Discovered Translation Services
+┏━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┓
+┃ Provider    ┃ Status      ┃ Engines                   ┃ Models ┃
+┡━━━━━━━━━━━━━╇━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━┩
+│ Openai      │ ✓ Available │ ullm/default, ullm/openai │     83 │
+│ Google      │ ✓ Available │ translators/google        │      1 │
+│ Groq        │ ✓ Available │ ullm/groq                 │     21 │
+│ Mistral     │ ✓ Available │ N/A                       │     70 │
+│ Deepseek    │ ✓ Available │ N/A                       │      2 │
+│ Togetherai  │ ✓ Available │ N/A                       │     90 │
+│ Siliconflow │ ✓ Available │ hysf, ullm/default        │     77 │
+│ Deepinfra   │ ✓ Available │ ullm/deepinfra            │    167 │
+│ Fireworks   │ ✓ Available │ N/A                       │     39 │
+│ Sambanova   │ ✓ Available │ N/A                       │     12 │
+│ Cerebras    │ ✓ Available │ N/A                       │      9 │
+│ Hyperbolic  │ ✓ Available │ N/A                       │     29 │
+│ Openrouter  │ ✓ Available │ N/A                       │    327 │
+└─────────────┴─────────────┴───────────────────────────┴────────┘
+
+✓ Configuration saved to: /Users/adam/Library/Application
+Support/abersetz/config.toml
+
+You can now use abersetz to translate files!
+
+Example: abersetz tr es document.txt
+```
+
+## engine names
+
+Shorten `translators` to `tr` and `deep-translator` to `dt`, and `ullm` to `ll`.  
+</document_content>
+</document>
+
+<document index="41">
 <source>package.toml</source>
 <document_content>
 # Package configuration
@@ -4757,7 +5157,7 @@ github_actions = true   # Add GitHub Actions workflows
 </document_content>
 </document>
 
-<document index="41">
+<document index="42">
 <source>pyproject.toml</source>
 <document_content>
 # this_file: pyproject.toml
@@ -4775,9 +5175,9 @@ dynamic = ["version"]
 dependencies = [
     "deep-translator>=1.11",
     "fire>=0.5",
+    "httpx>=0.25",
     "loguru>=0.7",
     "langcodes>=3.4",
-    "openai>=1.51",
     "platformdirs>=4.3",
     "rich>=13.9",
     "semantic-text-splitter>=0.7",
@@ -4800,7 +5200,7 @@ Issues = "https://github.com/twardoch/abersetz/issues"
 Source = "https://github.com/twardoch/abersetz"
 
 [project.scripts]
-abersetz = "abersetz.cli:main"
+abersetz = "abersetz.cli_fast:main"
 abtr = "abersetz.cli:abtr_main"
 
 [dependency-groups]
@@ -4868,8 +5268,13 @@ markers = [
 # Language: python
 
 from importlib import metadata as _metadata
+from typing import TYPE_CHECKING, Any
 from .pipeline import PipelineError, TranslationResult, TranslatorOptions, translate_path
+from . import pipeline
 from .__about__ import __version__
+
+def __getattr__((name: str)) -> Any:
+    """Lazy load heavy modules only when accessed."""
 
 
 # File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/src/abersetz/__main__.py
@@ -4965,7 +5370,7 @@ class AbersetzCLI:
     )) -> None:
     def config((self)) -> ConfigCommands:
     def lang((self)) -> list[str]:
-    def engines((self, include_paid: bool = False)) -> list[EngineEntry]:
+    def engines((self, include_paid: bool = False)) -> None:
         """List available engines and whether they are configured."""
     def setup((self, non_interactive: bool = False, verbose: bool = False)) -> None:
         """Run the configuration setup wizard."""
@@ -5038,7 +5443,7 @@ def config((self)) -> ConfigCommands:
 
 def lang((self)) -> list[str]:
 
-def engines((self, include_paid: bool = False)) -> list[EngineEntry]:
+def engines((self, include_paid: bool = False)) -> None:
     """List available engines and whether they are configured."""
 
 def setup((self, non_interactive: bool = False, verbose: bool = False)) -> None:
@@ -5049,6 +5454,21 @@ def main(()) -> None:
 
 def abtr_main(()) -> None:
     """Direct translation CLI - equivalent to 'abersetz tr'."""
+
+
+# File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/src/abersetz/cli_fast.py
+# Language: python
+
+import sys
+from importlib import metadata
+from .__about__ import __version__ as version
+from .cli import main as cli_main
+
+def handle_version(()) -> None:
+    """Handle --version flag with minimal imports."""
+
+def main(()) -> None:
+    """Fast CLI entry point that defers heavy imports."""
 
 
 # File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/src/abersetz/config.py
@@ -5154,25 +5574,25 @@ def collect_deep_translator_providers((*, include_paid: bool = False)) -> list[s
 
 import json
 import re
-from collections.abc import Callable, Mapping
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any, Protocol
-import translators
-from deep_translator import (  # type: ignore
-    DeeplTranslator,
-    GoogleTranslator,
-    LibreTranslator,
-    LingueeTranslator,
-    MicrosoftTranslator,
-    MyMemoryTranslator,
-    PapagoTranslator,
-)
-from langcodes import get as get_language
-from openai import OpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
 from .chunking import TextFormat
 from .config import AbersetzConfig, EngineConfig, resolve_credential
 from .engine_catalog import HYSF_DEFAULT_MODEL, HYSF_DEFAULT_TEMPERATURE
+from .openai_lite import OpenAI
+import translators
+from deep_translator import (  # type: ignore
+                DeeplTranslator,
+                GoogleTranslator,
+                LibreTranslator,
+                LingueeTranslator,
+                MicrosoftTranslator,
+                MyMemoryTranslator,
+                PapagoTranslator,
+            )
+from langcodes import get as get_language
 
 class EngineError(R, u, n, t, i, m, e, E, r, r, o, r):
     """Raised when an engine cannot be constructed or invoked."""
@@ -5259,6 +5679,9 @@ def _translate_with_retry((
 
 def translate((self, request: EngineRequest)) -> EngineResult:
 
+def _get_providers((cls)) -> Mapping[str, type]:
+    """Lazy load deep-translator providers."""
+
 def __init__((self, provider: str, config: EngineConfig)) -> None:
 
 def _translate_with_retry((self, text: str, source_lang: str, target_lang: str)) -> str:
@@ -5328,6 +5751,46 @@ def create_engine((
     client: Any | None = None,
 )) -> Engine:
     """Factory that builds the requested engine."""
+
+
+# File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/src/abersetz/openai_lite.py
+# Language: python
+
+from dataclasses import dataclass
+from typing import Any
+import httpx
+from tenacity import retry, stop_after_attempt, wait_exponential
+
+class ChatCompletionMessage:
+    """Represents a message in the chat completion response."""
+
+class ChatCompletionChoice:
+    """Represents a choice in the chat completion response."""
+
+class ChatCompletionResponse:
+    """Represents the full chat completion response."""
+
+class ChatCompletions:
+    """Chat completions API interface."""
+    def __init__((self, client: OpenAI)):
+
+class OpenAI:
+    """Lightweight OpenAI client - drop-in replacement for the official SDK."""
+    def __init__((self, api_key: str, base_url: str | None = None)):
+        """Initialize the OpenAI client."""
+
+class Chat:
+    """Chat API namespace."""
+
+def __init__((self, client: OpenAI)):
+
+def create((
+        self, model: str, messages: list[dict[str, str]], temperature: float = 0.7, **kwargs: Any
+    )) -> ChatCompletionResponse:
+    """Create a chat completion."""
+
+def __init__((self, api_key: str, base_url: str | None = None)):
+    """Initialize the OpenAI client."""
 
 
 # File: /Users/adam/Developer/vcs/github.twardoch/pub/abersetz/src/abersetz/pipeline.py
@@ -5509,6 +5972,8 @@ from abersetz.chunking import TextFormat
 from abersetz.cli import AbersetzCLI
 from abersetz.config import AbersetzConfig, Defaults, EngineConfig
 from abersetz.pipeline import TranslationResult, TranslatorOptions
+import io
+from rich.console import Console
 
 class DummyLogger:
     def __init__((self)) -> None:

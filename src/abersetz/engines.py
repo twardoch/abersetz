@@ -5,27 +5,18 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Callable, Mapping
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any, Protocol
 
-import translators  # type: ignore
-from deep_translator import (  # type: ignore
-    DeeplTranslator,
-    GoogleTranslator,
-    LibreTranslator,
-    LingueeTranslator,
-    MicrosoftTranslator,
-    MyMemoryTranslator,
-    PapagoTranslator,
-)
-from langcodes import get as get_language
-from openai import OpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from .chunking import TextFormat
 from .config import AbersetzConfig, EngineConfig, resolve_credential
 from .engine_catalog import HYSF_DEFAULT_MODEL, HYSF_DEFAULT_TEMPERATURE
+
+# Use lightweight OpenAI client for fast imports
+from .openai_lite import OpenAI
 
 
 class EngineError(RuntimeError):
@@ -93,6 +84,10 @@ class TranslatorsEngine(EngineBase):
     def __init__(self, provider: str, config: EngineConfig) -> None:
         super().__init__(config.name, config.chunk_size, config.html_chunk_size)
         self.provider = provider
+        # Lazy import translators only when engine is created
+        import translators  # type: ignore
+
+        self._translators = translators
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, max=10), reraise=True)
     def _translate_with_retry(
@@ -100,14 +95,14 @@ class TranslatorsEngine(EngineBase):
     ) -> str:
         """Internal method with retry logic for network failures."""
         if is_html:
-            return translators.translate_html(
+            return self._translators.translate_html(
                 text,
                 translator=self.provider,
                 from_language=source_lang,
                 to_language=target_lang,
             )
         else:
-            return translators.translate_text(
+            return self._translators.translate_text(
                 text,
                 translator=self.provider,
                 from_language=source_lang,
@@ -124,27 +119,45 @@ class TranslatorsEngine(EngineBase):
 class DeepTranslatorEngine(EngineBase):
     """Adapter for `deep-translator` providers with retry logic."""
 
-    PROVIDERS: Mapping[str, Callable[..., Any]] = {
-        "google": GoogleTranslator,
-        "deepl": DeeplTranslator,
-        "microsoft": MicrosoftTranslator,
-        "libre": LibreTranslator,
-        "linguee": LingueeTranslator,
-        "papago": PapagoTranslator,
-        "my_memory": MyMemoryTranslator,
-    }
+    PROVIDERS: Mapping[str, type] | None = None
+
+    @classmethod
+    def _get_providers(cls) -> Mapping[str, type]:
+        """Lazy load deep-translator providers."""
+        if cls.PROVIDERS is None:
+            from deep_translator import (  # type: ignore
+                DeeplTranslator,
+                GoogleTranslator,
+                LibreTranslator,
+                LingueeTranslator,
+                MicrosoftTranslator,
+                MyMemoryTranslator,
+                PapagoTranslator,
+            )
+
+            cls.PROVIDERS = {
+                "google": GoogleTranslator,
+                "deepl": DeeplTranslator,
+                "microsoft": MicrosoftTranslator,
+                "libre": LibreTranslator,
+                "linguee": LingueeTranslator,
+                "papago": PapagoTranslator,
+                "my_memory": MyMemoryTranslator,
+            }
+        return cls.PROVIDERS
 
     def __init__(self, provider: str, config: EngineConfig) -> None:
         super().__init__(config.name, config.chunk_size, config.html_chunk_size)
-        if provider not in self.PROVIDERS:
+        providers = self._get_providers()
+        if provider not in providers:
             raise EngineError(f"Unsupported deep-translator provider: {provider}")
         self.provider = provider
+        self._provider_class = providers[provider]
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, max=10), reraise=True)
     def _translate_with_retry(self, text: str, source_lang: str, target_lang: str) -> str:
         """Internal method with retry logic for network failures."""
-        translator_cls = self.PROVIDERS[self.provider]
-        translator = translator_cls(source=source_lang, target=target_lang)
+        translator = self._provider_class(source=source_lang, target=target_lang)
         return translator.translate(text)
 
     def translate(self, request: EngineRequest) -> EngineResult:
@@ -273,6 +286,8 @@ class HysfEngine(EngineBase):
     @staticmethod
     def _language_name(code: str) -> str:
         try:
+            from langcodes import get as get_language  # Lazy import
+
             return get_language(code).language_name("en") or code
         except Exception:  # pragma: no cover - unexpected lookup failure
             return code
@@ -349,8 +364,26 @@ def create_engine(
     *,
     client: Any | None = None,
 ) -> Engine:
-    """Factory that builds the requested engine."""
+    """Factory that builds the requested engine.
+
+    Supports shortcuts:
+    - tr/* -> translators/*
+    - dt/* -> deep-translator/*
+    - ll/* -> ullm/*
+    """
+    # Handle engine shortcuts
+    ENGINE_SHORTCUTS = {
+        "tr": "translators",
+        "dt": "deep-translator",
+        "ll": "ullm",
+    }
+
     base, _, variant = selector.partition("/")
+    base = ENGINE_SHORTCUTS.get(base, base)
+
+    # Reconstruct selector with expanded name
+    selector = f"{base}/{variant}" if variant else base
+
     engine_cfg = config.engines.get(base)
     if engine_cfg is None:
         raise EngineError(f"No configuration found for engine '{base}'")

@@ -46,7 +46,8 @@ def test_translators_engine_invokes_library(monkeypatch: pytest.MonkeyPatch) -> 
         )
         return "translated"
 
-    monkeypatch.setattr("abersetz.engines.translators.translate_text", fake_translate_text)
+    # Patch the instance's _translators module's translate_text method
+    monkeypatch.setattr(engine._translators, "translate_text", fake_translate_text)
 
     request = EngineRequest(
         text="hello",
@@ -139,7 +140,8 @@ def test_translators_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch) ->
             raise ConnectionError("Network error")
         return "Translated after retries"
 
-    monkeypatch.setattr("abersetz.engines.translators.translate_text", fake_translate_with_retry)
+    # Patch the instance's _translators module's translate_text method
+    monkeypatch.setattr(engine._translators, "translate_text", fake_translate_with_retry)
 
     request = EngineRequest(
         text="hello",
@@ -180,7 +182,8 @@ def test_deep_translator_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch
     # Patch the PROVIDERS dictionary directly
     from abersetz.engines import DeepTranslatorEngine
 
-    original_providers = DeepTranslatorEngine.PROVIDERS.copy()
+    # Force providers to be loaded first, then patch
+    original_providers = DeepTranslatorEngine._get_providers().copy()
     DeepTranslatorEngine.PROVIDERS = {**original_providers, "google": MockTranslator}
 
     try:

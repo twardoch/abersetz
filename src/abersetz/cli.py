@@ -62,16 +62,36 @@ def _render_engine_entries(entries: list[EngineEntry]) -> None:
     if not entries:
         console.print("No engines detected.")
         return
-    table = Table(title="Available Engines", show_header=True, header_style="bold cyan")
+    table = Table(title="Available Translation Engines", show_header=True, header_style="bold cyan")
     table.add_column("Selector", style="white")
+    table.add_column("Shortcut", style="cyan")
     table.add_column("Configured", style="green")
     table.add_column("Credential", style="yellow")
     table.add_column("Notes", style="magenta")
+
+    # Map of shortcuts
+    shortcuts = {
+        "translators": "tr",
+        "deep-translator": "dt",
+        "ullm": "ll",
+    }
+
     for entry in entries:
+        # Determine shortcut
+        base = entry.selector.split("/")[0]
+        shortcut = ""
+        if base in shortcuts:
+            if "/" in entry.selector:
+                provider = entry.selector.split("/", 1)[1]
+                shortcut = f"{shortcuts[base]}/{provider}"
+            else:
+                shortcut = shortcuts[base]
+
         table.add_row(
             entry.selector,
-            "yes" if entry.configured else "no",
-            "required" if entry.requires_api_key else "optional",
+            shortcut,
+            "✓" if entry.configured else "✗",
+            "required" if entry.requires_api_key else "free",
             entry.notes,
         )
     console.print(table)
@@ -342,11 +362,10 @@ class AbersetzCLI:
             console.print(line)
         return rows
 
-    def engines(self, include_paid: bool = False) -> list[EngineEntry]:
+    def engines(self, include_paid: bool = False) -> None:
         """List available engines and whether they are configured."""
         entries = _collect_engine_entries(include_paid)
         _render_engine_entries(entries)
-        return entries
 
     def setup(self, non_interactive: bool = False, verbose: bool = False) -> None:
         """Run the configuration setup wizard.
