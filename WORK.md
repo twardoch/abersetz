@@ -4,6 +4,11 @@ this_file: WORK.md
 # Work Log
 
 ## 2025-09-21
+### Release 1.0.19 Documentation 2025-09-21 13:05 UTC
+- Recorded v1.0.19 changelog entry with highlights, feature breakdown, and verification summary.
+- Pruned `PLAN.md` to active initiatives (Phase 4/5 and CLI option guardrails) and refreshed `TODO.md` with the pending regression tests only.
+- Tests not rerun; documentation and planning-only update.
+
 ### /report – Verification Sweep 2025-09-21 12:39 UTC
 - `python -m pytest -xvs` → 180 passed, 8 skipped in 91.12s; coverage plug-in reported 98% overall with only CLI line 286 plus intentionally skipped integration scaffolding remaining uncovered.
 - `python -m pytest --cov=. --cov-report=term-missing` → 180 passed, 8 skipped in 80.92s; coverage table unchanged (98%) with explicit misses on CLI line 286 and the skipped integration suite alongside focused setup/pipeline guard asserts.
