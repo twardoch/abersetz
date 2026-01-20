@@ -1,23 +1,6 @@
----
-layout: default
-title: Configuration
-nav_order: 5
----
-
 # Configuration
-{: .no_toc }
 
-## Table of contents
-{: .no_toc .text-delta }
-
-1. TOC
-{:toc}
-
----
-
-## Overview
-
-Abersetz stores configuration in a TOML file managed by `platformdirs`, ensuring cross-platform compatibility.
+Abersetz stores configuration in a TOML file managed by `platformdirs` for cross-platform compatibility.
 
 ## Configuration Location
 
@@ -88,13 +71,12 @@ Global default settings for all translations:
 
 ```toml
 [defaults]
-engine = "tr/google" # Default translation engine
-from_lang = "auto"             # Source language (auto-detect)
-to_lang = "en"                  # Target language
-chunk_size = 1200              # Characters per text chunk
-html_chunk_size = 1800         # Characters per HTML chunk
+engine = "tr/google"     # Default translation engine
+from_lang = "auto"       # Source language (auto-detect)
+to_lang = "en"           # Target language
+chunk_size = 1200        # Characters per text chunk
+html_chunk_size = 1800   # Characters per HTML chunk
 ```
-
 
 ### credentials
 
@@ -102,12 +84,11 @@ API key storage with environment variable references:
 
 ```toml
 [credentials.openai]
-env = "OPENAI_API_KEY"        # Read from environment
+env = "OPENAI_API_KEY"   # Read from environment
 
 [credentials.custom]
 value = "sk-actual-key-here"  # Direct value (not recommended)
 ```
-
 
 ### engines
 
@@ -120,10 +101,9 @@ chunk_size = 2000
 [engines.engine_name.credential]
 name = "credential_name"
 
-# Engine-specific options
 [engines.engine_name.options]
+# Engine-specific options
 ```
-
 
 ## Setting Up Credentials
 
@@ -145,7 +125,6 @@ Then reference in config:
 env = "OPENAI_API_KEY"
 ```
 
-
 ### Direct Values (Not Recommended)
 
 Store directly in config (less secure):
@@ -154,7 +133,6 @@ Store directly in config (less secure):
 [credentials.openai]
 value = "sk-actual-key-here"
 ```
-
 
 ## Engine Configuration
 
@@ -184,7 +162,6 @@ temperature = 0.3
 max_input_tokens = 200000
 ```
 
-
 Usage:
 ```bash
 abtr es file.txt --engine ullm/gpt4
@@ -204,7 +181,6 @@ base_url = "http://localhost:8080/v1"
 model = "local-model"
 temperature = 0.5
 ```
-
 
 ## Managing Configuration
 
@@ -350,7 +326,6 @@ engine = "tr/google"
 to_lang = "es"
 ```
 
-
 ### Multi-engine Config
 
 ```toml
@@ -384,7 +359,6 @@ model = "claude-3-opus-20240229"
 base_url = "https://api.anthropic.com/v1"
 ```
 
-
 ### Enterprise Config
 
 ```toml
@@ -410,7 +384,6 @@ max_retries = 5
 timeout = 30
 ```
 
-
 ## Security Best Practices
 
 1. **Never commit API keys**: Add `config.toml` to `.gitignore`
@@ -430,7 +403,7 @@ timeout = 30
 
 ### Config not loading
 
-Check file exists and is valid JSON:
+Check file exists and is valid TOML:
 
 ```bash
 CONFIG_PATH=$(abersetz config path | tail -1)
@@ -455,9 +428,9 @@ chmod 644 "$(abersetz config path | tail -1)"
 
 ## Validation Selector Tips
 
-- Keep a short list of smoke-test selectors (for example, `tr/google,ll/default`) to avoid hammering every provider when you validate changes.
-- Run `abersetz validate --selectors tr/google,ll/default --no-include-defaults` during CI or offline development; it skips auto-discovered providers while still exercising each engine family.
-- Review the [CLI validate command](cli.html#abersetz-validate) for more usage patterns.
+- Keep a short list of smoke-test selectors (e.g., `tr/google,ll/default`) to avoid hammering every provider during validation
+- Run `abersetz validate --selectors tr/google,ll/default --no-include-defaults` during CI or offline development; it skips auto-discovered providers while still exercising each engine family
+- Review the [CLI validate command](cli.html#abersetz-validate) for more usage patterns
 
 ## See Also
 

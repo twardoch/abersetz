@@ -1,27 +1,31 @@
+Here's the improved version of your README with more concise, technically accurate, and slightly livelier language:
+
 ---
-this_file: README.md
----
+
 # abersetz
 
-Minimalist file translator that reuses proven machine translation engines while keeping configuration portable and repeatable. The tool walks through a simple locate → chunk → translate → merge pipeline and exposes both a Python API and a `fire`-powered CLI.
+A minimalist file translator that uses established machine translation engines while keeping configuration portable and repeatable. It follows a simple pipeline: locate → chunk → translate → merge. Provides both a Python API and a CLI powered by `fire`.
 
 ## Why abersetz?
-- Focuses on translating files, not single strings.
-- Reuses stable engines from `translators` and `deep-translator`, plus pluggable LLM-based engines for consistent terminology.
-- Persists engine preferences and API secrets with `platformdirs`, supporting either raw values or the environment variable that stores them.
-- Shares voc between chunks so long documents stay consistent.
-- Keeps a lean codebase: no custom infrastructure, just clear building blocks.
+
+- Translates files, not just strings.
+- Supports engines from `translators`, `deep-translator`, and pluggable LLM-based backends for consistent terminology.
+- Stores engine preferences and credentials using `platformdirs`, supporting either raw values or environment variables.
+- Shares vocabulary across chunks to maintain consistency in long documents.
+- Keeps the codebase small: no custom infrastructure, just clear components doing their job.
 
 ## Key Features
-- Recursive file discovery with include/xclude filters.
-- Automatic HTML vs. plain-text detection to preserve markup when possible.
-- Semantic chunking via `semantic-text-splitter`, with configurable lengths per engine.
-- voc-aware translation pipeline that merges `<voc>` JSON emitted by LLM engines.
-- Offline-friendly dry-run mode for testing and demos.
-- Optional voc sidecar files when `--save-voc` is set.
-- Built-in `abersetz validate` health check that pings each configured engine, reports latency, and surfaces pricing hints from the research catalog.
+
+- Recursive file discovery with include/exclude filters.
+- Automatic HTML vs. plain-text detection to preserve markup where possible.
+- Semantic chunking via `semantic-text-splitter`, with per-engine configurable lengths.
+- Vocabulary-aware translation pipeline that merges `<voc>` JSON output from LLM engines.
+- Dry-run mode for offline testing and demos.
+- Optional vocabulary sidecar files when `--save-voc` is enabled.
+- Built-in `abersetz validate` command that pings configured engines, reports latency, and shows pricing hints from the research catalog.
 
 ## Installation
+
 ```bash
 pip install abersetz
 ```
@@ -29,54 +33,62 @@ pip install abersetz
 ## Quick Start
 
 ### First-time Setup
+
 ```bash
-# Automatically discover and configure available translation services
+# Auto-discover and configure available translation services
 abersetz setup
 
-# Smoke-test configured engines with a single command
+# Test configured engines with a quick validation
 abersetz validate --target-lang es
 ```
 
-This will scan your environment for API keys, test endpoints, and create an optimized configuration.
+This scans your environment for API keys, tests endpoints, and generates an optimized config.
 
 ### Basic Translation
+
 ```bash
-# Using the main CLI
+# Translate using main CLI
 abersetz tr pl ./docs --engine tr/google --output ./build/pl
 
-# Or using the shorthand command
+# Or use the shorthand
 abtr pl ./docs --engine tr/google --output ./build/pl
 ```
 
-### CLI Options (preview)
-- `to_lang`: first positional argument selecting the target language.
-- `--from-lang`: source language (defaults to `auto`).
-- `--engine`: one of
-  - `tr/<provider>` (e.g. `tr/google`)
-  - `dt/<provider>` (e.g. `dt/deepl`)
+### CLI Options
+
+- `to_lang`: First positional argument specifying target language.
+- `--from-lang`: Source language (default: `auto`).
+- `--engine`: One of:
+  - `tr/<provider>` (e.g., `tr/google`)
+  - `dt/<provider>` (e.g., `dt/deepl`)
   - `hy`
   - `ll/<profile>` where profiles are defined in config.
-    - Legacy selectors such as `translators/google` remain accepted and are auto-normalized.
-- `--recurse/--no-recurse`: recurse into subdirectories (defaults to on).
-- `--write_over`: replace input files instead of writing to output dir.
-- `--save-voc`: drop merged voc JSON next to each translated file.
-- `--chunk-size` / `--html-chunk-size`: override default chunk lengths.
-- `--verbose`: enable debug logging via loguru.
-- `abersetz engines` extras:
-  - `--family tr|dt|ll|hy`: filter listing to a single engine family.
-  - `--configured-only`: show only configured engines.
-- `abersetz validate` extras:
-  - `--selectors tr/google,ll/default`: limit validation to specific selectors (comma-separated).
-  - `--target-lang es`: override the default sample translation language (`es`).
-  - `--sample-text "Hello!"`: supply a custom validation snippet.
+    - Legacy selectors like `translators/google` still work and are auto-normalized.
+- `--recurse/--no-recurse`: Traverse subdirectories (default: on).
+- `--write_over`: Replace input files instead of writing to output directory.
+- `--save-voc`: Save merged vocabulary JSON next to each translated file.
+- `--chunk-size` / `--html-chunk-size`: Override default chunk lengths.
+- `--verbose`: Enable debug logging via `loguru`.
+
+#### Extra options for `abersetz engines`:
+- `--family tr|dt|ll|hy`: Filter by engine family.
+- `--configured-only`: Show only configured engines.
+
+#### Extra options for `abersetz validate`:
+- `--selectors tr/google,ll/default`: Limit checks to specific engines (comma-separated).
+- `--target-lang es`: Set validation language (default: `es`).
+- `--sample-text "Hello!"`: Use custom text for validation.
 
 ## Configuration
-`abersetz` stores runtime configuration under the user config path determined by `platformdirs`. The config file keeps:
-- Global defaults (engine, languages, chunk sizes).
-- Engine-specific settings (API endpoints, retry policies, HTML behaviour).
-- Credential entries, each allowing either `{ "env": "ENV_NAME" }` or `{ "value": "actual-secret" }`.
 
-Example snippet (stored in `config.toml`):
+`abersetz` saves runtime configuration under the user config path from `platformdirs`. The config file includes:
+
+- Global defaults (engine, languages, chunk sizes)
+- Engine-specific settings (endpoints, retry policies, HTML behavior)
+- Credential entries, supporting `{ "env": "ENV_NAME" }` or `{ "value": "actual-secret" }`
+
+Example `config.toml`:
+
 ```toml
 [defaults]
 engine = "tr/google"
@@ -114,13 +126,16 @@ max_input_tokens = 32000
 
 [engines.ullm.options.profiles.default.prolog]
 ```
+
 Use `abersetz config show` and `abersetz config path` to inspect the file.
 
 ## CLI Tools
+
 - `abersetz`: Main CLI exposing `tr` (translate), `validate`, and `config` commands.
-- `abtr`: Direct translation shorthand (equivalent to `abersetz tr`).
+- `abtr`: Shorthand for translation (`abersetz tr`).
 
 ## Python API
+
 ```python
 from abersetz import translate_path, TranslatorOptions
 
@@ -131,14 +146,17 @@ translate_path(
 ```
 
 ## Examples
-The `examples/` directory holds ready-to-run demos:
-- `poem_en.txt`: source text.
-- `poem_pl.txt`: translated sample output.
-- `vocab.json`: voc generated during translation.
-- `walkthrough.md`: step-by-step CLI invocation log.
-- `validate_report.sh`: captures the validation summary table for quick audits.
+
+The `examples/` folder includes ready-to-run demos:
+
+- `poem_en.txt`: Source text.
+- `poem_pl.txt`: Translated sample.
+- `vocab.json`: Vocabulary generated during translation.
+- `walkthrough.md`: Step-by-step CLI usage log.
+- `validate_report.sh`: Captures validation summary for quick audits.
 
 ## Development Workflow
+
 ```bash
 uv sync
 python -m pytest --cov=. --cov-report=term-missing
@@ -147,9 +165,15 @@ ruff format src tests
 ```
 
 ## Testing Philosophy
-- Every helper has direct unit coverage.
-- Integration tests exercise the pipeline with a stub engine.
-- Network calls are mocked; real APIs are never hit in CI.
+
+- Unit tests cover every helper directly.
+- Integration tests simulate the full pipeline with a stub engine.
+- Network calls are mocked; CI never touches real APIs.
 
 ## License
+
 MIT
+
+--- 
+
+Let me know if you want this exported as a `.md` file or adjusted further.

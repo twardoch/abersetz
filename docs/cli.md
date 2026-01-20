@@ -17,10 +17,10 @@ nav_order: 3
 
 ## Overview
 
-Abersetz provides two command-line tools:
+Abersetz ships with two command-line tools:
 
-- `abersetz`: Main CLI with subcommands (`tr`, `validate`, `config`, `engines`, `version`)
-- `abtr`: Direct translation shorthand
+- `abersetz`: The main interface. Supports subcommands like `tr`, `validate`, `config`, `engines`, and `version`.
+- `abtr`: A shorthand for direct translation.
 
 ## Main Commands
 
@@ -42,15 +42,15 @@ abersetz tr PATH [OPTIONS]
 |--------|-------------|---------|
 | `to_lang` (positional) | Target language code | — |
 | `--from-lang` | Source language code | `auto` |
-| `--engine` | Translation engine | `tr/google` (legacy names auto-normalized) |
+| `--engine` | Translation engine | `tr/google` |
 | `--output` | Output directory | `<lang>/<filename>` |
 | `--recurse/--no-recurse` | Process subdirectories | `True` |
 | `--write_over` | Replace original files | `False` |
 | `--include` | File patterns to include | `*.txt,*.md,*.html` |
-| `--xclude` | File patterns to xclude | None |
+| `--xclude` | File patterns to exclude | None |
 | `--chunk-size` | Characters per chunk | `1200` |
 | `--html-chunk-size` | Characters per HTML chunk | `1800` |
-| `--save-voc` | Save voc JSON | `False` |
+| `--save-voc` | Save vocabulary JSON | `False` |
 | `--dry-run` | Preview without translating | `False` |
 | `--verbose` | Enable debug output | `False` |
 
@@ -64,12 +64,12 @@ abersetz config COMMAND
 
 #### Subcommands
 
-- `show`: Display current configuration
-- `path`: Show configuration file location
+- `show`: Show current configuration
+- `path`: Show config file location
 
 ### abersetz version
 
-Display version information.
+Show version info.
 
 ```bash
 abersetz version
@@ -83,24 +83,24 @@ List available engine families and providers.
 abersetz engines [--include-paid] [--family tr|dt|ll|hy] [--configured-only]
 ```
 
-- `--family`: filter to a single engine family (short alias or legacy name).
-- `--configured-only`: show only engines currently configured.
+- `--family`: Filter by engine family.
+- `--configured-only`: List only configured engines.
 
 ### abersetz validate
 
-Exercise each configured engine with a short translation and report status, latency, and pricing hints.
+Test each configured engine with a short translation. Reports status, latency, and pricing info.
 
 ```bash
 abersetz validate [--selectors tr/google,ll/default] [--target-lang es] [--sample-text "Hello"]
 ```
 
-- `--selectors`: comma-separated list of selectors to validate (defaults to every configured selector).
-- `--target-lang`: target language for the sample translation (defaults to `es`).
-- `--sample-text`: override the default sample prompt (`Hello, world!`).
-- `--include-defaults/--no-include-defaults`: toggle whether the default engine from config is forced into the run.
+- `--selectors`: Comma-separated list of engines to test. Defaults to all configured.
+- `--target-lang`: Language for test translation. Defaults to `es`.
+- `--sample-text`: Custom text for testing. Defaults to `"Hello, world!"`.
+- `--include-defaults/--no-include-defaults`: Include default engine from config. Default is `True`.
 
 {: .note }
-Running validation hits live translation APIs. When you are offline—or when you only need a smoke test—use `--selectors` to limit the run to a handful of engines and add `--no-include-defaults` to skip automatically discovered selectors. For example:
+Validation uses live APIs. To avoid hitting every configured engine, use `--selectors` and `--no-include-defaults`. Example:
 
 ```bash
 abersetz validate \
@@ -109,31 +109,31 @@ abersetz validate \
   --sample-text "Ping"
 ```
 
-This checks only the Google free tier and your primary LLM profile, keeping the run under a few seconds and avoiding throttled providers.
+This tests Google Translate and your primary LLM profile quickly, skipping offline or throttled engines.
 
 ## Shorthand Command
 
 ### abtr
 
-Direct translation command equivalent to `abersetz tr`:
+Shorthand for `abersetz tr`.
 
 ```bash
 abtr TO_LANG PATH [OPTIONS]
 ```
 
-All options from `abersetz tr` are available.
+Supports all the same options as `abersetz tr`.
 
 ## Usage Examples
 
 ### Basic Translation
 
-Translate a single file:
+Translate a single file to Spanish:
 
 ```bash
 abersetz tr es document.txt
 ```
 
-Translate to French using shorthand:
+Same using shorthand:
 
 ```bash
 abtr fr document.txt
@@ -141,13 +141,13 @@ abtr fr document.txt
 
 ### Directory Translation
 
-Translate all files in a directory:
+Translate all files in `./docs` to German:
 
 ```bash
 abersetz tr de ./docs --output ./docs_de
 ```
 
-With specific patterns:
+With custom include/exclude patterns:
 
 ```bash
 abtr ja ./project \
@@ -179,7 +179,7 @@ abtr pt file.txt --engine ullm/gpt4
 
 ### Validate Engines
 
-Generate a quick health report for every configured engine:
+Check health of specific engines:
 
 ```bash
 abersetz validate --target-lang de --selectors tr/google,ll/default
@@ -187,13 +187,13 @@ abersetz validate --target-lang de --selectors tr/google,ll/default
 
 ### Advanced Options
 
-write_over original files:
+Overwrite original files:
 
 ```bash
 abersetz tr es backup.txt --write_over
 ```
 
-Save voc for LLM engines:
+Save vocabulary file for LLM engines:
 
 ```bash
 abtr de technical.md \
@@ -201,14 +201,14 @@ abtr de technical.md \
   --save-voc
 ```
 
-Dry run to preview:
+Preview changes without translating:
 
 ```bash
 abersetz tr fr large_project/ \
   --dry-run
 ```
 
-Custom chunk sizes:
+Custom chunk sizes for HTML:
 
 ```bash
 abtr zh-CN document.html \
@@ -217,7 +217,7 @@ abtr zh-CN document.html \
 
 ## Language Codes
 
-Common language codes supported:
+Supported language codes:
 
 | Code | Language |
 |------|----------|
@@ -238,17 +238,17 @@ Common language codes supported:
 
 ## Pattern Matching
 
-Include/xclude patterns support wildcards:
+Include/exclude patterns support wildcards:
 
-- `*.txt` - All .txt files
-- `doc*` - Files starting with "doc"
-- `*test*` - Files containing "test"
-- `.*` - Hidden files
-- `*.{md,txt}` - Multiple extensions
+- `*.txt` – All .txt files
+- `doc*` – Files starting with "doc"
+- `*test*` – Files containing "test"
+- `.*` – Hidden files
+- `*.{md,txt}` – Files with .md or .txt extension
 
 ## Environment Variables
 
-Set default behaviors with environment variables:
+Set defaults via environment variables:
 
 ```bash
 # Default target language
@@ -264,14 +264,14 @@ export SILICONFLOW_API_KEY=sk-...
 
 ## Output Format
 
-Translation results are printed as file paths:
+Translation outputs are printed as file paths:
 
 ```
 /path/to/output/file1.txt
 /path/to/output/file2.txt
 ```
 
-Use `--verbose` for detailed progress:
+Add `--verbose` for detailed progress logs:
 
 ```bash
 abersetz tr fr docs/ --verbose
@@ -279,7 +279,7 @@ abersetz tr fr docs/ --verbose
 
 ## Error Handling
 
-Common errors and solutions:
+Common errors and fixes:
 
 ### Missing API key
 
@@ -287,7 +287,7 @@ Common errors and solutions:
 Error: Missing API key for engine
 ```
 
-Solution: Export the required environment variable:
+Fix: Set the required environment variable:
 
 ```bash
 export SILICONFLOW_API_KEY="your-key"
@@ -299,7 +299,7 @@ export SILICONFLOW_API_KEY="your-key"
 Error: No files matched under /path
 ```
 
-Solution: Check your include patterns:
+Fix: Review include patterns:
 
 ```bash
 abtr . --include "*.md,*.txt"
@@ -311,13 +311,13 @@ abtr . --include "*.md,*.txt"
 Error: Network error - Connection timeout
 ```
 
-Solution: The tool automatically retries. Check your internet connection.
+Fix: Tool retries automatically. Check your connection.
 
 ## Tips and Tricks
 
 ### Batch translation
 
-Create a script for multiple languages:
+Translate to multiple languages with a loop:
 
 ```bash
 for lang in es fr de ja; do
@@ -327,7 +327,7 @@ done
 
 ### Parallel processing
 
-Use GNU parallel for speed:
+Speed up translation with GNU parallel:
 
 ```bash
 find . -name "*.txt" | parallel -j4 abtr es {}
@@ -335,7 +335,7 @@ find . -name "*.txt" | parallel -j4 abtr es {}
 
 ### Progress tracking
 
-For large projects, use verbose mode:
+Log progress for large jobs:
 
 ```bash
 abersetz tr fr large_project/ --verbose 2>&1 | tee translation.log
@@ -343,7 +343,7 @@ abersetz tr fr large_project/ --verbose 2>&1 | tee translation.log
 
 ### Testing configuration
 
-Always test with dry-run first:
+Always preview with `--dry-run`:
 
 ```bash
 abersetz tr de important_docs/ --dry-run

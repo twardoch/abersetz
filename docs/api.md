@@ -79,14 +79,14 @@ options = TranslatorOptions(
 - `recurse` (bool): Process subdirectories
 - `write_over` (bool): Replace original files
 - `output_dir` (Path): Output directory path
-- `save_voc` (bool): Save voc JSON
+- `save_voc` (bool): Save vocabulary JSON
 - `chunk_size` (int): Characters per text chunk
 - `html_chunk_size` (int): Characters per HTML chunk
 - `include` (tuple): File patterns to include
-- `xclude` (tuple): File patterns to xclude
+- `xclude` (tuple): File patterns to exclude
 - `dry_run` (bool): Preview without translating
 - `prolog` (dict): Initial context for LLMs
-- `initial_voc` (dict): Starting voc
+- `initial_voc` (dict): Starting vocabulary
 
 ### TranslationResult
 
@@ -108,7 +108,7 @@ result = TranslationResult(
 - `source` (Path): Source file path
 - `destination` (Path): Output file path
 - `chunks` (int): Number of chunks processed
-- `voc` (dict): Final voc (LLM engines)
+- `voc` (dict): Final vocabulary (LLM engines)
 - `format` (TextFormat): Detected format (PLAIN, HTML, MARKDOWN)
 
 ### PipelineError
@@ -287,7 +287,7 @@ class TranslationWorkflow:
         self.voc = {}
 
     def translate_with_voc(self, files, to_lang):
-        """Maintain voc across files."""
+        """Maintain vocabulary across files."""
         all_results = []
 
         for file in files:
@@ -303,11 +303,11 @@ class TranslationWorkflow:
             )
 
             if results:
-                # Update voc
+                # Update vocabulary
                 self.voc.update(results[0].voc)
                 all_results.extend(results)
 
-        # Save final voc
+        # Save final vocabulary
         with open(f"voc_{to_lang}.json", "w") as f:
             json.dump(self.voc, f, indent=2)
 
@@ -407,13 +407,13 @@ class CustomEngine(EngineBase):
         )
 ```
 
-### voc Management
+### Vocabulary Management
 
 ```python
 from typing import Dict
 import json
 
-class vocManager:
+class VocabularyManager:
     """Manage translation vocabularies."""
 
     def __init__(self):

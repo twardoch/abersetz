@@ -17,8 +17,8 @@ nav_order: 2
 
 ## Requirements
 
-- Python 3.10 or higher
-- pip or uv package manager
+- Python 3.10 or higher  
+- pip or uv package manager  
 
 ## Installing with pip
 
@@ -30,7 +30,7 @@ pip install abersetz
 
 ## Installing with uv
 
-If you use the modern uv package manager:
+If you prefer the modern uv package manager:
 
 ```bash
 uv pip install abersetz
@@ -67,21 +67,21 @@ abersetz tr es test.txt --dry-run
 Abersetz automatically installs these dependencies:
 
 ### Core dependencies
-- **translators** (>=5.9): Multiple free translation APIs
-- **deep-translator** (>=1.11): Alternative translation providers
-- **openai** (>=1.51): LLM-based translation engines
-- **tenacity** (>=8.4): Retry logic for API calls
+- **translators** (>=5.9): Multiple free translation APIs  
+- **deep-translator** (>=1.11): Alternative translation providers  
+- **openai** (>=1.51): LLM-based translation engines  
+- **tenacity** (>=8.4): Retry logic for API calls  
 
 ### Utility dependencies
-- **fire** (>=0.5): CLI interface generation
-- **rich** (>=13.9): Terminal formatting
-- **loguru** (>=0.7): Structured logging
-- **platformdirs** (>=4.3): Cross-platform config paths
-- **semantic-text-splitter** (>=0.7): Intelligent text chunking
+- **fire** (>=0.5): CLI interface generation  
+- **rich** (>=13.9): Terminal formatting  
+- **loguru** (>=0.7): Structured logging  
+- **platformdirs** (>=4.3): Cross-platform config paths  
+- **semantic-text-splitter** (>=0.7): Intelligent text chunking  
 
 ## Optional: Setting up API keys
 
-For LLM-based translation engines, you'll need API keys:
+For LLM-based translation engines, you’ll need API keys:
 
 ```bash
 # OpenAI GPT models
@@ -140,21 +140,21 @@ docker run -v $(pwd):/data abersetz tr es /data/file.txt
 
 ### Command not found
 
-If `abersetz` command is not found after installation:
+If `abersetz` isn't found after installation:
 
-1. Check pip installed it to PATH:
+1. Check where pip installed it:
    ```bash
    pip show -f abersetz | grep Location
    ```
 
-2. Ensure scripts directory is in PATH:
+2. Make sure the scripts directory is in your PATH:
    ```bash
    export PATH="$HOME/.local/bin:$PATH"
    ```
 
 ### Permission denied
 
-On Linux/Mac, you may need to add execute permissions:
+On Linux or macOS, you might need to make the script executable:
 
 ```bash
 chmod +x ~/.local/bin/abersetz
@@ -163,7 +163,7 @@ chmod +x ~/.local/bin/abtr
 
 ### SSL certificate errors
 
-If you encounter SSL errors with API calls:
+If you hit SSL errors during API calls:
 
 ```bash
 # Update certificates
@@ -175,6 +175,6 @@ export CURL_CA_BUNDLE=""
 
 ## Next steps
 
-- [Configure abersetz](configuration/)
-- [Learn CLI commands](cli/)
-- [Explore examples](examples/)
+- [Configure abersetz](configuration/)  
+- [Learn CLI commands](cli/)  
+- [Explore

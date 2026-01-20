@@ -1,103 +1,169 @@
+Sure. Let's go step-by-step.
 
-We want a `abersetz` Python package that performs language translation of text in files. Single file or multiple files. We also want a Fire CLI tool. 
+---
 
-Copy structure and ideas and overall functionality from @external/cerebrate-file.txt
+## @PLAN.md
 
-The working scheme is: 
+```markdown
+# Project Plan: `abersetz`
 
-- We locate files
-- We split the files into chunks
-- We translate the chunks
-- We merge the chunks 
-- We save the translated files into a new folder or we write_over
+## Overview
+`abersetz` is a Python package and CLI tool for translating text files using various translation engines. It supports both single and multiple file translation, with configurable chunking, language detection, and output handling.
 
-https://pypi.org/project/translators/ ships with a CLI tool called 'fanyi' that can be used to translate text: 
+## Key Features
+- File discovery with optional recursion (`--recurse`)
+- Chunking of files for translation
+- Support for multiple translation engines:
+  - External packages: `translators`, `deep-translator`
+  - Custom engines:
+    - `hysf`: Uses OpenAI client to call SiliconFlow API with `tencent/Hunyuan-MT-7B`
+    - `ullm`: Configurable LLM translation engine with custom vocabulary support
+- Language detection and specification (`--from`, `--to`)
+- HTML content detection
+- Vocabulary tracking and persistence across chunks (`<voc>` tag)
+- Output control:
+  - Save to new directory
+  - Overwrite original files (`--write_over`)
+  - Optional vocabulary export (`--save_voc`)
 
+## Architecture
+1. **File Discovery Module**
+   - Accept file paths or glob patterns
+   - Optional recursive scanning (`--recurse`)
+2. **Text Splitting Module**
+   - Use `text-splitter` or `tokenizers`/`tiktoken` for intelligent chunking
+   - Configurable chunk size per engine
+3. **Translation Engine Interface**
+   - Unified interface for calling translation backends
+   - Implement wrappers for:
+     - `translators`
+     - `deep-translator`
+     - Custom `hysf` engine (OpenAI + tenacity)
+     - Custom `ullm` engine (OpenAI + tenacity + configurable endpoints)
+4. **Language Handling**
+   - Use `langcodes` for standardizing language codes
+   - Auto-detect source language unless specified
+5. **HTML Detection**
+   - Detect HTML content using simple heuristics or `ftfy`
+6. **Vocabulary Management**
+   - Extract and merge `<voc>` from LLM responses
+   - Maintain state across chunks
+   - Optionally save vocabulary to JSON
+7. **Output Module**
+   - Write translated files to a new directory or overwrite originals
+8. **CLI Tool**
+   - Use `fire` for CLI generation
+   - Mimic structure and logic of `cerebrate-file`
+   - Support all engine types and flags
+
+## Dependencies
+- `fire`
+- `platformdirs`
+- `langcodes`
+- `ftfy`
+- `translators`
+- `deep-translator`
+- `openai`
+- `tenacity`
+- `text-splitter` or `tokenizers`/`tiktoken`
+
+## Configuration Storage
+- Store API keys and engine-specific settings in user config directory using `platformdirs`
+- Support both environment variable names and literal values
+
+## File Structure
 ```
->fanyi --help                                                                                                                          usage: fanyi input [--help] [--translator] [--from] [--to] [--is_html] [--version]
-
-Translators(fanyi for CLI) is a library that aims to bring free, multiple, enjoyable translations to individuals and students in Python.
-
-positional arguments:
-  input                 raw text or path to a file to be translated.
-
-options:
-  --help                show help information.
-  --translator          e.g. bing, google, yandex, etc...
-  --from                from_language, default `auto` detected.
-  --to                  to_language, default `en`.
-  --is_html             is_html, default `0`.
-  --version             Show version information.
+abersetz/
+├── __init__.py
+├── cli.py
+├── core.py
+├── engines/
+│   ├── __init__.py
+│   ├── base.py
+│   ├── translators_engine.py
+│   ├── deep_translator_engine.py
+│   ├── hysf_engine.py
+│   └── ullm_engine.py
+├── splitter.py
+├── voc.py
+├── config.py
+└── utils.py
 ```
 
-Our tool should use the 'recurse' flag like @external/cerebrate-file.txt . It should not translate text but should translate files instead (similar to @external/cerebrate-file.txt ).
-
-
-We do need this mechanism: 
-
-```
-  --from                from_language, default `auto` detected.
-  --to                  to_language, default `en`.
+## Examples Folder
+- Real-world translation examples
+- Various file types (txt, html, md)
+- Demonstrations of vocabulary handling
 ```
 
-As for HTML, we should actually have some sort of DETECTION of HTML. 
+---
 
-We need to connect our package to "translators" and "deep-translator" packages, and use the translator engines from there easily. 
+## @TODO.md
 
-But on top of that, we also implement our own translator engines. 
+```markdown
+# Implementation TODO
 
-The first custom engine is 'hysf' (hunyuan/siliconflow). It should work by calling the OpenAI package with the siliconflow API and the model name 'tencent/Hunyuan-MT-7B'. The model has a 33k token window and the prompt format is like so (using curl):
-
-And then, we also need to use the platformdirs package to store the API keys (in a dual form: we either store the env var name or the actual value), and other configuration. For example chunk sizes for various translator engines. 
-
-
-
+- [ ] Create project structure and directories
+- [ ] Set up `platformdirs` for config storage
+- [ ] Implement config loading/saving for API keys and chunk sizes
+- [ ] Add language code validation with `langcodes`
+- [ ] Implement file discovery with optional `--recurse`
+- [ ] Add HTML detection logic
+- [ ] Integrate `text-splitter` or token-based chunking
+- [ ] Define base translation engine interface
+- [ ] Wrap `translators` package into engine class
+- [ ] Wrap `deep-translator` package into engine class
+- [ ] Implement `hysf` engine using OpenAI and tenacity
+- [ ] Implement `ullm` engine with configurable API endpoints
+- [ ] Add vocabulary (`<voc>`) parsing and merging logic
+- [ ] Implement file output logic (new folder or overwrite)
+- [ ] Build CLI with `fire`, mimicking `cerebrate-file`
+- [ ] Add support for `--from`, `--to`, `--write_over`, `--save_voc`
+- [ ] Write real-world examples in `examples/` folder
+- [ ] Test all engines with sample files
+- [ ] Verify vocabulary consistency across chunks
+- [ ] Refine chunking and error handling
+- [ ] Add version info and basic help output
+- [ ] Document usage in updated `README.md`
 ```
-curl -s --request POST --url https://api.siliconflow.com/v1/chat/completions --header "Authorization: Bearer ${SILICONFLOW_API_KEY}" --header 'Content-Type: application/json' --data '{"model":"tencent/Hunyuan-MT-7B","temperature":1.0,"messages":[{"role":"user","content": "Translate the following segment into Polish, without additional explanation.\n\nMYTEXT"}]}' | jq -r '.choices[0].message.content'
+
+---
+
+## @README.md
+
+```markdown
+# abersetz
+
+A minimal file translation tool and Python package. Translate text in single or multiple files using a variety of translation engines, including free online services and custom LLM-based backends.
+
+## Features
+
+- Translate entire files (not just raw text)
+- Recursive file scanning (`--recurse`)
+- Configurable chunk-based translation for large texts
+- Built-in language detection or manual specification (`--from`, `--to`)
+- HTML content auto-detection
+- Vocabulary consistency for LLM engines (`<voc>` tag handling)
+- Save translations to new folder or overwrite originals (`--write_over`)
+- Optional vocabulary export (`--save_voc`)
+
+## Supported Engines
+
+### External
+- `bing`, `google`, `yandex` etc. via [`translators`](https://pypi.org/project/translators/)
+- Various services via [`deep-translator`](https://pypi.org/project/deep-translator/)
+
+### Custom
+- `hysf`: Calls SiliconFlow API using `tencent/Hunyuan-MT-7B` model via OpenAI client
+- `ullm`: Universal LLM engine with configurable endpoints, models, and vocabulary support
+
+## Installation
+
+```bash
+pip install abersetz
 ```
 
-where MYTEXT is the text to translate, and Polish is the target language. We should use the OpenAI Python package plus tenacity to handle the API calls.
+## Usage
 
-The second custom engine is 'ullm' (universal large language model) with configurable API endpoint provider URLs, model names, API key env var names or values, temperature, chunk size, and max input token length. See @external/dump_models.py for examples of LLM configurations. 
-
-The implementation of the LLM engine should be similar to @external/cerebrate-file.txt but using the OpenAI Python package plus tenacity to handle the API calls. 
-
-The main point is that the first chunk for the translation input should be sent with a potentially configured "prolog" which would typically be a custom voc expressed in JSON. 
-
-The LLM prompt request for the translation to be output inside the `<output>` tag, and optionally would (in the same call) include `<voc>` where the prompt would request the model to output a same-formatted JSON that would include "newly established custom voc". The idea is that the model should be able to translate, and then also output the most important translations as a from-to dict so that subsequent chunks could translate the same stuff consistently. 
-
-Our tool would parse for those voc outputs and would merge that into our running voc (and add it into the next chunk). We could also give the tool the --save_voc param and then in addition to the saved chunk, our tool would save the updated voc JSON next to the output file. 
-
-<TASK>
-
-1. Now /plan all this into @PLAN.md 
-
-2. Into @TODO.md write a flat linear list of `- [ ]` itemized tasks. 
-
-3. Replace @README.md with a detailed explanation of what our package does, how it works and why. 
-
-4. Edit @CLAUDE.md : keep its contents but at its very beginning add all the contents of the new @README.md 
-
-5. Start implementing tasks from @PLAN.md and @TODO.md  
-
-6. Create an `examples` folder and write actual real examples there. 
-
-7. Review, analyze, verify, test (on actual real examples). 
-
-8. Refine, improve, iterate. 
-
-Focus all your efforts on producing a lean, performant, focused minimal viable product. Eliminate unnecessary fluff. Minimize custom code if ready-made code can be used. 
-</TASK>
-
-## Potential dependencies
-
-- https://github.com/benbrandt/text-splitter (see @external/text-splitter.txt and @external/semantic-text-splitter.txt )
-- https://pypi.org/project/tokenizers/ (see @external/tokenizers.txt ) 
-- https://pypi.org/project/tiktoken/ (see @external/tiktoken.txt )
-- https://pypi.org/project/ftfy/ (see @external/python-ftfy.txt )
-- https://pypi.org/project/langcodes/ (see @external/langcodes.txt )
-- https://github.com/openai/openai-python
-- tenacity
-- deep-translator (see @external/deep-translator.txt )
-- https://pypi.org/project/translators/ ( see @external/translators.txt )
-- https://github.com/tox-dev/platformdirs ( see @external/platformdirs.txt )
+```bash
+# Translate a file or

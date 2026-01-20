@@ -9,48 +9,49 @@ permalink: /
 # abersetz
 {: .fs-9 }
 
-Minimalist file translator with pluggable engines
+Minimalist file translator with pluggable engines  
 {: .fs-6 .fw-300 }
 
-[Get started](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
-[View on GitHub](https://github.com/twardoch/abersetz){: .btn .fs-5 .mb-4 .mb-md-0 }
+[Get started](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }  
+[View on GitHub](https://github.com/twardoch/abersetz){: .btn .fs-5 .mb-4 .mb-md-0 }  
 
 ---
 
 ## Why abersetz?
 
-- **File-focused**: Designed for translating documents, not single strings
-- **Multiple engines**: Supports free and paid translation services
-- **voc consistency**: LLM engines maintain terminology across chunks
-- **Simple CLI**: Clean interface with minimal output
+- **File-focused**: Translates documents, not just strings
+- **Multiple engines**: Works with free and paid translation services
+- **voc consistency**: LLM engines keep terminology consistent across chunks
+- **Simple CLI**: Clean interface, minimal output
 - **Python API**: Full programmatic access for automation
 
 ## Features
 
-- 🔄 **Multiple translation engines**
+- **Multiple translation engines**
   - Free: Google, Bing via `translators` and `deep-translator`
-  - LLM: OpenAI, Anthropic, SiliconFlow, and 20+ providers
+  - LLM: OpenAI, Anthropic, SiliconFlow, and 20+ other providers
   - Custom endpoints for self-hosted models
 
-- 📁 **Smart file handling**
+- **Smart file handling**
   - Recursive directory translation
-  - Pattern matching with include/xclude
-  - HTML markup preservation
-  - Automatic format detection
+  - Pattern matching with include/exclude filters
+  - Preserves HTML markup
+  - Detects file formats automatically
 
-- 🧩 **Intelligent chunking**
-  - Semantic text splitting
+- **Intelligent chunking**
+  - Splits text semantically
   - Configurable chunk sizes per engine
-  - Context preservation across chunks
+  - Maintains context between chunks
 
-- 📚 **voc management**
-  - JSON voc propagation
-  - Consistent terminology in long documents
-  - Optional voc export
-- ✅ **Engine validation**
-  - `abersetz validate` smoke-tests each selector
-  - Latency and pricing hints pulled from the research catalog
-  - Ideal for CI smoke tests and onboarding checks
+- **voc management**
+  - Propagates JSON-based terminology lists
+  - Keeps long documents consistent
+  - Optionally exports updated voc files
+
+- **Engine validation**
+  - `abersetz validate` performs basic smoke tests
+  - Pulls latency and pricing data from internal catalog
+  - Useful for CI checks and new user setup
 
 ## Getting Started
 
@@ -62,14 +63,14 @@ pip install abersetz
 
 ### Quick Start
 
-Run setup, validate engines, and translate a file:
+Run setup, validate engines, then translate a file:
 ```bash
 abersetz setup
 abersetz validate --target-lang es
 abersetz tr es document.txt
 ```
 
-Or use the shorthand for translation:
+Shorthand for translation:
 ```bash
 abtr es document.txt
 ```
@@ -81,7 +82,7 @@ abersetz tr fr ./docs --output ./docs_fr
 
 ### Configuration
 
-Abersetz stores configuration in your user directory:
+Abersetz saves config in your user directory:
 
 ```bash
 abersetz config path  # Show config location
@@ -99,13 +100,13 @@ abtr de file.txt --engine tr/google
 # Translate markdown files only
 abtr ja . --include "*.md" --output ./ja
 
-# Dry run to preview
+# Dry run to preview files to be translated
 abersetz tr zh-CN project/ --dry-run
 
-# Validate configured engines
+# Validate specific engines
 abersetz validate --selectors tr/google,ll/default
 
-# Use LLM with voc
+# Use LLM with terminology list
 export SILICONFLOW_API_KEY="your-key"
 abtr es technical.md --engine hy --save-voc
 ```
@@ -124,7 +125,7 @@ results = translate_path(
     )
 )
 
-# Batch with patterns
+# Batch translation with pattern filters
 results = translate_path(
     "docs/",
     TranslatorOptions(
@@ -146,4 +147,4 @@ results = translate_path(
 
 ## License
 
-MIT License - see [LICENSE](https://github.com/twardoch/abersetz/blob/main/LICENSE) for details.
+MIT License – see [LICENSE](https://github.com/twardoch/abersetz/blob/main
