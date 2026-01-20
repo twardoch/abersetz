@@ -11,6 +11,7 @@
 - **fire** (>=0.5): Google's Python Fire library for automatic CLI generation. Minimal code, automatic help, intuitive commands.
 - **rich** (>=13.9): Terminal formatting and progress indicators. Clean console output with tables, progress bars, and colors.
 - **langcodes** (>=3.4): Language metadata based on CLDR. Powers `abersetz lang` without custom tables.
+- **language-data** (>=1.4): Supplemental CLDR dataset required by `langcodes` for language names.
 
 ### Core Utilities
 - **loguru** (>=0.7): Simple, structured logging with rotation and colored output.
@@ -19,6 +20,10 @@
 - **tomli** (>=2.0, Python <3.11 only): Backport of the standard library TOML parser. Keeps config loading consistent across Python versions.
 - **semantic-text-splitter** (>=0.7): Smart text chunking that respects semantic boundaries. Helps preserve context during translation.
 - **tenacity** (>=8.4): Retry logic with exponential backoff. Handles API failures and rate limits.
+
+### Optional Local Engines
+- **mlx-lm**: Enables local MLX inference for HY-MT and TranslateGemma (`mthy/mlx`, `gemma/mlx`).
+- **llama-cpp-python**: Enables local GGUF inference for HY-MT and TranslateGemma (`mthy/gguf`, `gemma/gguf`).
 
 ## Development Dependencies
 
@@ -46,6 +51,7 @@
 
 ## Verification Log
 
+- 2026-01-20 — Added `language-data` to keep `langcodes` language-name lookups working; optional local engine notes updated.
 - 2025-09-21 11:03 UTC — /work reliability polish sweep (pytest, coverage, mypy, bandit) confirmed no dependency changes; improvements limited to tests and typing.
 - 2025-09-21 08:46 UTC — /report QA sweep (pytest, coverage, mypy, bandit) confirmed dependency roster unchanged; no new packages.
 - 2025-09-21 10:38 UTC — /work iteration adjusted tests only; dependency roster remains unchanged.

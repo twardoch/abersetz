@@ -2,9 +2,9 @@
 this_file: TODO.md
 ---
 ## Active TODO Items
-- [x] Add CLI regression test covering the missing target-language guard in `_build_options_from_cli`.
-- [x] Add CLI regression test confirming `prolog`/`voc` JSON inputs populate `TranslatorOptions`.
-- [x] Add CLI regression test asserting `save_voc`/`write_over` and chunk-size flags propagate to `TranslatorOptions`.
-- [x] Remove assistant preamble/outro from `README.md`.
-- [x] Add `_build_options_from_cli` coverage for default include handling.
-- [x] Add `_build_options_from_cli` coverage for output dir resolution.
+- [x] Add `--include-community` flag to setup for community/self-hosted engines.
+- [ ] Automate provider metadata extraction from `external/translators.txt` and `external/deep-translator.txt`.
+- [ ] Sync pricing/tier hints into setup output using current provider research.
+- [ ] Add structured hints for optional packages (for example `translators[google]`).
+- [ ] Add docs guidance on picking engines based on cost and availability.
+- [ ] Ensure docs link checks/CLI validation flows have regression coverage.

@@ -15,6 +15,8 @@ from rich.table import Table
 
 from .config import AbersetzConfig, Credential, EngineConfig, save_config
 from .engine_catalog import (
+    COMMUNITY_DEEP_TRANSLATOR_PROVIDERS,
+    COMMUNITY_TRANSLATOR_PROVIDERS,
     DEEP_TRANSLATOR_FREE_PROVIDERS,
     FREE_TRANSLATOR_PROVIDERS,
     HYSF_DEFAULT_MODEL,
@@ -89,9 +91,15 @@ PROVIDER_METADATA: dict[str, dict[str, str]] = {
 class SetupWizard:
     """Interactive setup wizard for abersetz configuration."""
 
-    def __init__(self, non_interactive: bool = False, verbose: bool = False):
+    def __init__(
+        self,
+        non_interactive: bool = False,
+        verbose: bool = False,
+        include_community: bool = False,
+    ):
         self.non_interactive = non_interactive
         self.verbose = verbose
+        self.include_community = include_community
         self.discovered_providers: list[DiscoveredProvider] = []
         self.validation_results: list[ValidationResult] | None = None
 
@@ -350,6 +358,13 @@ class SetupWizard:
             if item not in translator_providers:
                 translator_providers.append(item)
 
+        if not self.include_community:
+            translator_providers = [
+                item
+                for item in translator_providers
+                if item not in COMMUNITY_TRANSLATOR_PROVIDERS
+            ]
+
         if translator_providers:
             engines["translators"] = EngineConfig(
                 name="translators",
@@ -373,6 +388,13 @@ class SetupWizard:
             alias = premium_deep_map.get(provider.name)
             if alias and provider.is_available and alias not in deep_providers:
                 deep_providers.append(alias)
+
+        if not self.include_community:
+            deep_providers = [
+                item
+                for item in deep_providers
+                if item not in COMMUNITY_DEEP_TRANSLATOR_PROVIDERS
+            ]
 
         if deep_providers:
             engines["deep-translator"] = EngineConfig(
@@ -473,14 +495,20 @@ def _select_default_engine(
 def setup_command(
     non_interactive: bool = False,
     verbose: bool = False,
+    include_community: bool = False,
 ) -> None:
     """Run the abersetz setup wizard.
 
     Args:
         non_interactive: Run without user interaction (for CI/automation)
         verbose: Enable verbose output with detailed logging
+        include_community: Include community/self-hosted providers in defaults
     """
-    wizard = SetupWizard(non_interactive=non_interactive, verbose=verbose)
+    wizard = SetupWizard(
+        non_interactive=non_interactive,
+        verbose=verbose,
+        include_community=include_community,
+    )
     success = wizard.run()
 
     if not success and non_interactive:

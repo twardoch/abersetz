@@ -23,6 +23,7 @@ dependencies = [
     "translators>=5.9",
     "tomli-w>=1.0",
     "tomli>=2.0; python_version < \"3.11\"",
+    "language-data>=1.4.0",
 ]
 
 [[project.authors]]

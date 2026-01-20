@@ -82,6 +82,8 @@ FREE_TRANSLATOR_PROVIDERS = (
     "youdao",
 )
 
+COMMUNITY_TRANSLATOR_PROVIDERS = ("libre",)
+
 PAID_TRANSLATOR_PROVIDERS = (
     "alibaba",
     "baidu",
@@ -114,6 +116,7 @@ DEEP_TRANSLATOR_FREE_PROVIDERS = (
     "linguee",
     "my_memory",
 )
+COMMUNITY_DEEP_TRANSLATOR_PROVIDERS = ("libre",)
 DEEP_TRANSLATOR_PAID_PROVIDERS = (
     "deepl",
     "microsoft",

@@ -4,6 +4,11 @@ this_file: WORK.md
 # Work Log
 
 ## 2026-01-20
+### Setup Community Provider Opt-In
+- Added `--include-community` flag for setup and filtered community/self-hosted providers unless requested.
+- Updated CLI docs and README with the new setup flag.
+- Tests: `python -m pytest tests/test_setup.py -xvs`
+
 ### CLI Option Guardrails Sprint
 - Added regression coverage for target-language guardrails, prolog/voc JSON ingestion, and CLI option propagation.
 - Research: checked Python Fire missing-argument behavior for context.

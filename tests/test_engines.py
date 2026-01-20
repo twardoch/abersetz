@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -417,3 +418,112 @@ def test_create_engine_raises_when_config_missing_selector() -> None:
 
     with pytest.raises(EngineError, match="No configuration found for engine 'translators'"):
         create_engine("tr/google", cfg)
+
+
+def test_resolve_mthy_language_accepts_codes_and_names() -> None:
+    assert engines_module._resolve_mthy_language("en") == "英语"
+    assert engines_module._resolve_mthy_language("English") == "英语"
+    assert engines_module._resolve_mthy_language("中文") == "中文"
+
+
+def test_resolve_mthy_language_unknown_raises_engine_error() -> None:
+    with pytest.raises(EngineError, match="Unsupported HY-MT language"):
+        engines_module._resolve_mthy_language("xx")
+
+
+def test_local_mthy_mlx_engine_translates_with_prompt(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    model_dir = tmp_path / "mthy-mlx"
+    model_dir.mkdir()
+    cfg = config_module.AbersetzConfig(
+        defaults=config_module.Defaults(engine="mthy"),
+        engines={
+            "mthy": config_module.EngineConfig(
+                name="mthy",
+                options={"backend": "mlx", "model_path": str(model_dir)},
+            )
+        },
+    )
+    tokenizer = SimpleNamespace(chat_template="template")
+    captured: dict[str, object] = {}
+
+    def fake_apply_chat_template(messages: list[dict[str, str]], **_: object) -> str:
+        captured["messages"] = messages
+        return "templated"
+
+    def fake_generate(*_: object, **kwargs: object) -> str:
+        captured["prompt"] = kwargs.get("prompt")
+        return "translated"
+
+    tokenizer.apply_chat_template = fake_apply_chat_template
+
+    def fake_load(_: str) -> tuple[object, object]:
+        return object(), tokenizer
+
+    fake_module = SimpleNamespace(load=fake_load, generate=fake_generate)
+    monkeypatch.setitem(sys.modules, "mlx_lm", fake_module)
+
+    engine = create_engine("mthy", cfg)
+    request = EngineRequest(
+        text="Hello",
+        source_lang="en",
+        target_lang="en",
+        is_html=False,
+        voc={"existing": "value"},
+        prolog={},
+        chunk_index=0,
+        total_chunks=1,
+    )
+    result = engine.translate(request)
+
+    assert result.text == "translated"
+    assert result.voc == {"existing": "value"}
+    assert captured["prompt"] == "templated"
+    message = captured["messages"][0]["content"]
+    assert "将以下文本翻译为英语" in message
+
+
+def test_local_gemma_gguf_engine_uses_structured_messages(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    model_path = tmp_path / "model.gguf"
+    model_path.write_text("stub", encoding="utf-8")
+    cfg = config_module.AbersetzConfig(
+        defaults=config_module.Defaults(engine="gemma/gguf"),
+        engines={
+            "gemma": config_module.EngineConfig(
+                name="gemma",
+                options={"backend": "gguf", "model_path": str(model_path)},
+            )
+        },
+    )
+    captured: dict[str, object] = {}
+
+    class FakeLlama:
+        def __init__(self, **kwargs: object) -> None:
+            captured["init"] = kwargs
+
+        def create_chat_completion(self, **kwargs: object) -> dict[str, object]:
+            captured["call"] = kwargs
+            return {"choices": [{"message": {"content": "result"}}]}
+
+    monkeypatch.setitem(sys.modules, "llama_cpp", SimpleNamespace(Llama=FakeLlama))
+
+    engine = create_engine("gemma/gguf", cfg)
+    request = EngineRequest(
+        text="Hello",
+        source_lang="auto",
+        target_lang="fr",
+        is_html=False,
+        voc={},
+        prolog={},
+        chunk_index=0,
+        total_chunks=1,
+    )
+    result = engine.translate(request)
+
+    assert result.text == "result"
+    messages = captured["call"]["messages"]
+    assert messages[0]["content"][0]["source_lang_code"] == "en"
+    assert messages[0]["content"][0]["target_lang_code"] == "fr"

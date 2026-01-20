@@ -86,6 +86,18 @@ abersetz engines [--include-paid] [--family tr|dt|ll|hy] [--configured-only]
 - `--family`: Filter by engine family.
 - `--configured-only`: List only configured engines.
 
+### abersetz setup
+
+Run the configuration setup wizard.
+
+```bash
+abersetz setup [--non-interactive] [--verbose] [--include-community]
+```
+
+- `--non-interactive`: Run without prompts (CI/automation).
+- `--verbose`: Enable verbose debug logging.
+- `--include-community`: Add community/self-hosted providers such as LibreTranslate to defaults.
+
 ### abersetz validate
 
 Test each configured engine with a short translation. Reports status, latency, and pricing info.

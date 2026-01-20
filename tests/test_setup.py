@@ -152,6 +152,58 @@ def test_generate_config_builds_engines(monkeypatch) -> None:
     assert default_engine in {"tr/google", "dt/deepl", "hy", "ll/default"}
 
 
+def test_generate_config_excludes_community_providers_by_default(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    wizard = SetupWizard(non_interactive=True)
+    wizard.discovered_providers = [
+        DiscoveredProvider(name="google", api_key_env="GOOGLE_API_KEY", is_available=True)
+    ]
+
+    monkeypatch.setattr(
+        "abersetz.setup.collect_translator_providers",
+        lambda include_paid=False: ["google", "libre"],
+    )
+    monkeypatch.setattr(
+        "abersetz.setup.collect_deep_translator_providers",
+        lambda include_paid=False: ["google", "libre"],
+    )
+
+    config = wizard._generate_config()
+
+    assert config is not None
+    translators = config.engines["translators"].options["providers"]
+    deep = config.engines["deep-translator"].options["providers"]
+    assert "libre" not in translators
+    assert "libre" not in deep
+
+
+def test_generate_config_includes_community_providers_when_requested(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    wizard = SetupWizard(non_interactive=True, include_community=True)
+    wizard.discovered_providers = [
+        DiscoveredProvider(name="google", api_key_env="GOOGLE_API_KEY", is_available=True)
+    ]
+
+    monkeypatch.setattr(
+        "abersetz.setup.collect_translator_providers",
+        lambda include_paid=False: ["google", "libre"],
+    )
+    monkeypatch.setattr(
+        "abersetz.setup.collect_deep_translator_providers",
+        lambda include_paid=False: ["google", "libre"],
+    )
+
+    config = wizard._generate_config()
+
+    assert config is not None
+    translators = config.engines["translators"].options["providers"]
+    deep = config.engines["deep-translator"].options["providers"]
+    assert "libre" in translators
+    assert "libre" in deep
+
+
 def test_generate_config_prefers_hysf_when_translators_unavailable(monkeypatch) -> None:
     wizard = SetupWizard(non_interactive=True)
     wizard.discovered_providers = [
@@ -895,7 +947,7 @@ def test_generate_config_uses_fallbacks(monkeypatch) -> None:
         "abersetz.setup.collect_deep_translator_providers", lambda include_paid=False: []
     )
     monkeypatch.setattr("abersetz.setup.FREE_TRANSLATOR_PROVIDERS", ["google"])
-    monkeypatch.setattr("abersetz.setup.DEEP_TRANSLATOR_FREE_PROVIDERS", ["libre"])
+    monkeypatch.setattr("abersetz.setup.DEEP_TRANSLATOR_FREE_PROVIDERS", ["google"])
 
     wizard = SetupWizard(non_interactive=True)
     wizard.discovered_providers = [

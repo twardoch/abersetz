@@ -12,6 +12,7 @@ All notable changes to abersetz will be documented in this file.
 - Added `language-data` dependency to keep `langcodes` language-name lookups working in HYSF prompts.
 - Added CLI regression tests covering target-language guardrails, JSON prolog/voc ingestion, and option propagation.
 - Added CLI regression tests for include defaults and output directory resolution.
+- Added `--include-community` flag to `abersetz setup` for opting into community/self-hosted engines.
 
 ### Changed
 - Removed assistant preamble/outro text from `README.md`.

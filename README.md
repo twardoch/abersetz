@@ -39,6 +39,8 @@ abersetz setup
 abersetz validate --target-lang es
 ```
 
+Use `abersetz setup --include-community` to include community/self-hosted engines like LibreTranslate in the defaults.
+
 This scans your environment for API keys, tests endpoints, and generates an optimized config.
 
 ### Basic Translation

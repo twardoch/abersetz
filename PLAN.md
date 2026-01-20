@@ -17,7 +17,7 @@ Deliver a responsive translation CLI that defaults to short engine selectors, va
 - Automate provider metadata extraction from `external/translators.txt`, `external/deep-translator.txt`, and current API research so discovery stays accurate without manual updates.
 - Sync pricing/tier hints into setup output, highlighting free/community tiers and optional paid upgrades.
 - Add structured hints for optional packages the user might need (for example `translators[google]`).
-- Allow users to opt into community/self-hosted engines such as LibreTranslate with a `--include-community` flag.
+- [x] Allow users to opt into community/self-hosted engines such as LibreTranslate with a `--include-community` flag.
 - Document every provider addition in `DEPENDENCIES.md` with justification referencing external sources.
 
 ## Phase 5 – Documentation, Examples, and Tests

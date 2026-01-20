@@ -199,6 +199,20 @@ def _collect_engine_entries(
             )
         )
 
+    for local_name in ("mthy", "gemma"):
+        local_cfg = cfg.engines.get(local_name)
+        if local_cfg:
+            backend = str(local_cfg.options.get("backend", "")).strip()
+            selector = f"{local_name}/{backend}" if backend else local_name
+            entries.append(
+                EngineEntry(
+                    selector=selector,
+                    configured=True,
+                    requires_api_key=False,
+                    notes=backend or "local",
+                )
+            )
+
     ullm_cfg = cfg.engines.get("ullm")
     if ullm_cfg:
         profiles = ullm_cfg.options.get("profiles", {})
@@ -426,14 +440,24 @@ class AbersetzCLI:
         )
         _render_engine_entries(entries)
 
-    def setup(self, non_interactive: bool = False, verbose: bool = False) -> None:
+    def setup(
+        self,
+        non_interactive: bool = False,
+        verbose: bool = False,
+        include_community: bool = False,
+    ) -> None:
         """Run the configuration setup wizard.
 
         Args:
             non_interactive: Run without user interaction (for CI/automation)
             verbose: Enable verbose output with detailed logging
+            include_community: Include community/self-hosted providers in defaults
         """
-        setup_command(non_interactive=non_interactive, verbose=verbose)
+        setup_command(
+            non_interactive=non_interactive,
+            verbose=verbose,
+            include_community=include_community,
+        )
 
     def validate(
         self,

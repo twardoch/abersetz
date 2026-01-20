@@ -7,6 +7,7 @@ import json
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Protocol
 
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -26,6 +27,67 @@ from .openai_lite import OpenAI
 
 class EngineError(RuntimeError):
     """Raised when an engine cannot be constructed or invoked."""
+
+
+MTHY_LANGUAGE_DATA = """
+Chinese	zh	中文
+English	en	英语
+French	fr	法语
+Portuguese	pt	葡萄牙语
+Spanish	es	西班牙语
+Japanese	ja	日语
+Turkish	tr	土耳其语
+Russian	ru	俄语
+Arabic	ar	阿拉伯语
+Korean	ko	韩语
+Thai	th	泰语
+Italian	it	意大利语
+German	de	德语
+Vietnamese	vi	越南语
+Malay	ms	马来语
+Indonesian	id	印尼语
+Filipino	tl	菲律宾语
+Hindi	hi	印地语
+Traditional Chinese	zh-Hant	繁体中文
+Polish	pl	波兰语
+Czech	cs	捷克语
+Dutch	nl	荷兰语
+Khmer	km	高棉语
+Burmese	my	缅甸语
+Persian	fa	波斯语
+Gujarati	gu	古吉拉特语
+Urdu	ur	乌尔都语
+Telugu	te	泰卢固语
+Marathi	mr	马拉地语
+Hebrew	he	希伯来语
+Bengali	bn	孟加拉语
+Tamil	ta	泰米尔语
+Ukrainian	uk	乌克兰语
+Tibetan	bo	藏语
+Kazakh	kk	哈萨克语
+Mongolian	mn	蒙古语
+Uyghur	ug	维吾尔语
+Cantonese	yue	粤语
+"""
+
+MTHY_PROMPT_NO_TERMS = """将以下文本翻译为{target_language}，注意只需要输出翻译后的结果，不要额外解释：
+{source_text}
+"""
+
+MTHY_LANG_MAP: dict[str, str] = {}
+for line in MTHY_LANGUAGE_DATA.strip().splitlines():
+    english, code, chinese = line.split("\t")
+    MTHY_LANG_MAP[english.lower()] = chinese
+    MTHY_LANG_MAP[code.lower()] = chinese
+    MTHY_LANG_MAP[chinese] = chinese
+
+
+def _resolve_mthy_language(code: str) -> str:
+    """Resolve HY-MT language code/name to Chinese label."""
+    resolved = MTHY_LANG_MAP.get(code.lower())
+    if resolved is None:
+        raise EngineError(f"Unsupported HY-MT language: {code}")
+    return resolved
 
 
 @dataclass(slots=True)
@@ -81,6 +143,147 @@ class EngineBase:
         if fmt is TextFormat.HTML and self.html_chunk_size:
             return self.html_chunk_size
         return self.chunk_size
+
+
+class LocalMlxEngine(EngineBase):
+    """Local MLX-backed engine for HY-MT and TranslateGemma."""
+
+    def __init__(
+        self,
+        family: str,
+        config: EngineConfig,
+        model_path: str,
+        *,
+        max_tokens: int,
+    ) -> None:
+        super().__init__(config.name, config.chunk_size, config.html_chunk_size)
+        self._family = family
+        self._max_tokens = max_tokens
+        path = Path(model_path)
+        if not path.exists():
+            raise EngineError(f"Model path does not exist: {model_path}")
+        try:
+            from mlx_lm import generate, load  # type: ignore
+        except Exception as exc:  # pragma: no cover - optional dependency
+            raise EngineError("mlx-lm is required for MLX engines") from exc
+        self._generate = generate
+        self._model, self._tokenizer = load(model_path)
+
+    def translate(self, request: EngineRequest) -> EngineResult:
+        if self._family == "mthy":
+            prompt = MTHY_PROMPT_NO_TERMS.format(
+                target_language=_resolve_mthy_language(request.target_lang),
+                source_text=request.text,
+            )
+            if hasattr(self._tokenizer, "apply_chat_template") and getattr(
+                self._tokenizer, "chat_template", None
+            ):
+                messages = [{"role": "user", "content": prompt}]
+                prompt = self._tokenizer.apply_chat_template(
+                    messages, tokenize=False, add_generation_prompt=True
+                )
+            text = self._generate(
+                self._model,
+                self._tokenizer,
+                prompt=prompt,
+                max_tokens=self._max_tokens,
+                verbose=False,
+            )
+            return EngineResult(text=text, voc=dict(request.voc))
+        if self._family == "gemma":
+            source_lang = request.source_lang if request.source_lang != "auto" else "en"
+            messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "source_lang_code": source_lang,
+                            "target_lang_code": request.target_lang,
+                            "text": request.text,
+                        }
+                    ],
+                }
+            ]
+            if not hasattr(self._tokenizer, "apply_chat_template"):
+                raise EngineError("Gemma MLX tokenizer missing chat template support")
+            prompt = self._tokenizer.apply_chat_template(
+                messages, tokenize=False, add_generation_prompt=True
+            )
+            text = self._generate(
+                self._model,
+                self._tokenizer,
+                prompt=prompt,
+                max_tokens=self._max_tokens,
+                verbose=False,
+            )
+            return EngineResult(text=text.split("<end_of_turn>")[0].strip(), voc=dict(request.voc))
+        raise EngineError(f"Unsupported MLX family '{self._family}'")
+
+
+class LocalGgufEngine(EngineBase):
+    """Local GGUF-backed engine for HY-MT and TranslateGemma."""
+
+    def __init__(
+        self,
+        family: str,
+        config: EngineConfig,
+        model_path: str,
+        *,
+        max_tokens: int,
+        temperature: float,
+        n_gpu_layers: int,
+        n_ctx: int,
+    ) -> None:
+        super().__init__(config.name, config.chunk_size, config.html_chunk_size)
+        self._family = family
+        self._max_tokens = max_tokens
+        self._temperature = temperature
+        path = Path(model_path)
+        if not path.exists():
+            raise EngineError(f"Model file does not exist: {model_path}")
+        try:
+            from llama_cpp import Llama  # type: ignore
+        except Exception as exc:  # pragma: no cover - optional dependency
+            raise EngineError("llama-cpp-python is required for GGUF engines") from exc
+        self._llm = Llama(
+            model_path=model_path,
+            n_gpu_layers=n_gpu_layers,
+            n_ctx=n_ctx,
+            verbose=False,
+        )
+
+    def translate(self, request: EngineRequest) -> EngineResult:
+        if self._family == "mthy":
+            prompt = MTHY_PROMPT_NO_TERMS.format(
+                target_language=_resolve_mthy_language(request.target_lang),
+                source_text=request.text,
+            )
+            messages = [{"role": "user", "content": prompt}]
+        elif self._family == "gemma":
+            source_lang = request.source_lang if request.source_lang != "auto" else "en"
+            messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "source_lang_code": source_lang,
+                            "target_lang_code": request.target_lang,
+                            "text": request.text,
+                        }
+                    ],
+                }
+            ]
+        else:
+            raise EngineError(f"Unsupported GGUF family '{self._family}'")
+        output = self._llm.create_chat_completion(
+            messages=messages,
+            max_tokens=self._max_tokens,
+            temperature=self._temperature,
+        )
+        chunk_result = output["choices"][0]["message"]["content"]
+        return EngineResult(text=chunk_result, voc=dict(request.voc))
 
 
 class TranslatorsEngine(EngineBase):
@@ -388,6 +591,37 @@ def create_engine(
     if base == "ullm":
         profile = _select_profile(engine_cfg, variant)
         return _build_llm_engine(normalized, config, engine_cfg, profile=profile, client=client)
+    if base in {"mthy", "gemma"}:
+        options = dict(engine_cfg.options)
+        backend = (variant or options.get("backend") or "").strip().lower()
+        if not backend:
+            raise EngineError(f"No backend configured for engine {normalized}")
+        models = options.get("models")
+        model_map = models if isinstance(models, Mapping) else {}
+        model_path = (
+            options.get(f"{backend}_path")
+            or options.get("model_path")
+            or model_map.get(backend)
+        )
+        if not model_path:
+            raise EngineError(f"No model path configured for engine {normalized}")
+        max_tokens = int(options.get("max_tokens", 2048))
+        temperature = float(options.get("temperature", 0.0))
+        n_gpu_layers = int(options.get("n_gpu_layers", -1))
+        n_ctx = int(options.get("n_ctx", 4096))
+        if backend == "mlx":
+            return LocalMlxEngine(base, engine_cfg, str(model_path), max_tokens=max_tokens)
+        if backend == "gguf":
+            return LocalGgufEngine(
+                base,
+                engine_cfg,
+                str(model_path),
+                max_tokens=max_tokens,
+                temperature=temperature,
+                n_gpu_layers=n_gpu_layers,
+                n_ctx=n_ctx,
+            )
+        raise EngineError(f"Unsupported backend '{backend}' for engine '{normalized}'")
     raise EngineError(f"Unsupported engine '{base}'")
 
 
