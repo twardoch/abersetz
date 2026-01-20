@@ -3,6 +3,20 @@ this_file: WORK.md
 ---
 # Work Log
 
+## 2026-01-20
+### CLI Option Guardrails Sprint
+- Added regression coverage for target-language guardrails, prolog/voc JSON ingestion, and CLI option propagation.
+- Research: checked Python Fire missing-argument behavior for context.
+- Tests: `python -m pytest tests/test_cli.py -k "build_options_requires_target_language or loads_prolog_and_voc_json or propagates_optional_flags" -xvs`
+
+### Local MLX/GGUF Engine Integration
+- Added HY-MT and TranslateGemma local engine support for MLX/GGUF backends with configurable model paths.
+- Expanded CLI engine listings to include configured `mthy` and `gemma` local entries.
+- Added regression tests for local engine prompts, structured message payloads, and engine entry listing.
+- Documentation updated for optional local engine configuration and dependencies.
+- Installed dependencies with `uv sync` and added `language-data` for `langcodes` name lookups.
+- Tests: `uv run python -m pytest tests/test_engines.py tests/test_cli.py -xvs` (52 passed, 1 warning: translators deprecation regex).
+
 ## 2025-09-21
 ### Release 1.0.19 Documentation 2025-09-21 13:05 UTC
 - Recorded v1.0.19 changelog entry with highlights, feature breakdown, and verification summary.

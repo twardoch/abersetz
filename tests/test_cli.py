@@ -12,6 +12,7 @@ from abersetz.chunking import TextFormat
 from abersetz.cli import (
     AbersetzCLI,
     _collect_engine_entries,
+    _build_options_from_cli,
     _load_json_data,
     _parse_patterns,
     _render_engine_entries,
@@ -138,6 +139,78 @@ def test_load_json_data_prefers_files(tmp_path: Path) -> None:
 
     # empty references return empty dict for downstream safety
     assert _load_json_data(None) == {}
+
+
+def test_build_options_requires_target_language(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="Target language is required"):
+        _build_options_from_cli(
+            path=tmp_path,
+            engine="tr/google",
+            from_lang="auto",
+            to_lang=None,
+            recurse=True,
+            write_over=False,
+            output=None,
+            save_voc=False,
+            chunk_size=None,
+            html_chunk_size=None,
+            include=None,
+            xclude=None,
+            dry_run=True,
+            prolog=None,
+            voc=None,
+        )
+
+
+def test_build_options_loads_prolog_and_voc_json(tmp_path: Path) -> None:
+    voc_path = tmp_path / "voc.json"
+    voc_path.write_text('{"term": "gloss"}')
+
+    options = _build_options_from_cli(
+        path=tmp_path,
+        engine="tr/google",
+        from_lang="auto",
+        to_lang="es",
+        recurse=False,
+        write_over=False,
+        output=None,
+        save_voc=False,
+        chunk_size=None,
+        html_chunk_size=None,
+        include=None,
+        xclude=None,
+        dry_run=True,
+        prolog='{"tone": "formal"}',
+        voc=str(voc_path),
+    )
+
+    assert options.prolog == {"tone": "formal"}, "Expected inline prolog JSON to populate options"
+    assert options.initial_voc == {"term": "gloss"}, "Expected voc file JSON to populate options"
+
+
+def test_build_options_propagates_optional_flags(tmp_path: Path) -> None:
+    options = _build_options_from_cli(
+        path=tmp_path,
+        engine="tr/google",
+        from_lang="auto",
+        to_lang="es",
+        recurse=False,
+        write_over=True,
+        output=None,
+        save_voc=True,
+        chunk_size=900,
+        html_chunk_size=1200,
+        include=None,
+        xclude=None,
+        dry_run=True,
+        prolog=None,
+        voc=None,
+    )
+
+    assert options.save_voc is True, "Expected save_voc flag to propagate to options"
+    assert options.write_over is True, "Expected write_over flag to propagate to options"
+    assert options.chunk_size == 900, "Expected chunk_size override to propagate to options"
+    assert options.html_chunk_size == 1200, "Expected html_chunk_size override to propagate"
 
 
 def test_render_engine_entries_handles_empty(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -352,6 +425,30 @@ def test_collect_engine_entries_string_branches(
     assert entries["dt/deepl"].configured is True
     assert entries["ll/default"].configured is True
     assert entries["hy"].configured is True
+
+
+def test_collect_engine_entries_includes_local_engines(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    cfg = AbersetzConfig(
+        defaults=Defaults(engine="tr/google"),
+        engines={
+            "mthy": EngineConfig(name="mthy", options={"backend": "mlx"}),
+            "gemma": EngineConfig(name="gemma", options={"backend": "gguf"}),
+        },
+    )
+
+    monkeypatch.setattr("abersetz.cli.load_config", lambda: cfg)
+    monkeypatch.setattr("abersetz.cli.collect_translator_providers", lambda include_paid=False: [])
+    monkeypatch.setattr(
+        "abersetz.cli.collect_deep_translator_providers", lambda include_paid=False: []
+    )
+
+    entries = {entry.selector: entry for entry in _collect_engine_entries(include_paid=False)}
+
+    assert entries["mthy/mlx"].configured is True
+    assert entries["mthy/mlx"].requires_api_key is False
+    assert entries["gemma/gguf"].configured is True
 
 
 def test_collect_engine_entries_handles_deep_translator_string_providers(

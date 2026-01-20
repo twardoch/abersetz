@@ -28,17 +28,5 @@ Deliver a responsive translation CLI that defaults to short engine selectors, va
 - Extend `docs/` (or README) with guidance on picking engines based on cost and availability, drawing on the provider research above.
 - Ensure tests cover selector normalization, CLI output, validation command, setup integration, and documentation link checks.
 
-## Maintenance Sprint – CLI Option Guardrails *(Planned)*
+## Maintenance Sprint – CLI Option Guardrails *(Completed)*
 **Objective**: Backfill regression coverage for CLI option validation and propagation so user-facing flags behave predictably without introducing new functionality.
-
-### Task 1 – Cover target-language requirement guard
-- Add a focused unit test that invokes `_build_options_from_cli` with `to_lang=None` and asserts the exact `ValueError`, documenting Fire’s behaviour when users omit the positional language argument.
-- Test command: `python -m pytest tests/test_cli.py -k "target_language_required" -xvs`.
-
-### Task 2 – Validate prolog and voc ingestion
-- Extend `tests/test_cli.py` with a case that supplies inline and file-based JSON via `prolog`/`voc`, intercepts the resulting `TranslatorOptions`, and asserts the dictionaries match the input payloads.
-- Test command: `python -m pytest tests/test_cli.py -k "prolog_voc" -xvs`.
-
-### Task 3 – Ensure optional flags propagate to translator options
-- Add a regression test invoking `AbersetzCLI.tr` with `save_voc`, `write_over`, `chunk_size`, and `html_chunk_size`, then assert each flag propagates exactly as provided.
-- Test command: `python -m pytest tests/test_cli.py -k "optional_flags_propagate" -xvs`.
