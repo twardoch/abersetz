@@ -30,3 +30,9 @@ Deliver a responsive translation CLI that defaults to short engine selectors, va
 
 ## Maintenance Sprint – CLI Option Guardrails *(Completed)*
 **Objective**: Backfill regression coverage for CLI option validation and propagation so user-facing flags behave predictably without introducing new functionality.
+
+## Micro Sprint – README + CLI Option Defaults *(Completed)*
+**Objective**: Keep documentation clean and ensure CLI option defaults resolve predictably.
+- Remove assistant preamble/outro from `README.md`.
+- Add `_build_options_from_cli` coverage for include defaults when omitted.
+- Add `_build_options_from_cli` coverage for output dir resolution.

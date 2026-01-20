@@ -1,7 +1,3 @@
-Here's the improved version of your README with more concise, technically accurate, and slightly livelier language:
-
----
-
 # abersetz
 
 A minimalist file translator that uses established machine translation engines while keeping configuration portable and repeatable. It follows a simple pipeline: locate → chunk → translate → merge. Provides both a Python API and a CLI powered by `fire`.
@@ -23,6 +19,7 @@ A minimalist file translator that uses established machine translation engines w
 - Dry-run mode for offline testing and demos.
 - Optional vocabulary sidecar files when `--save-voc` is enabled.
 - Built-in `abersetz validate` command that pings configured engines, reports latency, and shows pricing hints from the research catalog.
+- Optional local MLX/GGUF engines for HY-MT and TranslateGemma when configured (`mthy`, `gemma`).
 
 ## Installation
 
@@ -127,6 +124,28 @@ max_input_tokens = 32000
 [engines.ullm.options.profiles.default.prolog]
 ```
 
+Local engines (optional):
+
+```toml
+[engines.mthy]
+name = "mthy"
+chunk_size = 1200
+
+[engines.mthy.options]
+backend = "mlx" # or "gguf"
+model_path = "/path/to/HY-MT1.5-7B-8bit"
+
+[engines.gemma]
+name = "gemma"
+chunk_size = 1200
+
+[engines.gemma.options]
+backend = "gguf" # or "mlx"
+model_path = "/path/to/translategemma-27b-it-Q8_0.gguf"
+n_ctx = 4096
+n_gpu_layers = -1
+```
+
 Use `abersetz config show` and `abersetz config path` to inspect the file.
 
 ## CLI Tools
@@ -173,7 +192,3 @@ ruff format src tests
 ## License
 
 MIT
-
---- 
-
-Let me know if you want this exported as a `.md` file or adjusted further.

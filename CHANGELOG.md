@@ -11,6 +11,10 @@ All notable changes to abersetz will be documented in this file.
 - Added optional local MLX/GGUF engines for HY-MT and TranslateGemma via `mthy` and `gemma` selectors.
 - Added `language-data` dependency to keep `langcodes` language-name lookups working in HYSF prompts.
 - Added CLI regression tests covering target-language guardrails, JSON prolog/voc ingestion, and option propagation.
+- Added CLI regression tests for include defaults and output directory resolution.
+
+### Changed
+- Removed assistant preamble/outro text from `README.md`.
 
 ## [1.0.19] - 2025-09-21
 

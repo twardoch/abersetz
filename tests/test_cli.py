@@ -213,6 +213,53 @@ def test_build_options_propagates_optional_flags(tmp_path: Path) -> None:
     assert options.html_chunk_size == 1200, "Expected html_chunk_size override to propagate"
 
 
+def test_build_options_defaults_include_when_none(tmp_path: Path) -> None:
+    options = _build_options_from_cli(
+        path=tmp_path,
+        engine="tr/google",
+        from_lang="auto",
+        to_lang="es",
+        recurse=False,
+        write_over=False,
+        output=None,
+        save_voc=False,
+        chunk_size=None,
+        html_chunk_size=None,
+        include=None,
+        xclude=None,
+        dry_run=True,
+        prolog=None,
+        voc=None,
+    )
+
+    assert (
+        options.include == TranslatorOptions().include
+    ), "Expected include to fall back to TranslatorOptions defaults"
+
+
+def test_build_options_resolves_output_dir(tmp_path: Path) -> None:
+    output_dir = tmp_path / "out"
+    options = _build_options_from_cli(
+        path=tmp_path,
+        engine="tr/google",
+        from_lang="auto",
+        to_lang="es",
+        recurse=False,
+        write_over=False,
+        output=output_dir,
+        save_voc=False,
+        chunk_size=None,
+        html_chunk_size=None,
+        include=None,
+        xclude=None,
+        dry_run=True,
+        prolog=None,
+        voc=None,
+    )
+
+    assert options.output_dir == output_dir.resolve(), "Expected output_dir to resolve to absolute path"
+
+
 def test_render_engine_entries_handles_empty(monkeypatch: pytest.MonkeyPatch) -> None:
     import io
 

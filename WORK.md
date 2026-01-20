@@ -9,6 +9,11 @@ this_file: WORK.md
 - Research: checked Python Fire missing-argument behavior for context.
 - Tests: `python -m pytest tests/test_cli.py -k "build_options_requires_target_language or loads_prolog_and_voc_json or propagates_optional_flags" -xvs`
 
+### README + CLI Option Defaults
+- Removed assistant preamble/outro text from `README.md`.
+- Added regression coverage for default include handling and output dir resolution.
+- Tests: `python -m pytest tests/test_cli.py -k "build_options_defaults_include_when_none or build_options_resolves_output_dir" -xvs`
+
 ### Local MLX/GGUF Engine Integration
 - Added HY-MT and TranslateGemma local engine support for MLX/GGUF backends with configurable model paths.
 - Expanded CLI engine listings to include configured `mthy` and `gemma` local entries.
