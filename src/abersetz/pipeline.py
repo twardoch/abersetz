@@ -1,4 +1,6 @@
-"""High level translation pipeline."""
+"""High level translation pipeline.
+
+The brain of the operation. This takes a file or directory, figures out what text format it is, chops it up into digestible chunks, sends it to the translation engine, and stitches it all back together into a finished file."""
 # this_file: src/abersetz/pipeline.py
 
 from __future__ import annotations
@@ -18,7 +20,9 @@ DEFAULT_PATTERNS = ("*.txt", "*.md", "*.mdx", "*.html", "*.htm")
 
 @dataclass(slots=True)
 class TranslatorOptions:
-    """Runtime options controlling translation behaviour."""
+    """Runtime options controlling translation behaviour.
+
+All the settings passed down from the CLI or library call: what engine to use, where to save things, what to include/exclude, etc."""
 
     engine: str | None = None
     from_lang: str | None = None
@@ -38,7 +42,9 @@ class TranslatorOptions:
 
 @dataclass(slots=True)
 class TranslationResult:
-    """Information about a translated artefact."""
+    """Information about a translated artefact.
+
+Returned when a file is finished. Tells you where the output was saved, what engine was used, how many chunks it took, and what vocabulary was accumulated."""
 
     source: Path
     destination: Path
@@ -52,7 +58,9 @@ class TranslationResult:
 
 
 class PipelineError(RuntimeError):
-    """Raised when translation cannot proceed."""
+    """Raised when translation cannot proceed.
+
+Catch this if you pass a bad path, lack read permissions, or something breaks catastrophically in the middle of translation."""
 
 
 def translate_path(
@@ -62,7 +70,9 @@ def translate_path(
     config: AbersetzConfig | None = None,
     client: object | None = None,
 ) -> list[TranslationResult]:
-    """Translate a file or directory tree."""
+    """Translate a file or directory tree.
+
+The main entry point. Resolves paths, merges user options with defaults, finds all matching files, spins up the right engine, and feeds everything through the pipeline."""
     resolved = Path(path).resolve()
 
     # Validate input path exists and is accessible

@@ -62,7 +62,7 @@ Coverage is high (91%, per `TESTING.md`). Tests are logically grouped and cover 
 Documentation is clear and useful:
 
 - `README.md` gives a concise project overview.
-- `PLAN.md`, `TODO.md`, and `CHANGELOG.md` track development and future work.
+- `TASKS.md`, `TODO.md`, and `CHANGELOG.md` track development and future work.
 
 ## 4. Conclusion and Recommendations
 

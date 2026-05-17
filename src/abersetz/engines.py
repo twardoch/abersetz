@@ -1,4 +1,6 @@
-"""Translation engine adapters."""
+"""Translation engine adapters.
+
+The translation muscle. This file hooks up the pipeline to different backends—from local models to cloud translation APIs to LLMs. It handles retries, batching hints, and prompt formatting so the rest of the app doesn't have to."""
 # this_file: src/abersetz/engines.py
 
 from __future__ import annotations
@@ -26,7 +28,9 @@ from .openai_lite import OpenAI
 
 
 class EngineError(RuntimeError):
-    """Raised when an engine cannot be constructed or invoked."""
+    """Raised when an engine cannot be constructed or invoked.
+
+Catch this when API keys are missing, dependencies aren't installed, or an engine throws an unrecoverable fit."""
 
 
 MTHY_LANGUAGE_DATA = """
@@ -83,7 +87,9 @@ for line in MTHY_LANGUAGE_DATA.strip().splitlines():
 
 
 def _resolve_mthy_language(code: str) -> str:
-    """Resolve HY-MT language code/name to Chinese label."""
+    """Resolve HY-MT language code/name to Chinese label.
+
+Hunyuan-MT requires target languages written in Chinese. This translates ISO codes or English names into what the model understands."""
     resolved = MTHY_LANG_MAP.get(code.lower())
     if resolved is None:
         raise EngineError(f"Unsupported HY-MT language: {code}")
@@ -92,7 +98,9 @@ def _resolve_mthy_language(code: str) -> str:
 
 @dataclass(slots=True)
 class EngineRequest:
-    """Payload passed to engines."""
+    """Payload passed to engines.
+
+Everything an engine needs to translate one chunk: the text, the languages, format flags, and vocabulary hints."""
 
     text: str
     source_lang: str
@@ -106,14 +114,18 @@ class EngineRequest:
 
 @dataclass(slots=True)
 class EngineResult:
-    """Normalized engine output."""
+    """Normalized engine output.
+
+Contains the translated text and any new vocabulary terms the engine learned/decided on during this chunk."""
 
     text: str
     voc: dict[str, str]
 
 
 class Engine(Protocol):
-    """Protocol implemented by engine adapters."""
+    """Protocol implemented by engine adapters.
+
+Any new translation backend must implement this interface. It defines how to translate a chunk and what size chunks it prefers."""
 
     name: str
     chunk_size: int | None
@@ -127,7 +139,9 @@ class Engine(Protocol):
 
 
 class EngineBase:
-    """Shared helpers for engines."""
+    """Shared helpers for engines.
+
+Base class providing default chunk sizing logic."""
 
     def __init__(
         self,
@@ -146,7 +160,9 @@ class EngineBase:
 
 
 class LocalMlxEngine(EngineBase):
-    """Local MLX-backed engine for HY-MT and TranslateGemma."""
+    """Local MLX-backed engine for HY-MT and TranslateGemma.
+
+Runs models locally on Apple Silicon using MLX. Fast, private, but requires hefty hardware."""
 
     def __init__(
         self,
@@ -222,7 +238,9 @@ class LocalMlxEngine(EngineBase):
 
 
 class LocalGgufEngine(EngineBase):
-    """Local GGUF-backed engine for HY-MT and TranslateGemma."""
+    """Local GGUF-backed engine for HY-MT and TranslateGemma.
+
+Runs quantized models locally via llama.cpp. Great for standard hardware where MLX isn't an option."""
 
     def __init__(
         self,
@@ -287,7 +305,9 @@ class LocalGgufEngine(EngineBase):
 
 
 class TranslatorsEngine(EngineBase):
-    """Wrapper around the `translators` package with retry logic."""
+    """Wrapper around the `translators` package with retry logic.
+
+Hooks into the `translators` Python library to scrape/use web-based translation endpoints (Google, Bing, etc.). Since these are often undocumented web endpoints, we wrap calls in a tenacious retry loop."""
 
     def __init__(self, provider: str, config: EngineConfig) -> None:
         super().__init__(config.name, config.chunk_size, config.html_chunk_size)
@@ -325,7 +345,9 @@ class TranslatorsEngine(EngineBase):
 
 
 class DeepTranslatorEngine(EngineBase):
-    """Adapter for `deep-translator` providers with retry logic."""
+    """Adapter for `deep-translator` providers with retry logic.
+
+Hooks into `deep-translator` for more stable, often officially-supported web translation APIs. We still retry on network hiccups."""
 
     PROVIDERS: Mapping[str, type] | None = None
 
@@ -374,7 +396,9 @@ class DeepTranslatorEngine(EngineBase):
 
 
 class LlmEngine(EngineBase):
-    """Shared logic for LLM backed engines."""
+    """Shared logic for LLM backed engines.
+
+Talks to OpenAI-compatible endpoints. It wraps the text in XML tags, feeds it to the LLM, and extracts the translation from the resulting `<output>` block."""
 
     OUTPUT_RE = re.compile(r"<output>(?P<body>.*?)</output>", re.DOTALL | re.IGNORECASE)
     VOCAB_RE = re.compile(r"<voc>(?P<body>.*?)</voc>", re.DOTALL | re.IGNORECASE)
@@ -464,7 +488,9 @@ class LlmEngine(EngineBase):
 
 
 class HysfEngine(EngineBase):
-    """Specialised HYSF engine with fixed prompt semantics."""
+    """Specialised HYSF engine with fixed prompt semantics.
+
+Tencent's Hunyuan model works best with a very specific, simple prompt structure. This engine bypasses the XML-heavy LLM logic for a more direct approach."""
 
     MODEL = HYSF_DEFAULT_MODEL
     TEMPERATURE = HYSF_DEFAULT_TEMPERATURE
@@ -502,7 +528,9 @@ class HysfEngine(EngineBase):
 
 
 def _make_openai_client(token: str, base_url: str | None) -> OpenAI:
-    """Create an OpenAI client respecting optional base URL."""
+    """Create an OpenAI client respecting optional base URL.
+
+Points the client at OpenAI, SiliconFlow, or any local proxy that speaks the OpenAI protocol."""
     if base_url:
         return OpenAI(api_key=token, base_url=base_url)
     return OpenAI(api_key=token)
@@ -572,7 +600,9 @@ def create_engine(
     *,
     client: Any | None = None,
 ) -> Engine:
-    """Factory that builds the requested engine supporting short aliases."""
+    """Factory that builds the requested engine supporting short aliases.
+
+Give it `tr/google` and it builds a TranslatorsEngine backed by Google. Give it `hy/hysf` and it builds a SiliconFlow endpoint. It wires up the config, credentials, and adapter."""
 
     normalized = normalize_selector(selector) or selector
     base, variant = resolve_engine_reference(normalized)

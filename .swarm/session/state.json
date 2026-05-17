@@ -1,0 +1,99 @@
+{
+  "version": 2,
+  "writtenAt": 1775601208554,
+  "toolAggregates": {
+    "todowrite": {
+      "tool": "todowrite",
+      "count": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "totalDuration": 11
+    },
+    "skill": {
+      "tool": "skill",
+      "count": 3,
+      "successCount": 3,
+      "failureCount": 0,
+      "totalDuration": 416
+    }
+  },
+  "activeAgent": {
+    "ses_295ec4138ffe3NqmyksqABC0Db": "Sisyphus (Ultraworker)"
+  },
+  "delegationChains": {},
+  "agentSessions": {
+    "ses_295ec4138ffe3NqmyksqABC0Db": {
+      "agentName": "Sisyphus (Ultraworker)",
+      "lastToolCallTime": 1775601208392,
+      "lastAgentEventTime": 1775601172230,
+      "delegationActive": true,
+      "activeInvocationId": 1,
+      "lastInvocationIdByAgent": {
+        "Sisyphus (Ultraworker)": 1
+      },
+      "windows": {
+        "Sisyphus (Ultraworker):1": {
+          "id": 1,
+          "agentName": "Sisyphus (Ultraworker)",
+          "startedAtMs": 1775601172230,
+          "toolCalls": 4,
+          "consecutiveErrors": 0,
+          "hardLimitHit": false,
+          "lastSuccessTimeMs": 1775601208543,
+          "recentToolCalls": [
+            {
+              "tool": "todowrite",
+              "argsHash": 1369436653975036400,
+              "timestamp": 1775601191347
+            },
+            {
+              "tool": "skill",
+              "argsHash": 12610310321947050000,
+              "timestamp": 1775601208353
+            },
+            {
+              "tool": "skill",
+              "argsHash": 10637772417036032000,
+              "timestamp": 1775601208384
+            },
+            {
+              "tool": "skill",
+              "argsHash": 14383789188449864000,
+              "timestamp": 1775601208392
+            }
+          ],
+          "warningIssued": false,
+          "warningReason": ""
+        }
+      },
+      "lastCompactionHint": 0,
+      "architectWriteCount": 0,
+      "lastCoderDelegationTaskId": null,
+      "currentTaskId": null,
+      "turboMode": false,
+      "gateLog": {},
+      "reviewerCallCount": {},
+      "lastGateFailure": null,
+      "partialGateWarningsIssuedForTask": [],
+      "selfFixAttempted": false,
+      "selfCodingWarnedAtCount": 0,
+      "catastrophicPhaseWarnings": [],
+      "lastPhaseCompleteTimestamp": 0,
+      "lastPhaseCompletePhase": 0,
+      "phaseAgentsDispatched": [
+        "Sisyphus (Ultraworker)"
+      ],
+      "lastCompletedPhaseAgentsDispatched": [],
+      "qaSkipCount": 0,
+      "qaSkipTaskIds": [],
+      "pendingAdvisoryMessages": [],
+      "taskWorkflowStates": {},
+      "scopeViolationDetected": false,
+      "model_fallback_index": 0,
+      "modelFallbackExhausted": false,
+      "coderRevisions": 0,
+      "revisionLimitHit": false,
+      "sessionRehydratedAt": 0
+    }
+  }
+}

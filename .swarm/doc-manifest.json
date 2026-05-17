@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "scanned_at": "2026-04-07T22:32:52.450Z",
+  "files": [
+    {
+      "path": ".github/workflows/push.yml",
+      "title": "push.yml",
+      "summary": "name: Build & Test on: push: branches: [main] tags-ignore: [\"v*\"] pull_request: branches: [main] workflow_dispatch: permissions: contents: write id-token: write concurrency: group: ${{ github.workf...",
+      "lines": 112,
+      "mtime": 1758394520334
+    },
+    {
+      "path": ".github/workflows/release.yml",
+      "title": "release.yml",
+      "summary": "name: Release on: push: tags: [\"v*\"] permissions: contents: write id-token: write jobs: release: name: Release to PyPI runs-on: ubuntu-latest environment: name: pypi url: https://pypi.org/p/aberset...",
+      "lines": 59,
+      "mtime": 1758394520336
+    },
+    {
+      "path": ".venv/lib/python3.11/site-packages/fire/console/README.md",
+      "title": "README.md",
+      "summary": "This is the console package from googlecloudsdk, as used by Python Fire. Python Fire does not accept pull requests modifying the console package; rather, changes to console should go through the up...",
+      "lines": 4,
+      "mtime": 1768248150125
+    },
+    {
+      "path": ".venv/lib/python3.11/site-packages/langcodes/tests/README.md",
+      "title": "README.md",
+      "summary": "Most of the tests for langcodes are in doctests, intended to be run on Python 3. This directory contains additional tests that ensure langcodes can recognize language names as they are used on Wikt...",
+      "lines": 2,
+      "mtime": 1768943576805
+    },
+    {
+      "path": "AGENTS.md",
+      "title": "Development guidelines",
+      "summary": "Before you generate any response, assume your first instinct is wrong. Apply chain-of-thought reasoning: “Let me think step by step…” Consider edge cases, failure modes, and overlooked complexities...",
+      "lines": 348,
+      "mtime": 1769171072300
+    },
+    {
+      "path": "CHANGELOG.md",
+      "title": "Changelog",
+      "summary": "--- this_file: CHANGELOG.md --- All notable changes to abersetz will be documented in this file. - Added optional local MLX/GGUF engines for HY-MT and TranslateGemma via `mthy` and `gemma` selector...",
+      "lines": 106,
+      "mtime": 1768944555781
+    },
+    {
+      "path": "CLAUDE.md",
+      "title": "Development guidelines",
+      "summary": "Before you generate any response, assume your first instinct is wrong. Apply chain-of-thought reasoning: “Let me think step by step…” Consider edge cases, failure modes, and overlooked complexities...",
+      "lines": 348,
+      "mtime": 1769171072300
+    },
+    {
+      "path": "docs/_config.yml",
+      "title": "Jekyll configuration for abersetz documentation",
+      "summary": "title: abersetz description: Minimalist file translator with pluggable engines baseurl: \"/abersetz\" url: \"https://twardoch.github.io\" remote_theme: just-the-docs/just-the-docs@v0.7.0 color_scheme: ...",
+      "lines": 77,
+      "mtime": 1758411926660
+    },
+    {
+      "path": "docs/api.md",
+      "title": "Python API Reference",
+      "summary": "--- layout: default title: Python API nav_order: 4 --- {: .no_toc } {: .no_toc .text-delta } 1. TOC {:toc} --- The abersetz Python API provides programmatic access to all translation functionality....",
+      "lines": 442,
+      "mtime": 1768942688055
+    },
+    {
+      "path": "docs/cli.md",
+      "title": "CLI Reference",
+      "summary": "--- layout: default title: CLI Reference nav_order: 3 --- {: .no_toc } {: .no_toc .text-delta } 1. TOC {:toc} --- Abersetz ships with two command-line tools: - `abersetz`: The main interface. Suppo...",
+      "lines": 369,
+      "mtime": 1768944555782
+    },
+    {
+      "path": "docs/configuration.md",
+      "title": "Configuration",
+      "summary": "Abersetz stores configuration in a TOML file managed by `platformdirs` for cross-platform compatibility. Find your configuration file: ```bash abersetz config path ``` Typical locations: - **Linux*...",
+      "lines": 439,
+      "mtime": 1768942688055
+    },
+    {
+      "path": "docs/index.md",
+      "title": "abersetz",
+      "summary": "--- layout: home title: Home nav_order: 1 description: \"Abersetz is a minimalist file translator that reuses proven machine translation engines\" permalink: / --- {: .fs-9 } Minimalist file translat...",
+      "lines": 150,
+      "mtime": 1768942688055
+    },
+    {
+      "path": "docs/installation.md",
+      "title": "Installation",
+      "summary": "--- layout: default title: Installation nav_order: 2 --- {: .no_toc } {: .no_toc .text-delta } 1. TOC {:toc} --- - Python 3.10 or higher - pip or uv package manager The simplest way to install aber...",
+      "lines": 180,
+      "mtime": 1768942688055
+    },
+    {
+      "path": "external/lackai/.pytest_cache/README.md",
+      "title": "pytest cache directory #",
+      "summary": "This directory contains data from the pytest's cache plugin, which provides the `--lf` and `--ff` options, as well as the `cache` fixture. **Do not** commit this to version control. See [the docs](...",
+      "lines": 9,
+      "mtime": 1768684414836
+    },
+    {
+      "path": "external/lackai/AGENTS.md",
+      "title": "Development Guidelines",
+      "summary": "| Term | Meaning | |------|---------| | **MUST** | Required, no exceptions | | **SHOULD** | Default; deviate only with justification | | **MAY** | Optional | **Role (MUST):** Senior Expert Software...",
+      "lines": 420,
+      "mtime": 1768684182058
+    },
+    {
+      "path": "external/lackai/CLAUDE.md",
+      "title": "Development Guidelines",
+      "summary": "| Term | Meaning | |------|---------| | **MUST** | Required, no exceptions | | **SHOULD** | Default; deviate only with justification | | **MAY** | Optional | **Role (MUST):** Senior Expert Software...",
+      "lines": 420,
+      "mtime": 1768684182058
+    },
+    {
+      "path": "external/lackai/external/tts/README.md",
+      "title": "tts4 - Unified TTS CLI for macOS Apple Silicon",
+      "summary": "Text-to-speech CLI supporting MLX-native and GGUF models on Apple Silicon. - macOS on Apple Silicon - Python 3.12 (3.13+ has compatibility issues with librosa/numba) - [uv](https://docs.astral.sh/u...",
+      "lines": 99,
+      "mtime": 1767489744449
+    },
+    {
+      "path": "external/lackai/README.md",
+      "title": "Lackai: Local AI Inference for macOS Apple Silicon",
+      "summary": "[![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org) [![macOS](https://img.shields.io/badge/macOS-Apple%20Silicon-green.svg)](https://apple.com/silicon) [![License](h...",
+      "lines": 283,
+      "mtime": 1768684239882
+    },
+    {
+      "path": "README.md",
+      "title": "abersetz",
+      "summary": "A minimalist file translator that uses established machine translation engines while keeping configuration portable and repeatable. It follows a simple pipeline: locate → chunk → translate → merge....",
+      "lines": 197,
+      "mtime": 1768944555781
+    }
+  ]
+}

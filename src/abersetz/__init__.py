@@ -1,4 +1,15 @@
-"""Public package surface for abersetz."""
+"""Public package surface for abersetz.
+
+Abersetz is an AI-powered translation pipeline designed to be fast, reliable, and invisible.
+It chunks text, hands it to language models, and stitches the translated pieces back together
+without breaking formatting or structure.
+
+We export only what you need to run translations or handle their failures:
+- `translate_path`: The main workhorse for files and directories.
+- `TranslatorOptions`: Knobs and dials for the translation pipeline.
+- `TranslationResult`: The outcome, good or bad.
+- `PipelineError`: When things break, this tells you why.
+"""
 # this_file: src/abersetz/__init__.py
 
 from __future__ import annotations

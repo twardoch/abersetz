@@ -1,4 +1,6 @@
-"""Smart configuration setup for abersetz."""
+"""Smart configuration setup for abersetz.
+
+Provides a CLI wizard that sniffs your environment variables for API keys (OpenAI, Anthropic, DeepL, etc.), tests them to make sure they actually work, and builds a working `config.toml` so you don't have to."""
 # this_file: src/abersetz/setup.py
 
 from __future__ import annotations
@@ -33,7 +35,9 @@ console = Console()
 
 @dataclass
 class DiscoveredProvider:
-    """Information about a discovered API provider."""
+    """Information about a discovered API provider.
+
+Tracks whether we found a key, if the endpoint is breathing, and what engines can use it."""
 
     name: str
     api_key_env: str
@@ -89,7 +93,9 @@ PROVIDER_METADATA: dict[str, dict[str, str]] = {
 
 
 class SetupWizard:
-    """Interactive setup wizard for abersetz configuration."""
+    """Interactive setup wizard for abersetz configuration.
+
+The brain behind `abersetz setup`. It runs through four phases: discover keys, test endpoints, build config, save and validate."""
 
     def __init__(
         self,
@@ -104,7 +110,9 @@ class SetupWizard:
         self.validation_results: list[ValidationResult] | None = None
 
     def run(self) -> bool:
-        """Run the setup wizard."""
+        """Run the setup wizard.
+
+Coordinates the discovery, testing, and saving phases. Returns True if a valid config was created, False if no API keys were found."""
         if not self.non_interactive:
             console.print("\n[bold cyan]🔧 Abersetz Configuration Setup[/bold cyan]\n")
             console.print("Scanning environment for API keys and endpoints...\n")
@@ -148,7 +156,9 @@ class SetupWizard:
         return False
 
     def _validate_config(self, config: AbersetzConfig) -> None:
-        """Run validation after configuration is saved."""
+        """Run validation after configuration is saved.
+
+Fires off a quick request to every configured engine to make sure they aren't hallucinating or timing out immediately."""
 
         results = validate_engines(config, include_defaults=True)
         self.validation_results = results
@@ -178,7 +188,9 @@ class SetupWizard:
             logger.warning("Validation failed for %s: %s", item.selector, item.error)
 
     def _discover_providers(self) -> None:
-        """Scan environment for API keys."""
+        """Scan environment for API keys.
+
+Checks `os.environ` for known key patterns (like `OPENAI_API_KEY`) and registers providers when it finds them."""
         for name, env_key, base_url in KNOWN_PROVIDERS:
             api_key = os.environ.get(env_key)
             if api_key:
@@ -215,7 +227,9 @@ class SetupWizard:
                     logger.debug(f"Found {name} API key in {env_key}")
 
     def _test_endpoints(self) -> None:
-        """Test discovered endpoints with lightweight API calls."""
+        """Test discovered endpoints with lightweight API calls.
+
+We don't just trust an API key exists; we poke the endpoint (usually the `/models` route) to see if it responds with a 200 OK."""
         if not self.non_interactive:
             console.print("Testing discovered services...\n")
 
@@ -235,7 +249,9 @@ class SetupWizard:
                 progress.update(task, advance=1)
 
     def _test_single_endpoint(self, provider: DiscoveredProvider) -> None:
-        """Test a single API endpoint."""
+        """Test a single API endpoint.
+
+Makes a quick GET request to verify the key works. Catches timeouts, auth errors, and DNS failures."""
         if not provider.base_url:
             return
 
@@ -294,7 +310,9 @@ class SetupWizard:
                 logger.debug(f"✗ {provider.name}: {provider.error}")
 
     def _display_results(self) -> None:
-        """Display discovered providers in a table."""
+        """Display discovered providers in a table.
+
+Uses Rich to print a pretty summary of what we found and whether it works."""
         if not self.discovered_providers:
             return
 
@@ -325,7 +343,9 @@ class SetupWizard:
         console.print(table)
 
     def _generate_config(self) -> AbersetzConfig | None:
-        """Generate configuration from discovered providers."""
+        """Generate configuration from discovered providers.
+
+Takes the raw list of working keys and builds a proper `AbersetzConfig` object, prioritizing stable engines (like DeepL) over generic ones (like Translators)."""
         if not self.discovered_providers:
             return None
 
@@ -476,7 +496,9 @@ def _select_default_engine(
     engines: dict[str, EngineConfig],
     providers: Sequence[DiscoveredProvider],
 ) -> str | None:
-    """Choose the default engine based on configured priorities."""
+    """Choose the default engine based on configured priorities.
+
+We prefer DeepL if you have it. If not, Google Translate via `translators`. If not that, Hunyuan. If none of those, we just pick the first thing that works."""
     if "deep-translator" in engines and any(
         provider.name == "deepl" and provider.is_available for provider in providers
     ):
@@ -498,6 +520,8 @@ def setup_command(
     include_community: bool = False,
 ) -> None:
     """Run the abersetz setup wizard.
+
+    The main entry point for the `setup` CLI command.
 
     Args:
         non_interactive: Run without user interaction (for CI/automation)

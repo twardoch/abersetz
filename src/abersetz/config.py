@@ -1,4 +1,6 @@
-"""Configuration helpers for abersetz."""
+"""Configuration helpers for abersetz.
+
+Reads, writes, and validates `config.toml`. This handles everything from default engines to API keys and chunk sizes."""
 # this_file: src/abersetz/config.py
 
 from __future__ import annotations
@@ -32,7 +34,9 @@ CONFIG_FILENAME = "config.toml"
 
 @dataclass(slots=True)
 class Defaults:
-    """Runtime defaults for translation."""
+    """Runtime defaults for translation.
+
+What engine to use, source/target languages, and how big text chunks should be."""
 
     engine: str = "tr/google"
     from_lang: str = "auto"
@@ -70,7 +74,9 @@ class Defaults:
 
 @dataclass(slots=True)
 class Credential:
-    """Represents an API credential reference."""
+    """Represents an API credential reference.
+
+Could be an environment variable name, an explicit key, or a named reference to another credential."""
 
     name: str | None = None
     env: str | None = None
@@ -108,7 +114,9 @@ CredentialLike = Credential | Mapping[str, Any] | str | None
 
 @dataclass(slots=True)
 class EngineConfig:
-    """Engine specific configuration block."""
+    """Engine specific configuration block.
+
+Holds options, chunk sizes, and credentials for a specific translation engine (e.g., Google Translate, DeepL, or an LLM provider)."""
 
     name: str
     chunk_size: int | None = None
@@ -141,7 +149,9 @@ class EngineConfig:
 
 @dataclass(slots=True)
 class AbersetzConfig:
-    """Aggregate configuration for the toolkit."""
+    """Aggregate configuration for the toolkit.
+
+The root configuration object holding defaults, credentials, and engine-specific setups."""
 
     defaults: Defaults = field(default_factory=Defaults)
     credentials: dict[str, Credential] = field(default_factory=dict)
@@ -221,17 +231,21 @@ DEFAULT_CONFIG_DICT: dict[str, Any] = {
 
 
 def _default_dict() -> dict[str, Any]:
-    """Return a deep copy of the default config mapping."""
+    """Return a deep copy of the default config mapping.
+
+Provides a safe, immutable baseline for creating new configs or restoring broken ones."""
     return copy.deepcopy(DEFAULT_CONFIG_DICT)
 
 
 def _default_config() -> AbersetzConfig:
-    """Return a fresh ``AbersetzConfig`` with defaults."""
+    """Return a fresh `AbersetzConfig` populated with the default settings."""
     return AbersetzConfig.from_dict(_default_dict())
 
 
 def config_dir() -> Path:
-    """Return directory holding the configuration file."""
+    """Return the directory holding the configuration file.
+
+Respects the `ABERSETZ_CONFIG_DIR` env var if set, otherwise uses the OS-specific user config directory."""
     custom = os.getenv("ABERSETZ_CONFIG_DIR")
     if custom:
         return Path(custom)
@@ -239,12 +253,15 @@ def config_dir() -> Path:
 
 
 def config_path() -> Path:
-    """Return absolute path to the configuration file."""
+    """Return the absolute path to the `config.toml` file."""
     return config_dir() / CONFIG_FILENAME
 
 
 def load_config() -> AbersetzConfig:
-    """Load configuration from disk, creating defaults if needed."""
+    """Load configuration from disk, creating defaults if needed.
+
+If the file is missing, we create it. If it's corrupted, we back it up and create a fresh one.
+Returns a valid `AbersetzConfig` object no matter what."""
     from loguru import logger
 
     path = config_path()
@@ -283,7 +300,7 @@ def load_config() -> AbersetzConfig:
 
 
 def save_config(config: AbersetzConfig) -> None:
-    """Persist configuration to ``config.toml``."""
+    """Persist configuration to `config.toml`."""
     path = config_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     content = tomli_w.dumps(config.to_dict())
@@ -294,9 +311,10 @@ def resolve_credential(
     config: AbersetzConfig,
     reference: CredentialLike,
 ) -> str | None:
-    """Resolve a credential reference to a usable secret.
+    """Resolve a credential reference to a usable secret string.
 
-    Returns None if no credential found, logs helpful messages.
+    Checks named references, environment variables, and explicit values.
+    Returns `None` if no usable secret is found, logging a helpful error about what to fix.
     """
     from loguru import logger
 

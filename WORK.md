@@ -30,7 +30,7 @@ this_file: WORK.md
 ## 2025-09-21
 ### Release 1.0.19 Documentation 2025-09-21 13:05 UTC
 - Recorded v1.0.19 changelog entry with highlights, feature breakdown, and verification summary.
-- Pruned `PLAN.md` to active initiatives (Phase 4/5 and CLI option guardrails) and refreshed `TODO.md` with the pending regression tests only.
+- Pruned `TASKS.md` to active initiatives (Phase 4/5 and CLI option guardrails) and refreshed `TODO.md` with the pending regression tests only.
 - Tests not rerun; documentation and planning-only update.
 
 ### /report – Verification Sweep 2025-09-21 12:39 UTC
@@ -46,7 +46,7 @@ this_file: WORK.md
 - `python -m pytest --cov=. --cov-report=term-missing` → 177 passed, 8 skipped in 85.02s; coverage table unchanged at 98% with explicit line listings limited to the skipped integration suite and guarded setup/pipeline assertions.
 - `uvx mypy .` → 3 errors (`src/abersetz/cli.py` optional output assignments and `external/dump_models.py` credential default handling); all other modules typed cleanly.
 - `uvx bandit -r .` → 438 Low-severity findings attributable to deliberate `assert` usage across tests and the config backup `try/except/pass`; Medium/High severities remain zero.
-- Updated `PLAN.md`/`TODO.md` with the "Residual Type & Coverage Polish" sprint covering mypy cleanup and pipeline chunk-size regressions.
+- Updated `TASKS.md`/`TODO.md` with the "Residual Type & Coverage Polish" sprint covering mypy cleanup and pipeline chunk-size regressions.
 - /cleanup removed `.pytest_cache`, `.mypy_cache`, `.ruff_cache`, `.benchmarks`, and `.coverage` immediately after verification.
 
 ### /work – Residual Type & Coverage Polish Task 1 2025-09-21 12:24 UTC
@@ -399,7 +399,7 @@ this_file: WORK.md
 - `python -m pytest --cov=. --cov-report=term-missing` → 112 passed, 8 skipped; total coverage holds at 94% with remaining misses limited to long-tail CLI/setup/helper branches and intentional integration skips.
 - `uvx mypy .` → 40+ expected errors from missing third-party stubs (pytest/httpx/tenacity/semantic_text_splitter/langcodes/rich/platformdirs/tomli_w/loguru) plus mocked `Chat.completions` attributes and example accessors.
 - `uvx bandit -r .` → 300 Low severity findings (test `assert` usage + backup fallback) with no Medium/High issues.
-- Updated PLAN.md to mark coverage hardening sprint complete and checked off TODO items after verifying new tests.
+- Updated TASKS.md to mark coverage hardening sprint complete and checked off TODO items after verifying new tests.
 - Cleared `.pytest_cache`, `.mypy_cache`, `.benchmarks`, `.coverage`, `.ruff_cache` after verification run.
 
 ### Automated Report – 2025-09-21 06:13 UTC
@@ -408,7 +408,7 @@ this_file: WORK.md
 - `uvx mypy .` → 70+ errors dominated by missing third-party stubs (`pytest`, `httpx`, `tenacity`, `langcodes`, `rich`, `platformdirs`, `tomli_w`, `loguru`) and stubbed `Chat.completions` attribute usage within tests and `openai_lite.py`.
 - `uvx bandit -r .` → 264 Low severity findings (expected `assert` usage across tests and guarded backup writer fallback in `config.py`).
 - Removed `.pytest_cache`, `.mypy_cache`, `.benchmarks`, `.coverage`, `.ruff_cache`.
-- Identified follow-up coverage tasks for config fallback, engine catalog provider helpers, and CLI engine filters; logged in `PLAN.md` and `TODO.md`.
+- Identified follow-up coverage tasks for config fallback, engine catalog provider helpers, and CLI engine filters; logged in `TASKS.md` and `TODO.md`.
 
 ### Automated Report – 2025-09-21 06:25 UTC
 - `python -m pytest -xvs` → 103 passed, 8 skipped in 84.21s; coverage plugin snapshot 94% with notable improvements in `config.py` (94%), `engine_catalog.py` (93%), and `cli.py` (90%).

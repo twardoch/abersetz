@@ -1,4 +1,6 @@
-"""Command line interface for abersetz."""
+"""Command line interface for abersetz.
+
+The user-facing CLI. This translates terminal commands into pipeline options, formats output nicely with Rich, and handles the `abersetz tr` and `abersetz config` subcommands."""
 # this_file: src/abersetz/cli.py
 
 from __future__ import annotations
@@ -249,7 +251,9 @@ def _collect_engine_entries(
 
 
 class ConfigCommands:
-    """Configuration related helpers."""
+    """Configuration related helpers.
+
+Subcommands under `abersetz config` to show the current setup or print the config file path."""
 
     def show(self) -> str:
         cfg = load_config()
@@ -263,7 +267,9 @@ class ConfigCommands:
 
 
 def _validate_language_code(code: str | None, param_name: str) -> str | None:
-    """Validate language code format."""
+    """Validate language code format.
+
+Ensures the user didn't pass gibberish for a language code, though currently it mostly trusts the user."""
     if code is None or code == "auto":
         return code
 
@@ -333,13 +339,15 @@ POPULAR_LANG_CODES = ("en", "es", "fr", "de", "ja", "zh-CN", "pl")
 
 
 class AbersetzCLI:
-    """Abersetz translation tool - translate files between languages.
+    """Abersetz translation tool.
 
-    Use 'abersetz tr' to translate files, or 'abersetz config' to manage configuration.
+    The main CLI application. Exposes `tr` for translation, `config` for settings, `lang` for language codes, and `engines` to see what backends are available.
     """
 
     def version(self) -> str:
-        """Show version information."""
+        """Show version information.
+
+Prints the current version of abersetz."""
         from . import __version__
 
         console.print(f"abersetz version {__version__}")
@@ -432,7 +440,9 @@ class AbersetzCLI:
         family: str | None = None,
         configured_only: bool = False,
     ) -> None:
-        """List available engines and whether they are configured."""
+        """List available engines and whether they are configured.
+
+Prints a formatted table showing every engine we know about, whether you have it set up, and if it requires a paid API key."""
         entries = _collect_engine_entries(
             include_paid,
             family=family,
@@ -468,7 +478,9 @@ class AbersetzCLI:
         sample_text: str = "Hello, world!",
         include_defaults: bool = True,
     ) -> list[ValidationResult]:
-        """Validate configured engines by translating a short phrase."""
+        """Validate configured engines by translating a short phrase.
+
+Fires a test string ("Hello, world!") through the selected engines to measure latency and verify they actually work."""
 
         cfg = load_config()
         selector_tuple = _parse_patterns(selectors)
@@ -485,12 +497,16 @@ class AbersetzCLI:
 
 
 def main() -> None:
-    """Invoke the Fire CLI."""
+    """Invoke the Fire CLI.
+
+Turns the `AbersetzCLI` class into a command-line application."""
     fire.Fire(AbersetzCLI())
 
 
 def abtr_main() -> None:
-    """Direct translation CLI - equivalent to 'abersetz tr'."""
+    """Direct translation CLI.
+
+A shortcut command. `abtr es file.txt` is exactly the same as `abersetz tr es file.txt`."""
 
     # Create CLI instance and call tr method directly
     cli = AbersetzCLI()

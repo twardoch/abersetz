@@ -1,4 +1,6 @@
-"""Legacy shim exporting the primary pipeline API."""
+"""Legacy shim exporting the primary pipeline API.
+
+Kept around so scripts relying on `from abersetz.abersetz import translate_path` don't suddenly break."""
 # this_file: src/abersetz/abersetz.py
 
 from __future__ import annotations

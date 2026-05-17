@@ -2,7 +2,7 @@ Sure. Let's go step-by-step.
 
 ---
 
-## @PLAN.md
+## @TASKS.md
 
 ```markdown
 # Project Plan: `abersetz`
