@@ -5,6 +5,7 @@ Reads, writes, and validates `config.toml`. This handles everything from default
 
 from __future__ import annotations
 
+import contextlib
 import copy
 import os
 from collections.abc import Mapping
@@ -36,7 +37,7 @@ CONFIG_FILENAME = "config.toml"
 class Defaults:
     """Runtime defaults for translation.
 
-What engine to use, source/target languages, and how big text chunks should be."""
+    What engine to use, source/target languages, and how big text chunks should be."""
 
     engine: str = "tr/google"
     from_lang: str = "auto"
@@ -76,7 +77,7 @@ What engine to use, source/target languages, and how big text chunks should be."
 class Credential:
     """Represents an API credential reference.
 
-Could be an environment variable name, an explicit key, or a named reference to another credential."""
+    Could be an environment variable name, an explicit key, or a named reference to another credential."""
 
     name: str | None = None
     env: str | None = None
@@ -116,7 +117,7 @@ CredentialLike = Credential | Mapping[str, Any] | str | None
 class EngineConfig:
     """Engine specific configuration block.
 
-Holds options, chunk sizes, and credentials for a specific translation engine (e.g., Google Translate, DeepL, or an LLM provider)."""
+    Holds options, chunk sizes, and credentials for a specific translation engine (e.g., Google Translate, DeepL, or an LLM provider)."""
 
     name: str
     chunk_size: int | None = None
@@ -151,7 +152,7 @@ Holds options, chunk sizes, and credentials for a specific translation engine (e
 class AbersetzConfig:
     """Aggregate configuration for the toolkit.
 
-The root configuration object holding defaults, credentials, and engine-specific setups."""
+    The root configuration object holding defaults, credentials, and engine-specific setups."""
 
     defaults: Defaults = field(default_factory=Defaults)
     credentials: dict[str, Credential] = field(default_factory=dict)
@@ -233,7 +234,7 @@ DEFAULT_CONFIG_DICT: dict[str, Any] = {
 def _default_dict() -> dict[str, Any]:
     """Return a deep copy of the default config mapping.
 
-Provides a safe, immutable baseline for creating new configs or restoring broken ones."""
+    Provides a safe, immutable baseline for creating new configs or restoring broken ones."""
     return copy.deepcopy(DEFAULT_CONFIG_DICT)
 
 
@@ -245,7 +246,7 @@ def _default_config() -> AbersetzConfig:
 def config_dir() -> Path:
     """Return the directory holding the configuration file.
 
-Respects the `ABERSETZ_CONFIG_DIR` env var if set, otherwise uses the OS-specific user config directory."""
+    Respects the `ABERSETZ_CONFIG_DIR` env var if set, otherwise uses the OS-specific user config directory."""
     custom = os.getenv("ABERSETZ_CONFIG_DIR")
     if custom:
         return Path(custom)
@@ -260,8 +261,8 @@ def config_path() -> Path:
 def load_config() -> AbersetzConfig:
     """Load configuration from disk, creating defaults if needed.
 
-If the file is missing, we create it. If it's corrupted, we back it up and create a fresh one.
-Returns a valid `AbersetzConfig` object no matter what."""
+    If the file is missing, we create it. If it's corrupted, we back it up and create a fresh one.
+    Returns a valid `AbersetzConfig` object no matter what."""
     from loguru import logger
 
     path = config_path()
@@ -288,10 +289,8 @@ Returns a valid `AbersetzConfig` object no matter what."""
             f"Resetting to defaults. Backup saved as config.toml.backup"
         )
         backup_path = path.parent / "config.toml.backup"
-        try:
+        with contextlib.suppress(Exception):  # pragma: no cover - best effort backup
             backup_path.write_text(content, encoding="utf-8")
-        except Exception:  # pragma: no cover - best effort backup
-            pass
         default = _default_config()
         save_config(default)
         return default

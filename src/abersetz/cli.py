@@ -253,7 +253,7 @@ def _collect_engine_entries(
 class ConfigCommands:
     """Configuration related helpers.
 
-Subcommands under `abersetz config` to show the current setup or print the config file path."""
+    Subcommands under `abersetz config` to show the current setup or print the config file path."""
 
     def show(self) -> str:
         cfg = load_config()
@@ -269,7 +269,7 @@ Subcommands under `abersetz config` to show the current setup or print the confi
 def _validate_language_code(code: str | None, param_name: str) -> str | None:
     """Validate language code format.
 
-Ensures the user didn't pass gibberish for a language code, though currently it mostly trusts the user."""
+    Ensures the user didn't pass gibberish for a language code, though currently it mostly trusts the user."""
     if code is None or code == "auto":
         return code
 
@@ -347,7 +347,7 @@ class AbersetzCLI:
     def version(self) -> str:
         """Show version information.
 
-Prints the current version of abersetz."""
+        Prints the current version of abersetz."""
         from . import __version__
 
         console.print(f"abersetz version {__version__}")
@@ -442,7 +442,7 @@ Prints the current version of abersetz."""
     ) -> None:
         """List available engines and whether they are configured.
 
-Prints a formatted table showing every engine we know about, whether you have it set up, and if it requires a paid API key."""
+        Prints a formatted table showing every engine we know about, whether you have it set up, and if it requires a paid API key."""
         entries = _collect_engine_entries(
             include_paid,
             family=family,
@@ -480,7 +480,7 @@ Prints a formatted table showing every engine we know about, whether you have it
     ) -> list[ValidationResult]:
         """Validate configured engines by translating a short phrase.
 
-Fires a test string ("Hello, world!") through the selected engines to measure latency and verify they actually work."""
+        Fires a test string ("Hello, world!") through the selected engines to measure latency and verify they actually work."""
 
         cfg = load_config()
         selector_tuple = _parse_patterns(selectors)
@@ -499,14 +499,14 @@ Fires a test string ("Hello, world!") through the selected engines to measure la
 def main() -> None:
     """Invoke the Fire CLI.
 
-Turns the `AbersetzCLI` class into a command-line application."""
+    Turns the `AbersetzCLI` class into a command-line application."""
     fire.Fire(AbersetzCLI())
 
 
 def abtr_main() -> None:
     """Direct translation CLI.
 
-A shortcut command. `abtr es file.txt` is exactly the same as `abersetz tr es file.txt`."""
+    A shortcut command. `abtr es file.txt` is exactly the same as `abersetz tr es file.txt`."""
 
     # Create CLI instance and call tr method directly
     cli = AbersetzCLI()

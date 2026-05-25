@@ -8,14 +8,31 @@ All notable changes to abersetz will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- Added `examples/benchmark.py` speed benchmarking tool to compare translation engine throughput and accuracy across providers, with auto-discovery for all 7 local Hy-MT2 MLX/GGUF models and local LMStudio servers.
+- Added `examples/README.md` explaining benchmark configuration, dry-runs, and option flags.
+- Added support for local `Hy-MT2` translation models (MLX and GGUF backends) with automatic resolution of local/LMStudio paths.
+- Added automatic model downloading from Hugging Face via `huggingface-hub` if not found locally.
+- Added prompt-level terminology intervention support for `Hy-MT2` models.
+- Added `huggingface-hub` production dependency.
 - Added optional local MLX/GGUF engines for HY-MT and TranslateGemma via `mthy` and `gemma` selectors.
 - Added `language-data` dependency to keep `langcodes` language-name lookups working in HYSF prompts.
 - Added CLI regression tests covering target-language guardrails, JSON prolog/voc ingestion, and option propagation.
 - Added CLI regression tests for include defaults and output directory resolution.
 - Added `--include-community` flag to `abersetz setup` for opting into community/self-hosted engines.
+- Added `pytest-asyncio` development dependency to support testing of async code.
 
 ### Changed
+- Rewrote `examples/` directory to keep only `./examples/data/` source files while deleting legacy scripts.
+- Rewrote `tests/test_examples.py` to cover the new benchmark runner.
+- Updated `get_engine_descriptor` helper in the benchmark runner to resolve short selectors to canonical config keys for correct descriptor output.
+- Refactored all translation engines/providers into separate modules inside `src/abersetz/providers/` for a cleaner architecture.
+- Removed support for legacy `Hy-MT1.x` models (which now raise an `EngineError` if loaded locally).
 - Removed assistant preamble/outro text from `README.md`.
+- Removed transient one-off files: `update_*.py` refactoring scripts, `md.txt`, and `translation_report.json`.
+
+### Fixed
+- Fixed `test_cli_setup_forwards_flags` to support `include_community` keyword argument.
+- Cleaned up lint warnings: fixed B904 (exception chaining via `from e`) in `src/abersetz/pipeline.py`, silenced useless expression warning B018 in `tests/test_package.py`, and refactored try-except-pass block in `src/abersetz/config.py` using `contextlib.suppress`.
 
 ## [1.0.19] - 2025-09-21
 

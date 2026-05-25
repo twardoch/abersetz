@@ -22,7 +22,7 @@ DEFAULT_PATTERNS = ("*.txt", "*.md", "*.mdx", "*.html", "*.htm")
 class TranslatorOptions:
     """Runtime options controlling translation behaviour.
 
-All the settings passed down from the CLI or library call: what engine to use, where to save things, what to include/exclude, etc."""
+    All the settings passed down from the CLI or library call: what engine to use, where to save things, what to include/exclude, etc."""
 
     engine: str | None = None
     from_lang: str | None = None
@@ -44,7 +44,7 @@ All the settings passed down from the CLI or library call: what engine to use, w
 class TranslationResult:
     """Information about a translated artefact.
 
-Returned when a file is finished. Tells you where the output was saved, what engine was used, how many chunks it took, and what vocabulary was accumulated."""
+    Returned when a file is finished. Tells you where the output was saved, what engine was used, how many chunks it took, and what vocabulary was accumulated."""
 
     source: Path
     destination: Path
@@ -60,7 +60,7 @@ Returned when a file is finished. Tells you where the output was saved, what eng
 class PipelineError(RuntimeError):
     """Raised when translation cannot proceed.
 
-Catch this if you pass a bad path, lack read permissions, or something breaks catastrophically in the middle of translation."""
+    Catch this if you pass a bad path, lack read permissions, or something breaks catastrophically in the middle of translation."""
 
 
 def translate_path(
@@ -72,7 +72,7 @@ def translate_path(
 ) -> list[TranslationResult]:
     """Translate a file or directory tree.
 
-The main entry point. Resolves paths, merges user options with defaults, finds all matching files, spins up the right engine, and feeds everything through the pipeline."""
+    The main entry point. Resolves paths, merges user options with defaults, finds all matching files, spins up the right engine, and feeds everything through the pipeline."""
     resolved = Path(path).resolve()
 
     # Validate input path exists and is accessible
@@ -88,7 +88,7 @@ The main entry point. Resolves paths, merges user options with defaults, finds a
             # Try to list directory to check read permissions
             list(resolved.iterdir())
     except (PermissionError, OSError) as e:
-        raise PipelineError(f"Cannot read {resolved}: {e}")
+        raise PipelineError(f"Cannot read {resolved}: {e}") from e
 
     cfg = config or load_config()
     opts = _merge_defaults(options, cfg)

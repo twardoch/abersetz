@@ -11,8 +11,8 @@ import tomllib
 from abersetz.chunking import TextFormat
 from abersetz.cli import (
     AbersetzCLI,
-    _collect_engine_entries,
     _build_options_from_cli,
+    _collect_engine_entries,
     _load_json_data,
     _parse_patterns,
     _render_engine_entries,
@@ -232,9 +232,9 @@ def test_build_options_defaults_include_when_none(tmp_path: Path) -> None:
         voc=None,
     )
 
-    assert (
-        options.include == TranslatorOptions().include
-    ), "Expected include to fall back to TranslatorOptions defaults"
+    assert options.include == TranslatorOptions().include, (
+        "Expected include to fall back to TranslatorOptions defaults"
+    )
 
 
 def test_build_options_resolves_output_dir(tmp_path: Path) -> None:
@@ -257,7 +257,9 @@ def test_build_options_resolves_output_dir(tmp_path: Path) -> None:
         voc=None,
     )
 
-    assert options.output_dir == output_dir.resolve(), "Expected output_dir to resolve to absolute path"
+    assert options.output_dir == output_dir.resolve(), (
+        "Expected output_dir to resolve to absolute path"
+    )
 
 
 def test_render_engine_entries_handles_empty(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -359,15 +361,15 @@ def _stub_engine_entries(monkeypatch: pytest.MonkeyPatch) -> AbersetzConfig:
     monkeypatch.setattr("abersetz.cli.load_config", lambda: cfg)
     monkeypatch.setattr(
         "abersetz.cli.collect_translator_providers",
-        lambda include_paid=False: ["bing", "google"]
-        if not include_paid
-        else ["bing", "google", "deepl"],
+        lambda include_paid=False: (
+            ["bing", "google"] if not include_paid else ["bing", "google", "deepl"]
+        ),
     )
     monkeypatch.setattr(
         "abersetz.cli.collect_deep_translator_providers",
-        lambda include_paid=False: ["deepl", "argos"]
-        if not include_paid
-        else ["deepl", "argos", "papago"],
+        lambda include_paid=False: (
+            ["deepl", "argos"] if not include_paid else ["deepl", "argos", "papago"]
+        ),
     )
     return cfg
 
@@ -757,17 +759,19 @@ def test_cli_validate_accepts_selector_string(monkeypatch: pytest.MonkeyPatch) -
 
 
 def test_cli_setup_forwards_flags(monkeypatch: pytest.MonkeyPatch) -> None:
-    calls: list[tuple[bool, bool]] = []
+    calls: list[tuple[bool, bool, bool]] = []
 
-    def fake_setup_command(*, non_interactive: bool, verbose: bool) -> None:
-        calls.append((non_interactive, verbose))
+    def fake_setup_command(
+        *, non_interactive: bool, verbose: bool, include_community: bool = False
+    ) -> None:
+        calls.append((non_interactive, verbose, include_community))
 
     monkeypatch.setattr("abersetz.cli.setup_command", fake_setup_command)
 
     cli = AbersetzCLI()
-    cli.setup(non_interactive=True, verbose=True)
+    cli.setup(non_interactive=True, verbose=True, include_community=True)
 
-    assert calls == [(True, True)]
+    assert calls == [(True, True, True)]
 
 
 def test_cli_main_invokes_fire(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -527,3 +527,122 @@ def test_local_gemma_gguf_engine_uses_structured_messages(
     messages = captured["call"]["messages"]
     assert messages[0]["content"][0]["source_lang_code"] == "en"
     assert messages[0]["content"][0]["target_lang_code"] == "fr"
+
+
+def test_local_mthy_mlx_engine_hymt2_prompt_with_terminology(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    model_dir = tmp_path / "mthy-mlx-hymt2"
+    model_dir.mkdir()
+    cfg = config_module.AbersetzConfig(
+        defaults=config_module.Defaults(engine="mthy"),
+        engines={
+            "mthy": config_module.EngineConfig(
+                name="mthy",
+                options={"backend": "mlx", "model_path": str(model_dir)},
+            )
+        },
+    )
+    tokenizer = SimpleNamespace(chat_template="template")
+    captured: dict[str, object] = {}
+
+    def fake_apply_chat_template(messages: list[dict[str, str]], **_: object) -> str:
+        captured["messages"] = messages
+        return "templated"
+
+    def fake_generate(*_: object, **kwargs: object) -> str:
+        captured["prompt"] = kwargs.get("prompt")
+        return "translated"
+
+    tokenizer.apply_chat_template = fake_apply_chat_template
+
+    def fake_load(_: str) -> tuple[object, object]:
+        return object(), tokenizer
+
+    fake_module = SimpleNamespace(load=fake_load, generate=fake_generate)
+    monkeypatch.setitem(sys.modules, "mlx_lm", fake_module)
+
+    engine = create_engine("mthy", cfg)
+    request = EngineRequest(
+        text="Hello",
+        source_lang="en",
+        target_lang="en",
+        is_html=False,
+        voc={"hello": "bonjour", "apple": "pomme"},
+        prolog={},
+        chunk_index=0,
+        total_chunks=1,
+    )
+    result = engine.translate(request)
+
+    assert result.text == "translated"
+    assert result.voc == {"hello": "bonjour", "apple": "pomme"}
+    assert captured["prompt"] == "templated"
+    message = captured["messages"][0]["content"]
+    assert "参考下面的翻译：" in message
+    assert "apple翻译成pomme" in message
+    assert "hello翻译成bonjour" in message
+    assert "将以下文本翻译为英语" in message
+
+
+def test_legacy_hymt1_models_raise_engine_error(tmp_path: Path) -> None:
+    # 1. Hunyuan-MT-7B (legacy Hy-MT1)
+    legacy_path = tmp_path / "Hunyuan-MT-7B"
+    legacy_path.mkdir()
+    cfg = config_module.AbersetzConfig(
+        defaults=config_module.Defaults(engine="mthy"),
+        engines={
+            "mthy": config_module.EngineConfig(
+                name="mthy",
+                options={"backend": "mlx", "model_path": str(legacy_path)},
+            )
+        },
+    )
+    with pytest.raises(EngineError, match="Hy-MT1.x models are no longer supported"):
+        create_engine("mthy", cfg)
+
+
+def test_resolve_and_download_model_uses_lmstudio_path(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    # Mock LMStudio path exists
+    lmstudio_dir = tmp_path / "QwQbb" / "Hy-MT2-30B-A3B-MLX-4bit"
+    lmstudio_dir.mkdir(parents=True)
+
+    # Patch the KNOWN_MAPPING dict entry to point to our temp lmstudio path
+    from abersetz.providers.mlx import KNOWN_MAPPING, resolve_and_download_model
+
+    original_path = KNOWN_MAPPING["QwQbb/Hy-MT2-30B-A3B-MLX-4bit"]["lmstudio_path"]
+    KNOWN_MAPPING["QwQbb/Hy-MT2-30B-A3B-MLX-4bit"]["lmstudio_path"] = str(lmstudio_dir)
+
+    try:
+        res = resolve_and_download_model("QwQbb/Hy-MT2-30B-A3B-MLX-4bit", "mlx")
+        assert res == str(lmstudio_dir.resolve())
+    finally:
+        KNOWN_MAPPING["QwQbb/Hy-MT2-30B-A3B-MLX-4bit"]["lmstudio_path"] = original_path
+
+
+def test_resolve_and_download_model_triggers_huggingface_download(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    # Ensure LMStudio path does NOT exist by patching it to a non-existent temp path
+    from abersetz.providers.mlx import KNOWN_MAPPING, resolve_and_download_model
+
+    original_path = KNOWN_MAPPING["p0we7/Hy-MT2-1.8B-oQ8-fp16"]["lmstudio_path"]
+    KNOWN_MAPPING["p0we7/Hy-MT2-1.8B-oQ8-fp16"]["lmstudio_path"] = "/nonexistent/lmstudio/path"
+
+    captured_repo = None
+
+    def fake_snapshot_download(repo_id: str) -> str:
+        nonlocal captured_repo
+        captured_repo = repo_id
+        return "/cached/huggingface/path"
+
+    monkeypatch.setattr("huggingface_hub.snapshot_download", fake_snapshot_download)
+
+    try:
+        res = resolve_and_download_model("p0we7/Hy-MT2-1.8B-oQ8-fp16", "mlx")
+        assert res == "/cached/huggingface/path"
+        assert captured_repo == "p0we7/Hy-MT2-1.8B-oQ8-fp16"
+    finally:
+        KNOWN_MAPPING["p0we7/Hy-MT2-1.8B-oQ8-fp16"]["lmstudio_path"] = original_path

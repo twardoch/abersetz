@@ -20,7 +20,7 @@ from .engines import EngineError, EngineRequest, create_engine
 class ValidationResult:
     """Outcome of validating a single engine selector.
 
-Tracks whether the test translation worked, how long it took, what the result was, or what exploded."""
+    Tracks whether the test translation worked, how long it took, what the result was, or what exploded."""
 
     selector: str
     success: bool
@@ -126,7 +126,7 @@ def validate_engines(
 ) -> list[ValidationResult]:
     """Validate configured engines by performing a tiny translation.
 
-Fires the test string through the engines, measures the time, and catches any errors. Used heavily by the `setup` wizard and `validate` CLI commands."""
+    Fires the test string through the engines, measures the time, and catches any errors. Used heavily by the `setup` wizard and `validate` CLI commands."""
 
     cfg = config or load_config()
     factory = create_engine_fn or create_engine

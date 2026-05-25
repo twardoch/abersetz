@@ -32,7 +32,7 @@ def _split_selector(selector: str) -> tuple[str, str | None]:
 def normalize_selector(selector: str | None) -> str | None:
     """Return canonical short selector for supported engine families.
 
-Turns things like `translators/google` into `tr/google`. Keeps the CLI and config tidy."""
+    Turns things like `translators/google` into `tr/google`. Keeps the CLI and config tidy."""
 
     if selector is None:
         return None
@@ -55,7 +55,7 @@ Turns things like `translators/google` into `tr/google`. Keeps the CLI and confi
 def resolve_engine_reference(selector: str) -> tuple[str, str | None]:
     """Resolve selector (short or long) into engine config key and variant.
 
-Turns `tr/google` into `("translators", "google")` so the factory knows exactly what to build."""
+    Turns `tr/google` into `("translators", "google")` so the factory knows exactly what to build."""
 
     base, variant = _split_selector(selector.strip()) if selector else ("", None)
     base_key = base.lower()
@@ -145,7 +145,7 @@ def _filter_available(pool: Iterable[str], allowed: Iterable[str]) -> list[str]:
 def collect_translator_providers(*, include_paid: bool = False) -> list[str]:
     """Return translator providers available in current environment.
 
-Checks what the `translators` library actually supports on your machine right now."""
+    Checks what the `translators` library actually supports on your machine right now."""
     try:
         import translators  # type: ignore
     except Exception:
@@ -160,7 +160,7 @@ Checks what the `translators` library actually supports on your machine right no
 def collect_deep_translator_providers(*, include_paid: bool = False) -> list[str]:
     """Return deep-translator providers supported by abersetz.
 
-Lists the `deep-translator` backends we know how to talk to."""
+    Lists the `deep-translator` backends we know how to talk to."""
     pool = list(DEEP_TRANSLATOR_FREE_PROVIDERS)
     if include_paid:
         pool.extend(DEEP_TRANSLATOR_PAID_PROVIDERS)
@@ -177,7 +177,7 @@ Lists the `deep-translator` backends we know how to talk to."""
 class EngineEntry:
     """Descriptor for CLI listing.
 
-Used by the `--list-engines` command to format output."""
+    Used by the `--list-engines` command to format output."""
 
     selector: str
     configured: bool

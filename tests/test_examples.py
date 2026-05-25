@@ -1,639 +1,313 @@
-"""Tests for example helper utilities."""
+"""Tests for the translation benchmark example utility."""
 # this_file: tests/test_examples.py
 
 from __future__ import annotations
 
-import asyncio
 import importlib.util
 import json
-import runpy
-import sys
-from collections.abc import Callable
-from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Protocol, cast
+from typing import Any
+from unittest.mock import patch
 
-import pytest  # type: ignore[import-not-found]
-
-from abersetz.chunking import TextFormat
-from abersetz.pipeline import TranslationResult, TranslatorOptions
+import pytest
 
 
-class _StubResult:
-    def __init__(
-        self, source: str, destination: str, *, fmt: TextFormat = TextFormat.PLAIN
-    ) -> None:
-        self.source = Path(source)
-        self.destination = Path(destination)
-        self.chunks = 2
-        self.format = fmt
-        self.voc = {"chunk_1": "HELLO"}
-
-
-class _BasicApiModule(Protocol):
-    translate_path: Callable[..., object]
-
-    def format_example_doc(self, func: Callable[..., object]) -> str: ...
-
-    def example_simple(self) -> None: ...
-
-    def example_batch(self) -> None: ...
-
-    def example_dry_run(self) -> None: ...
-
-    def example_html(self) -> None: ...
-
-    def example_with_config(self) -> None: ...
-
-    def example_llm_with_voc(self) -> None: ...
-
-    def cli(self, example: str | None = None) -> None: ...
-
-
-def _load_basic_api() -> _BasicApiModule:
-    module_path = Path(__file__).resolve().parents[1] / "examples" / "basic_api.py"
-    spec = importlib.util.spec_from_file_location("examples.basic_api", module_path)
-    if spec is None or spec.loader is None:  # pragma: no cover - defensive guard
-        raise RuntimeError("Unable to load examples.basic_api")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return cast(_BasicApiModule, module)
-
-
-basic_api = _load_basic_api()
-
-
-def _load_advanced_api():
-    module_path = Path(__file__).resolve().parents[1] / "examples" / "advanced_api.py"
-    spec = importlib.util.spec_from_file_location("examples.advanced_api", module_path)
-    if spec is None or spec.loader is None:  # pragma: no cover - defensive guard
-        raise RuntimeError("Unable to load examples.advanced_api")
+# Load benchmark module dynamically
+def _load_benchmark() -> Any:
+    module_path = Path(__file__).resolve().parents[1] / "examples" / "benchmark.py"
+    spec = importlib.util.spec_from_file_location("examples.benchmark", module_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Unable to load examples/benchmark.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
 
 
-advanced_api = _load_advanced_api()
+benchmark_mod = _load_benchmark()
+sanitize_name = benchmark_mod.sanitize_name
+get_engine_descriptor = benchmark_mod.get_engine_descriptor
+BenchmarkRunner = benchmark_mod.BenchmarkRunner
+main = benchmark_mod.main
 
 
-def test_format_example_doc_handles_none() -> None:
-    def _no_doc() -> None:  # pragma: no cover - doc intentionally missing
-        return None
+class DummyEngineConfig:
+    def __init__(
+        self, name: str, options: dict[str, Any], credential: dict[str, Any] | None = None
+    ) -> None:
+        self.name = name
+        self.options = options
+        self.credential = credential
+        self.chunk_size = options.get("chunk_size", 800)
+        self.html_chunk_size = options.get("html_chunk_size", 1200)
 
-    _no_doc.__doc__ = None
 
-    assert basic_api.format_example_doc(_no_doc) == "No description provided."
+class DummyConfig:
+    def __init__(self, engines: dict[str, Any]) -> None:
+        self.engines = engines
 
 
-def test_format_example_doc_strips_whitespace() -> None:
-    def _with_doc() -> None:
-        """Example description with padding"""
+def test_sanitize_name_when_input_has_special_chars_then_replaces_with_hyphens() -> None:
+    """Test sanitize_name replaces non-alphanumeric chars with hyphens."""
+    assert sanitize_name("engine/name-1.0") == "engine-name-1-0"
+    assert sanitize_name("some_model@name!") == "some_model-name"
 
-    assert basic_api.format_example_doc(_with_doc) == "Example description with padding"
 
+def test_sanitize_name_when_input_has_leading_trailing_hyphens_then_strips_them() -> None:
+    """Test sanitize_name strips leading/trailing hyphens."""
+    assert sanitize_name("---my-model---") == "my-model"
 
-def test_example_simple_outputs_summary(
-    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
-) -> None:
-    calls: dict[str, object] = {}
 
-    def fake_translate_path(path: str, options: TranslatorOptions) -> list[_StubResult]:
-        calls["path"] = path
-        calls["options"] = options
-        return [_StubResult("poem_en.txt", "translations/poem_es.txt")]
+def test_get_engine_descriptor_when_translators_then_returns_correct_prefix() -> None:
+    """Test get_engine_descriptor formatting for translators engine."""
+    engine_cfg = DummyEngineConfig("translators", {"provider": "google"})
+    cfg = DummyConfig({"translators": engine_cfg})
 
-    monkeypatch.setattr(basic_api, "translate_path", fake_translate_path)
+    # Variant specified in selector
+    assert get_engine_descriptor("translators/bing", cfg) == "tr-bing"
+    # Fallback to provider option
+    assert get_engine_descriptor("translators", cfg) == "tr-google"
 
-    basic_api.example_simple()
 
-    output = capsys.readouterr().out
-    assert "Translated poem_en.txt -> translations/poem_es.txt" in output
-    assert "Used 2 chunks in plain format" in output
+def test_get_engine_descriptor_when_deep_translator_then_returns_correct_prefix() -> None:
+    """Test get_engine_descriptor formatting for deep-translator engine."""
+    engine_cfg = DummyEngineConfig("deep-translator", {"provider": "my_memory"})
+    cfg = DummyConfig({"deep-translator": engine_cfg})
 
-    options = cast(TranslatorOptions, calls["options"])
-    assert options.to_lang == "es"
-    assert options.engine == "tr/google"
+    assert get_engine_descriptor("deep-translator/google", cfg) == "dt-google"
+    assert get_engine_descriptor("deep-translator", cfg) == "dt-my_memory"
 
 
-def test_example_batch_uses_include_filters(
-    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
-) -> None:
-    calls: dict[str, Any] = {}
+def test_get_engine_descriptor_when_hysf_then_returns_tencent_details() -> None:
+    """Test get_engine_descriptor formatting for hysf engine."""
+    engine_cfg = DummyEngineConfig("hysf", {"model": "Hunyuan-MT-7B"})
+    cfg = DummyConfig({"hysf": engine_cfg})
 
-    def fake_translate_path(path: str, options: TranslatorOptions) -> list[_StubResult]:
-        calls["path"] = path
-        calls["options"] = options
-        return [
-            _StubResult("file1.txt", "translations/fr/file1.txt"),
-            _StubResult("file2.md", "translations/fr/file2.md"),
-        ]
+    assert get_engine_descriptor("hysf", cfg) == "hysf-siliconflow-Hunyuan-MT-7B"
 
-    monkeypatch.setattr(basic_api, "translate_path", fake_translate_path)
 
-    basic_api.example_batch()
+def test_get_engine_descriptor_when_ullm_then_returns_profile_details() -> None:
+    """Test get_engine_descriptor formatting for ullm engine."""
+    profiles = {
+        "default": {"model": "Hunyuan-MT-7B"},
+        "custom": {"model": "my-custom-model"},
+    }
+    engine_cfg = DummyEngineConfig("ullm", {"profiles": profiles})
+    cfg = DummyConfig({"ullm": engine_cfg})
 
-    output = capsys.readouterr().out
-    assert "Translated 2 files" in output
+    assert get_engine_descriptor("ullm/default", cfg) == "ullm-default-Hunyuan-MT-7B"
+    assert get_engine_descriptor("ullm/custom", cfg) == "ullm-custom-my-custom-model"
+    # Default variant fallback
+    assert get_engine_descriptor("ullm", cfg) == "ullm-default-Hunyuan-MT-7B"
 
-    options = cast(TranslatorOptions, calls["options"])
-    assert options.include == ("*.txt", "*.md")
-    assert options.xclude == ("*_fr.txt", "*_fr.md")
-    assert options.output_dir == Path("translations/fr")
-    assert options.engine == "dt/google"
 
-
-def test_example_dry_run_lists_files(
-    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
-) -> None:
-    def fake_translate_path(path: str, options: TranslatorOptions) -> list[_StubResult]:
-        return [_StubResult("test_files/sample.txt", "unused/sample.txt")]
-
-    monkeypatch.setattr(basic_api, "translate_path", fake_translate_path)
-
-    basic_api.example_dry_run()
-
-    output = capsys.readouterr().out
-    assert "Would translate: test_files/sample.txt" in output
-
-
-def test_example_html_preserves_markup_intent(
-    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
-) -> None:
-    def fake_translate_path(path: str, options: TranslatorOptions) -> list[_StubResult]:
-        return [_StubResult("website/index.html", "translations/index.html", fmt=TextFormat.HTML)]
-
-    monkeypatch.setattr(basic_api, "translate_path", fake_translate_path)
-
-    basic_api.example_html()
-
-    output = capsys.readouterr().out
-    assert "HTML translation complete" in output
-
-
-def test_example_with_config_uses_modified_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
-    @dataclass
-    class _Defaults:
-        to_lang: str = "en"
-        chunk_size: int = 500
-
-    @dataclass
-    class _Config:
-        defaults: _Defaults = field(default_factory=_Defaults)
-        engines: dict[str, object] = field(default_factory=dict)
-
-    saved: dict[str, Any] = {}
-
-    config = _Config()
-
-    def fake_load_config() -> _Config:
-        return config
-
-    def fake_save_config(value: _Config) -> None:
-        saved["config"] = value
-
-    def fake_translate_path(
-        path: str, options: TranslatorOptions | None = None, *, config: _Config
-    ) -> list[_StubResult]:
-        saved["call_config"] = config
-        saved["options"] = options
-        return [_StubResult("document.txt", "document.txt")]
-
-    monkeypatch.setattr("abersetz.config.load_config", fake_load_config)
-    monkeypatch.setattr("abersetz.config.save_config", fake_save_config)
-    monkeypatch.setattr(basic_api, "translate_path", fake_translate_path)
-
-    basic_api.example_with_config()
-
-    assert saved["config"].defaults.to_lang == "es"
-    assert saved["config"].defaults.chunk_size == 1500
-    assert "custom_llm" in saved["config"].engines
-    options = cast(TranslatorOptions | None, saved["options"])
-    assert options is None
-    assert saved["call_config"] is config
-
-
-def test_example_llm_with_voc_reports_final_vocab(
-    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
-) -> None:
-    def fake_translate_path(path: str, options: TranslatorOptions) -> list[_StubResult]:
-        return [_StubResult("technical_doc.md", "outputs/technical_doc.md")]
-
-    monkeypatch.setattr(basic_api, "translate_path", fake_translate_path)
-
-    basic_api.example_llm_with_voc()
-
-    output = capsys.readouterr().out
-    assert "Final voc" in output
-
-
-def test_translation_workflow_translate_project_collects_results_and_errors(
-    monkeypatch: pytest.MonkeyPatch,
-    tmp_path: Path,
-) -> None:
-    collected: list[TranslationResult] = []
-
-    def fake_translate_path(path: str, options: TranslatorOptions, *, config: object | None = None):
-        if options.to_lang == "es":
-            result = TranslationResult(
-                source=tmp_path / "docs" / "index.md",
-                destination=tmp_path / "docs_es" / "index.md",
-                chunks=3,
-                voc={"hello": "hola"},
-                format=TextFormat.PLAIN,
-            )
-            collected.append(result)
-            return [result]
-        raise RuntimeError("boom")
-
-    monkeypatch.setattr(advanced_api, "translate_path", fake_translate_path)
-
-    workflow = advanced_api.TranslationWorkflow(config=advanced_api.AbersetzConfig())
-    workflow.translate_project(str(tmp_path / "docs"), ["es", "fr"], engine="tr/google")
-
-    assert [r.destination.parent.name for r in workflow.results] == ["docs_es"]
-    assert workflow.errors == {"fr": "boom"}
-    assert collected
-
-
-def test_translation_workflow_generate_report_creates_parent_dirs(tmp_path: Path) -> None:
-    workflow = advanced_api.TranslationWorkflow(config=advanced_api.AbersetzConfig())
-    workflow.results = [
-        TranslationResult(
-            source=tmp_path / "docs" / "alpha.md",
-            destination=tmp_path / "docs_es" / "alpha.md",
-            chunks=2,
-            voc={"one": "uno"},
-            format=TextFormat.PLAIN,
-        ),
-        TranslationResult(
-            source=tmp_path / "docs" / "beta.html",
-            destination=tmp_path / "docs_es" / "beta.html",
-            chunks=1,
-            voc={},
-            format=TextFormat.HTML,
-        ),
-    ]
-    workflow.errors = {"fr": "boom"}
-
-    target = tmp_path / "reports" / "daily" / "summary.json"
-    report = workflow.generate_report(str(target))
-
-    assert target.exists()
-    payload = json.loads(target.read_text())
-    assert payload["total_files"] == 2
-    assert payload["languages"]["es"]["files"] == 2
-    assert report["errors"] == {"fr": "boom"}
-
-
-def test_translation_workflow_lazy_loads_config(monkeypatch: pytest.MonkeyPatch) -> None:
-    sentinel = object()
-    calls = {"count": 0}
-
-    def fake_load_config() -> object:
-        calls["count"] += 1
-        return sentinel
-
-    monkeypatch.setattr(advanced_api, "load_config", fake_load_config)
-
-    workflow = advanced_api.TranslationWorkflow()
-    assert workflow.config is sentinel
-    assert calls["count"] == 1
-
-    provided = advanced_api.AbersetzConfig()
-    workflow_with_config = advanced_api.TranslationWorkflow(config=provided)
-    assert workflow_with_config.config is provided
-    assert calls["count"] == 1
-
-
-def test_voc_manager_translate_with_consistency_preserves_base_voc(
-    monkeypatch: pytest.MonkeyPatch,
-    capsys: pytest.CaptureFixture[str],
-) -> None:
-    manager = advanced_api.vocManager()
-    snapshots: list[dict[str, str]] = []
-    call_count = {"value": 0}
-
-    def fake_translate_path(path: str, options: TranslatorOptions) -> list[TranslationResult]:
-        call_count["value"] += 1
-        snapshots.append(dict(options.initial_voc))
-        voc_payload = {"First": "One"} if call_count["value"] == 1 else {"Second": "Two"}
-        return [
-            TranslationResult(
-                source=Path(path),
-                destination=Path("build") / Path(path).name,
-                chunks=1,
-                voc=voc_payload,
-                format=TextFormat.PLAIN,
-            )
-        ]
-
-    monkeypatch.setattr(advanced_api, "translate_path", fake_translate_path)
-
-    initial_results, initial_vocab = manager.translate_with_consistency(["doc.txt"], "es")
-    assert len(initial_results) == 1
-    assert initial_vocab == {"First": "One"}
-
-    base = {"Existing": "Value"}
-    followup_results, followup_vocab = manager.translate_with_consistency(
-        ["doc2.txt"],
-        "es",
-        base_voc=base,
+def test_get_engine_descriptor_when_mthy_or_gemma_then_returns_backend_details() -> None:
+    """Test get_engine_descriptor formatting for local engines like mthy and gemma."""
+    engine_cfg_mthy = DummyEngineConfig(
+        "mthy", {"backend": "mlx", "mlx_path": "/path/to/my-model-1.8B"}
     )
+    cfg = DummyConfig({"mthy": engine_cfg_mthy})
 
-    assert len(followup_results) == 1
-    assert followup_vocab == {"Existing": "Value", "Second": "Two"}
-    assert base == {"Existing": "Value"}
-    assert snapshots == [{}, {"Existing": "Value"}]
-
-    output = capsys.readouterr().out
-    assert "Translating doc.txt" in output
+    assert get_engine_descriptor("mthy/mlx", cfg) == "mthy-mlx-my-model-1-8B"
+    # Backend fallback
+    assert get_engine_descriptor("mthy", cfg) == "mthy-mlx-my-model-1-8B"
 
 
-def test_voc_manager_load_and_merge(tmp_path: Path) -> None:
-    manager = advanced_api.vocManager()
-
-    es_file = tmp_path / "en_es.json"
-    fr_file = tmp_path / "es_fr.json"
-    es_file.write_text(json.dumps({"hello": "hola"}), encoding="utf-8")
-    fr_file.write_text(json.dumps({"hola": "bonjour"}), encoding="utf-8")
-
-    manager.load_voc(str(es_file), "en-es")
-    manager.load_voc(str(fr_file), "es-fr")
-
-    merged = manager.merge_vocabularies("es-fr", "missing", "en-es")
-    assert merged == {"hola": "bonjour", "hello": "hola"}
+def test_get_engine_descriptor_when_unknown_engine_then_returns_sanitized_selector() -> None:
+    """Test get_engine_descriptor fallbacks for unknown engines."""
+    cfg = DummyConfig({})
+    assert get_engine_descriptor("unknown-engine/variant", cfg) == "unknown-engine-variant"
 
 
-@pytest.mark.asyncio
-async def test_parallel_translator_compare_translations_handles_failures(
-    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+def test_runner_run_when_dry_run_then_completes_successfully(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    sentinel_config = object()
-    monkeypatch.setattr(advanced_api, "load_config", lambda: sentinel_config)
+    """Test standard runner execution on dry-run mode."""
+    # Write temporary mock files inside examples/data
+    root_dir = tmp_path / "mock_project"
+    poem_dir = root_dir / "examples" / "data" / "poem"
+    fontlab_dir = root_dir / "examples" / "data" / "fontlab"
+    poem_dir.mkdir(parents=True)
+    fontlab_dir.mkdir(parents=True)
 
-    class _StubEngine:
-        def __init__(self, name: str) -> None:
-            self.name = name
+    poem_file = poem_dir / "poem.en.md"
+    fontlab_file = fontlab_dir / "fontlab-7-tldr.en.md"
 
-        def translate(self, request: Any):
-            assert request.target_lang == "es"
-            if self.name == "fail":
-                raise RuntimeError("kaboom")
-            return type("_Result", (), {"text": f"{request.text}-{self.name}"})()
+    poem_file.write_text("Poem text content", encoding="utf-8")
+    fontlab_file.write_text("Fontlab text content", encoding="utf-8")
 
-    def fake_create_engine(name: str, config: object):
-        assert config is sentinel_config
-        return _StubEngine(name)
+    # Mock Path resolution in benchmark to use our temp path
+    original_path = Path
 
-    monkeypatch.setattr(advanced_api, "create_engine", fake_create_engine)
+    def mock_path(*args: Any, **kwargs: Any) -> Any:
+        if args and isinstance(args[0], str) and "benchmark.py" in args[0]:
+            return original_path(root_dir / "examples" / "benchmark.py")
+        return original_path(*args, **kwargs)
 
-    translator = advanced_api.ParallelTranslator()
-    results = await translator.compare_translations("hello", ["ok", "fail"], "es")
+    monkeypatch.setattr(benchmark_mod, "Path", mock_path)
 
-    output = capsys.readouterr().out
-    assert "=== Translation Comparison ===" in output
-    assert results["ok"] == "hello-ok"
-    assert results["fail"].startswith("Error: kaboom")
+    # Mock translate_path to simulate translation
+    from abersetz.chunking import TextFormat
+    from abersetz.pipeline import TranslationResult
 
-
-def test_example_voc_consistency_writes_vocab(
-    monkeypatch: pytest.MonkeyPatch,
-    tmp_path: Path,
-    capsys: pytest.CaptureFixture[str],
-) -> None:
-    manager = advanced_api.vocManager()
-    expected_files = ["api_reference.md", "user_guide.md", "developer_docs.md"]
-
-    def fake_translate_with_consistency(
-        *, files: list[str], to_lang: str, base_voc: dict[str, str]
-    ):
-        assert files == expected_files
-        assert to_lang == "es"
-        assert base_voc["pipeline"] == "pipeline de procesamiento"
-        return (["result"], {"API": "API"})
-
-    monkeypatch.setattr(advanced_api, "vocManager", lambda: manager)
-    monkeypatch.setattr(manager, "translate_with_consistency", fake_translate_with_consistency)
-    monkeypatch.chdir(tmp_path)
-
-    advanced_api.example_voc_consistency()
-
-    payload = json.loads((tmp_path / "technical_voc_es.json").read_text())
-    assert payload == {"API": "API"}
-    output = capsys.readouterr().out
-    assert "Final voc has 1 terms" in output
-
-
-def test_example_parallel_comparison_invokes_async_run(
-    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
-) -> None:
-    translator = advanced_api.ParallelTranslator()
-
-    async def fake_compare(text: str, engines: list[str], to_lang: str):
-        assert to_lang == "fr"
-        assert engines[-1] == "hy"
-        return {engine: f"{engine}-ok" for engine in engines}
-
-    monkeypatch.setattr(advanced_api, "ParallelTranslator", lambda: translator)
-    monkeypatch.setattr(translator, "compare_translations", fake_compare)
-
-    calls: dict[str, bool] = {}
-
-    def fake_run(coro):
-        calls["ran"] = True
-        loop = asyncio.new_event_loop()
-        try:
-            return loop.run_until_complete(coro)
-        finally:
-            loop.close()
-
-    monkeypatch.setattr(advanced_api.asyncio, "run", fake_run)
-
-    advanced_api.example_parallel_comparison()
-
-    assert calls.get("ran") is True
-
-
-def test_example_incremental_translation_processes_files(
-    monkeypatch: pytest.MonkeyPatch,
-    tmp_path: Path,
-    capsys: pytest.CaptureFixture[str],
-) -> None:
-    monkeypatch.chdir(tmp_path)
-    docs_dir = tmp_path / "large_docs"
-    docs_dir.mkdir()
-    file_a = docs_dir / "a.md"
-    file_b = docs_dir / "b.md"
-    file_a.write_text("alpha")
-    file_b.write_text("beta")
-
-    call_count = {"value": 0}
-
-    def fake_translate_path(
-        path: str,
-        options: TranslatorOptions,
-        *,
-        config: object | None = None,
-    ) -> list[TranslationResult]:
-        call_count["value"] += 1
-        if call_count["value"] == 2:
-            raise RuntimeError("boom")
+    def mock_translate_path(source: Path, opts: Any, config: Any) -> list[TranslationResult]:
+        dest = source.parent / "pl" / source.name
         return [
             TranslationResult(
-                source=Path(path),
-                destination=Path(path).with_suffix(".out"),
+                source=source,
+                destination=dest,
                 chunks=1,
                 voc={},
                 format=TextFormat.PLAIN,
             )
         ]
 
-    monkeypatch.setattr(advanced_api, "translate_path", fake_translate_path)
+    monkeypatch.setattr(benchmark_mod, "translate_path", mock_translate_path)
 
-    advanced_api.example_incremental_translation()
+    # Instantiate runner and run with dry-run
+    runner = BenchmarkRunner()
+    runner.run(engines=["tr/google"], dry_run=True)
 
-    checkpoint = tmp_path / ".translation_checkpoint.json"
-    assert checkpoint.exists()
-    saved_paths = json.loads(checkpoint.read_text())
-    relative_paths = {str(file_a.relative_to(tmp_path)), str(file_b.relative_to(tmp_path))}
-    assert set(saved_paths).issubset(relative_paths)
-    assert len(saved_paths) == 1
-    output = capsys.readouterr().out
-    assert "Failed: boom" in output
+    # Verify that the expected json results file was created
+    results_json = root_dir / "examples" / "benchmark_results.json"
+    assert results_json.exists()
+
+    with open(results_json, encoding="utf-8") as f:
+        data = json.load(f)
+        assert len(data) == 2
+        assert data[0]["engine"] == "tr/google"
+        assert data[0]["success"] is True
 
 
-def test_example_incremental_translation_reuses_checkpoint(
-    monkeypatch: pytest.MonkeyPatch,
-    tmp_path: Path,
-    capsys: pytest.CaptureFixture[str],
+def test_runner_run_when_no_engines_specified_and_api_key_set_then_discovers_siliconflow(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.chdir(tmp_path)
-    docs_dir = tmp_path / "large_docs"
-    docs_dir.mkdir()
-    done_file = docs_dir / "done.md"
-    pending_file = docs_dir / "pending.md"
-    done_file.write_text("done", encoding="utf-8")
-    pending_file.write_text("pending", encoding="utf-8")
+    """Test runner engine auto-discovery logic when SILICONFLOW_API_KEY is present."""
+    root_dir = tmp_path / "mock_project"
+    poem_dir = root_dir / "examples" / "data" / "poem"
+    fontlab_dir = root_dir / "examples" / "data" / "fontlab"
+    poem_dir.mkdir(parents=True)
+    fontlab_dir.mkdir(parents=True)
 
-    checkpoint = tmp_path / ".translation_checkpoint.json"
-    checkpoint.write_text(json.dumps(["large_docs/done.md"]), encoding="utf-8")
+    poem_file = poem_dir / "poem.en.md"
+    fontlab_file = fontlab_dir / "fontlab-7-tldr.en.md"
+    poem_file.write_text("Poem text content", encoding="utf-8")
+    fontlab_file.write_text("Fontlab text content", encoding="utf-8")
 
-    def fake_translate_path(
-        path: str,
-        options: TranslatorOptions,
-        *,
-        config: object | None = None,
-    ) -> list[TranslationResult]:
-        assert path == "large_docs/pending.md"
+    # Mock Path resolution in benchmark to use our temp path
+    original_path = Path
+
+    def mock_path(*args: Any, **kwargs: Any) -> Any:
+        if args and isinstance(args[0], str) and "benchmark.py" in args[0]:
+            return original_path(root_dir / "examples" / "benchmark.py")
+        return original_path(*args, **kwargs)
+
+    monkeypatch.setattr(benchmark_mod, "Path", mock_path)
+    monkeypatch.setenv("SILICONFLOW_API_KEY", "mock-key")
+
+    mock_cfg = DummyConfig(
+        {
+            "hysf": DummyEngineConfig("hysf", {}),
+            "ullm": DummyEngineConfig("ullm", {}),
+            "translators": DummyEngineConfig("translators", {}),
+            "deep-translator": DummyEngineConfig("deep-translator", {}),
+        }
+    )
+    monkeypatch.setattr(benchmark_mod, "load_config", lambda: mock_cfg)
+
+    recorded_engines = []
+
+    def mock_translate_path(source: Path, opts: Any, config: Any) -> list[Any]:
+        if opts.engine not in recorded_engines:
+            recorded_engines.append(opts.engine)
+        dest = source.parent / "pl" / source.name
         return [
             TranslationResult(
-                source=Path(path),
-                destination=Path(path).with_suffix(".out"),
+                source=source,
+                destination=dest,
                 chunks=1,
                 voc={},
                 format=TextFormat.PLAIN,
             )
         ]
 
-    monkeypatch.setattr(advanced_api, "translate_path", fake_translate_path)
+    from abersetz.chunking import TextFormat
+    from abersetz.pipeline import TranslationResult
 
-    advanced_api.example_incremental_translation()
+    monkeypatch.setattr(benchmark_mod, "translate_path", mock_translate_path)
 
-    saved = json.loads(checkpoint.read_text(encoding="utf-8"))
-    assert sorted(saved) == ["large_docs/done.md", "large_docs/pending.md"]
-    output = capsys.readouterr().out
-    assert "Already completed: 1 files" in output
-    assert "Saved to" in output
+    runner = BenchmarkRunner()
+    # Run with engines=None to trigger auto-discovery
+    runner.run(engines=None, dry_run=True)
+
+    # Auto-discovered engines should include standard translators plus hysf/ullm when API key is set
+    assert "hysf" in recorded_engines
+    assert "ullm/default" in recorded_engines
 
 
-def test_basic_api_cli_dispatch_runs_requested_example(
-    monkeypatch: pytest.MonkeyPatch,
-    capsys: pytest.CaptureFixture[str],
+def test_runner_run_when_translate_path_raises_exception_then_captures_failure(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    module_path = Path(__file__).resolve().parents[1] / "examples" / "basic_api.py"
-    calls: dict[str, object] = {}
+    """Test runner handles exceptions raised by translate_path gracefully."""
+    root_dir = tmp_path / "mock_project"
+    poem_dir = root_dir / "examples" / "data" / "poem"
+    fontlab_dir = root_dir / "examples" / "data" / "fontlab"
+    poem_dir.mkdir(parents=True)
+    fontlab_dir.mkdir(parents=True)
 
-    def fake_translate_path(path: str, options: TranslatorOptions) -> list[_StubResult]:
-        calls["path"] = path
-        calls["options"] = options
-        return [_StubResult("poem_en.txt", "translations/poem_es.txt")]
+    poem_file = poem_dir / "poem.en.md"
+    fontlab_file = fontlab_dir / "fontlab-7-tldr.en.md"
+    poem_file.write_text("Poem text content", encoding="utf-8")
+    fontlab_file.write_text("Fontlab text content", encoding="utf-8")
 
-    monkeypatch.setattr("abersetz.translate_path", fake_translate_path)
-    monkeypatch.setattr(sys, "argv", [str(module_path), "simple"])
+    # Mock Path resolution in benchmark to use our temp path
+    original_path = Path
 
-    runpy.run_path(str(module_path), run_name="__main__")
+    def mock_path(*args: Any, **kwargs: Any) -> Any:
+        if args and isinstance(args[0], str) and "benchmark.py" in args[0]:
+            return original_path(root_dir / "examples" / "benchmark.py")
+        return original_path(*args, **kwargs)
 
-    output = capsys.readouterr().out
-    assert "Usage" not in output
-    assert calls["path"] == "poem_en.txt"
-    options = cast(TranslatorOptions, calls["options"])
-    assert options.to_lang == "es"
-    assert options.engine == "tr/google"
+    monkeypatch.setattr(benchmark_mod, "Path", mock_path)
+
+    def mock_translate_path_failed(source: Path, opts: Any, config: Any) -> list[Any]:
+        raise RuntimeError("Network rate limit exceeded")
+
+    monkeypatch.setattr(benchmark_mod, "translate_path", mock_translate_path_failed)
+
+    runner = BenchmarkRunner()
+    runner.run(engines=["tr/google"], dry_run=True)
+
+    results_json = root_dir / "examples" / "benchmark_results.json"
+    with open(results_json, encoding="utf-8") as f:
+        data = json.load(f)
+        assert data[0]["success"] is False
+        assert "Network rate limit exceeded" in data[0]["error"]
 
 
-def test_basic_api_cli_usage_banner(
-    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+def test_runner_run_when_source_files_missing_then_exits_with_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    module_path = Path(__file__).resolve().parents[1] / "examples" / "basic_api.py"
-    monkeypatch.setattr(sys, "argv", [str(module_path)])
+    """Test runner exits when the test documents are not found."""
+    root_dir = tmp_path / "mock_project"
 
-    runpy.run_path(str(module_path), run_name="__main__")
+    # Mock Path resolution in benchmark to use our temp path
+    original_path = Path
 
-    output = capsys.readouterr().out
-    assert "Usage:" in output
-    assert "Available examples" in output
+    def mock_path(*args: Any, **kwargs: Any) -> Any:
+        if args and isinstance(args[0], str) and "benchmark.py" in args[0]:
+            return original_path(root_dir / "examples" / "benchmark.py")
+        return original_path(*args, **kwargs)
 
+    monkeypatch.setattr(benchmark_mod, "Path", mock_path)
 
-def test_advanced_api_cli_dispatch_runs_requested_example(
-    monkeypatch: pytest.MonkeyPatch,
-    capsys: pytest.CaptureFixture[str],
-) -> None:
-    module_path = Path(__file__).resolve().parents[1] / "examples" / "advanced_api.py"
-    captured_paths: list[str] = []
-    captured_engines: list[str] = []
-
-    def fake_translate_path(
-        path: str,
-        options: TranslatorOptions,
-        *,
-        config: object | None = None,
-    ) -> list[TranslationResult]:
-        captured_paths.append(path)
-        engine = options.engine
-        assert engine is not None
-        captured_engines.append(engine)
-        return [
-            TranslationResult(
-                source=Path(path),
-                destination=Path("build") / Path(path).name,
-                chunks=1,
-                voc={},
-                format=TextFormat.PLAIN,
-            )
-        ]
-
-    monkeypatch.setattr("abersetz.translate_path", fake_translate_path)
-    monkeypatch.setattr("abersetz.config.load_config", lambda: advanced_api.AbersetzConfig())
-    monkeypatch.setattr(sys, "argv", [str(module_path), "multi"])
-
-    runpy.run_path(str(module_path), run_name="__main__")
-
-    output = capsys.readouterr().out
-    assert "Translating to es" in output
-    assert captured_paths and captured_paths[0] == "docs"
-    assert captured_engines and captured_engines[0] == "tr/google"
+    runner = BenchmarkRunner()
+    with pytest.raises(SystemExit) as excinfo:
+        runner.run()
+    assert excinfo.value.code == 1
 
 
-def test_advanced_api_cli_usage_banner(
-    monkeypatch: pytest.MonkeyPatch,
-    capsys: pytest.CaptureFixture[str],
-) -> None:
-    module_path = Path(__file__).resolve().parents[1] / "examples" / "advanced_api.py"
-    monkeypatch.setattr(sys, "argv", [str(module_path)])
-    monkeypatch.setattr("abersetz.config.load_config", lambda: advanced_api.AbersetzConfig())
-
-    runpy.run_path(str(module_path), run_name="__main__")
-
-    output = capsys.readouterr().out
-    assert "Usage:" in output
-    assert "Advanced examples:" in output
+def test_main_when_called_then_invokes_fire() -> None:
+    """Test main function invokes fire.Fire correctly."""
+    with patch("fire.Fire") as mock_fire:
+        main()
+        mock_fire.assert_called_once_with(BenchmarkRunner)

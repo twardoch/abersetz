@@ -16,7 +16,7 @@ def test_getattr_rejects_unknown_symbol() -> None:
     import abersetz
 
     with pytest.raises(AttributeError) as excinfo:
-        abersetz.not_real_attribute
+        abersetz.not_real_attribute  # noqa: B018
 
     assert "not_real_attribute" in str(excinfo.value)
 

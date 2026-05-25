@@ -3,6 +3,32 @@ this_file: WORK.md
 ---
 # Work Log
 
+## 2026-05-25
+### Fully Rewrote Examples Directory and Implemented Translation Benchmark
+- Fully rewrote the `examples/` directory, keeping `examples/data/` while deleting legacy example scripts.
+- Implemented `examples/benchmark.py` with dynamic engine/credential discovery, output naming to `poem.pl--NNN.md` and `fontlab-7-tldr.pl--NNN.md` format, and speed benchmarking.
+- Expanded the benchmark to auto-discover and support all 7 local Hy-MT2 MLX & GGUF models directly, as well as local LMStudio API configurations.
+- Added a conditional mocking context manager to `examples/benchmark.py` so that dry-runs execute instantly, offline, and rate-safe for all 14 engine targets without calling remote APIs.
+- Fixed `get_engine_descriptor` config resolution to map short selector names to their long config counterparts for proper descriptor generation (e.g. `tr` -> `translators`), and correctly resolved local model names.
+- Rewrote `tests/test_examples.py` to cover the new benchmark runner with unit and integration tests, achieving 100% test coverage.
+- Ran the benchmark to translate `poem.en.md` and `fontlab-7-tldr.en.md` to Polish using `tr/google` and `dt/google` engines, saving the output translations to their respective folders.
+- Verified and ran all 187 project tests, which passed successfully.
+
+### Split Providers and Added Hy-MT2 Support
+- Refactored all engine providers out of `engines.py` into separate modules under `src/abersetz/providers/` (base, mlx, gguf, translators, deep_translator, llm, hysf).
+- Added support for local `Hy-MT2` models (MLX and GGUF backends) with automatic resolution of local/LMStudio paths.
+- Added automatic model downloading from Hugging Face via `huggingface-hub` if not found locally.
+- Added prompt-level terminology intervention support for `Hy-MT2` models.
+- Removed support for legacy `Hy-MT1.x` models (raising `EngineError` if loaded locally).
+- Tests: ran the comprehensive test suite (`pytest`) and type safety checks (`mypy`); all 196 tests passed cleanly and typechecking succeeded.
+
+### Repo Cleanup and Dependency Fixes
+- Removed transient one-off files: `update_*.py` refactoring scripts, `md.txt`, and `translation_report.json`.
+- Added `pytest-asyncio` development dependency to support testing of async code.
+- Fixed `test_cli_setup_forwards_flags` to support `include_community` keyword argument.
+- Cleaned up lint warnings: fixed B904 (exception chaining via `from e`) in `src/abersetz/pipeline.py`, silenced useless expression warning B018 in `tests/test_package.py`, and refactored try-except-pass block in `src/abersetz/config.py` using `contextlib.suppress`.
+- Tests: ran linting (`ruff`), syntax updates (`pyupgrade`), formatting, and verified the entire suite passes cleanly under `uv run pytest` and `uvx hatch test`.
+
 ## 2026-01-20
 ### Setup Community Provider Opt-In
 - Added `--include-community` flag for setup and filtered community/self-hosted providers unless requested.

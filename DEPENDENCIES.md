@@ -1,3 +1,6 @@
+---
+this_file: DEPENDENCIES.md
+---
 # Dependencies
 
 ## Production Dependencies
@@ -24,12 +27,15 @@
 ### Optional Local Engines
 - **mlx-lm**: Enables local MLX inference for HY-MT and TranslateGemma (`mthy/mlx`, `gemma/mlx`).
 - **llama-cpp-python**: Enables local GGUF inference for HY-MT and TranslateGemma (`mthy/gguf`, `gemma/gguf`).
+- **huggingface-hub**: Enables automatic downloading and resolution of local models from Hugging Face.
+
 
 ## Development Dependencies
 
 ### Testing
 - **pytest** (>=8.3): Testing framework with fixtures and plugins.
 - **pytest-cov** (>=6.0): Coverage reporting for pytest.
+- **pytest-asyncio** (>=1.3.0): Pytest plugin for testing async code.
 
 ### Code Quality
 - **ruff** (>=0.9): Fast linter and formatter. Replaces black, flake8, isort, and others.
