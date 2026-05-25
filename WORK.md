@@ -4,6 +4,11 @@ this_file: WORK.md
 # Work Log
 
 ## 2026-05-25
+### Fixed PyPI Publishing Flow
+- Updated `publish.sh` to clean the `dist/` directory before building the test/dev packages and before building the final release package.
+- This prevents PyPI from rejecting uploads due to the presence of local development version identifiers (with a `+` suffix, e.g. `1.0.23.dev1+gc17a1f7d3.d20260525`) in the `dist/` folder.
+- Verified that all 187 tests pass successfully.
+
 ### Fully Rewrote Examples Directory and Implemented Translation Benchmark
 - Fully rewrote the `examples/` directory, keeping `examples/data/` while deleting legacy example scripts.
 - Implemented `examples/benchmark.py` with dynamic engine/credential discovery, output naming to `poem.pl--NNN.md` and `fontlab-7-tldr.pl--NNN.md` format, and speed benchmarking.

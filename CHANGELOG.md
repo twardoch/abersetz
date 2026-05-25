@@ -31,6 +31,7 @@ All notable changes to abersetz will be documented in this file.
 - Removed transient one-off files: `update_*.py` refactoring scripts, `md.txt`, and `translation_report.json`.
 
 ### Fixed
+- Fixed PyPI publishing flow in `publish.sh` by cleaning the `dist/` directory before building the release package, preventing local development version files from being uploaded and rejected by PyPI due to local version identifier restrictions.
 - Fixed `test_cli_setup_forwards_flags` to support `include_community` keyword argument.
 - Cleaned up lint warnings: fixed B904 (exception chaining via `from e`) in `src/abersetz/pipeline.py`, silenced useless expression warning B018 in `tests/test_package.py`, and refactored try-except-pass block in `src/abersetz/config.py` using `contextlib.suppress`.
 
