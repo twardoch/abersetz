@@ -1,0 +1,2148 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 20,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": ".pre-commit-config.yaml",
+      "language": "yaml",
+      "fileCategory": "config",
+      "totalLines": 19,
+      "nonEmptyLines": 19,
+      "sections": [
+        {
+          "heading": "repos",
+          "level": 1,
+          "line": 1
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 1
+      }
+    },
+    {
+      "path": "AGENTS.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 347,
+      "nonEmptyLines": 277,
+      "sections": [
+        {
+          "heading": "Development guidelines",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Foundation: Challenge your first instinct with chain-of-thought",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "CoT reasoning template",
+          "level": 3,
+          "line": 7
+        },
+        {
+          "heading": "No sycophancy, accuracy first",
+          "level": 2,
+          "line": 15
+        },
+        {
+          "heading": "Complete execution",
+          "level": 2,
+          "line": 26
+        },
+        {
+          "heading": "Absolute priority: never overcomplicate, always verify",
+          "level": 2,
+          "line": 33
+        },
+        {
+          "heading": "Verification workflow: mandatory",
+          "level": 2,
+          "line": 43
+        },
+        {
+          "heading": "Before writing any code",
+          "level": 2,
+          "line": 52
+        },
+        {
+          "heading": "Never assume: always verify",
+          "level": 2,
+          "line": 60
+        },
+        {
+          "heading": "Test-first development",
+          "level": 2,
+          "line": 70
+        },
+        {
+          "heading": "Complexity detection triggers: rethink your approach immediately",
+          "level": 2,
+          "line": 82
+        },
+        {
+          "heading": "Before starting any work",
+          "level": 2,
+          "line": 95
+        },
+        {
+          "heading": "Project documentation to maintain",
+          "level": 2,
+          "line": 104
+        },
+        {
+          "heading": "Code quality standards",
+          "level": 2,
+          "line": 113
+        },
+        {
+          "heading": "Testing standards",
+          "level": 2,
+          "line": 126
+        },
+        {
+          "heading": "Tool usage",
+          "level": 2,
+          "line": 138
+        },
+        {
+          "heading": "File path tracking",
+          "level": 2,
+          "line": 144
+        },
+        {
+          "heading": "For Python",
+          "level": 2,
+          "line": 153
+        },
+        {
+          "heading": "Package-first Python",
+          "level": 3,
+          "line": 172
+        },
+        {
+          "heading": "Python CLI scripts",
+          "level": 3,
+          "line": 184
+        },
+        {
+          "heading": "Post-work activities",
+          "level": 2,
+          "line": 196
+        },
+        {
+          "heading": "Critical reflection",
+          "level": 3,
+          "line": 198
+        },
+        {
+          "heading": "Documentation updates",
+          "level": 3,
+          "line": 207
+        },
+        {
+          "heading": "Special commands",
+          "level": 2,
+          "line": 214
+        },
+        {
+          "heading": "/plan command: transform requirements into detailed plans",
+          "level": 3,
+          "line": 216
+        },
+        {
+          "heading": "/report command",
+          "level": 3,
+          "line": 261
+        },
+        {
+          "heading": "/work command",
+          "level": 4,
+          "line": 269
+        },
+        {
+          "heading": "/test command: run comprehensive tests",
+          "level": 4,
+          "line": 285
+        },
+        {
+          "heading": "Anti-enterprise bloat guidelines",
+          "level": 2,
+          "line": 295
+        },
+        {
+          "heading": "RED LIST: NEVER ADD these unless requested",
+          "level": 3,
+          "line": 303
+        },
+        {
+          "heading": "GREEN LIST: what is appropriate",
+          "level": 3,
+          "line": 319
+        },
+        {
+          "heading": "Prose",
+          "level": 2,
+          "line": 329
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 32
+      }
+    },
+    {
+      "path": "CHANGELOG.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 159,
+      "nonEmptyLines": 136,
+      "sections": [
+        {
+          "heading": "Changelog",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "[Unreleased]",
+          "level": 2,
+          "line": 8
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 10
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 37
+        },
+        {
+          "heading": "Fixed",
+          "level": 3,
+          "line": 55
+        },
+        {
+          "heading": "[1.0.19] - 2025-09-21",
+          "level": 2,
+          "line": 74
+        },
+        {
+          "heading": "Highlights",
+          "level": 3,
+          "line": 76
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 81
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 87
+        },
+        {
+          "heading": "Fixed",
+          "level": 3,
+          "line": 92
+        },
+        {
+          "heading": "Documentation",
+          "level": 3,
+          "line": 97
+        },
+        {
+          "heading": "Testing & Quality",
+          "level": 3,
+          "line": 101
+        },
+        {
+          "heading": "[0.1.0] - 2025-01-20",
+          "level": 2,
+          "line": 106
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 108
+        },
+        {
+          "heading": "Fixed",
+          "level": 3,
+          "line": 126
+        },
+        {
+          "heading": "[0.1.1] - 2025-01-21",
+          "level": 2,
+          "line": 131
+        },
+        {
+          "heading": "Changed",
+          "level": 3,
+          "line": 133
+        },
+        {
+          "heading": "Added",
+          "level": 3,
+          "line": 140
+        },
+        {
+          "heading": "Fixed",
+          "level": 3,
+          "line": 144
+        },
+        {
+          "heading": "Improved",
+          "level": 3,
+          "line": 149
+        },
+        {
+          "heading": "Technical Details",
+          "level": 3,
+          "line": 154
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 21
+      }
+    },
+    {
+      "path": "CLAUDE.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 347,
+      "nonEmptyLines": 277,
+      "sections": [
+        {
+          "heading": "Development guidelines",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Foundation: Challenge your first instinct with chain-of-thought",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "CoT reasoning template",
+          "level": 3,
+          "line": 7
+        },
+        {
+          "heading": "No sycophancy, accuracy first",
+          "level": 2,
+          "line": 15
+        },
+        {
+          "heading": "Complete execution",
+          "level": 2,
+          "line": 26
+        },
+        {
+          "heading": "Absolute priority: never overcomplicate, always verify",
+          "level": 2,
+          "line": 33
+        },
+        {
+          "heading": "Verification workflow: mandatory",
+          "level": 2,
+          "line": 43
+        },
+        {
+          "heading": "Before writing any code",
+          "level": 2,
+          "line": 52
+        },
+        {
+          "heading": "Never assume: always verify",
+          "level": 2,
+          "line": 60
+        },
+        {
+          "heading": "Test-first development",
+          "level": 2,
+          "line": 70
+        },
+        {
+          "heading": "Complexity detection triggers: rethink your approach immediately",
+          "level": 2,
+          "line": 82
+        },
+        {
+          "heading": "Before starting any work",
+          "level": 2,
+          "line": 95
+        },
+        {
+          "heading": "Project documentation to maintain",
+          "level": 2,
+          "line": 104
+        },
+        {
+          "heading": "Code quality standards",
+          "level": 2,
+          "line": 113
+        },
+        {
+          "heading": "Testing standards",
+          "level": 2,
+          "line": 126
+        },
+        {
+          "heading": "Tool usage",
+          "level": 2,
+          "line": 138
+        },
+        {
+          "heading": "File path tracking",
+          "level": 2,
+          "line": 144
+        },
+        {
+          "heading": "For Python",
+          "level": 2,
+          "line": 153
+        },
+        {
+          "heading": "Package-first Python",
+          "level": 3,
+          "line": 172
+        },
+        {
+          "heading": "Python CLI scripts",
+          "level": 3,
+          "line": 184
+        },
+        {
+          "heading": "Post-work activities",
+          "level": 2,
+          "line": 196
+        },
+        {
+          "heading": "Critical reflection",
+          "level": 3,
+          "line": 198
+        },
+        {
+          "heading": "Documentation updates",
+          "level": 3,
+          "line": 207
+        },
+        {
+          "heading": "Special commands",
+          "level": 2,
+          "line": 214
+        },
+        {
+          "heading": "/plan command: transform requirements into detailed plans",
+          "level": 3,
+          "line": 216
+        },
+        {
+          "heading": "/report command",
+          "level": 3,
+          "line": 261
+        },
+        {
+          "heading": "/work command",
+          "level": 4,
+          "line": 269
+        },
+        {
+          "heading": "/test command: run comprehensive tests",
+          "level": 4,
+          "line": 285
+        },
+        {
+          "heading": "Anti-enterprise bloat guidelines",
+          "level": 2,
+          "line": 295
+        },
+        {
+          "heading": "RED LIST: NEVER ADD these unless requested",
+          "level": 3,
+          "line": 303
+        },
+        {
+          "heading": "GREEN LIST: what is appropriate",
+          "level": 3,
+          "line": 319
+        },
+        {
+          "heading": "Prose",
+          "level": 2,
+          "line": 329
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 32
+      }
+    },
+    {
+      "path": "DEPENDENCIES.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 73,
+      "nonEmptyLines": 55,
+      "sections": [
+        {
+          "heading": "Dependencies",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "Production Dependencies",
+          "level": 2,
+          "line": 6
+        },
+        {
+          "heading": "Translation Engines",
+          "level": 3,
+          "line": 8
+        },
+        {
+          "heading": "CLI and User Interface",
+          "level": 3,
+          "line": 13
+        },
+        {
+          "heading": "Core Utilities",
+          "level": 3,
+          "line": 19
+        },
+        {
+          "heading": "Optional Local Engines",
+          "level": 3,
+          "line": 27
+        },
+        {
+          "heading": "Development Dependencies",
+          "level": 2,
+          "line": 34
+        },
+        {
+          "heading": "Testing",
+          "level": 3,
+          "line": 36
+        },
+        {
+          "heading": "Code Quality",
+          "level": 3,
+          "line": 41
+        },
+        {
+          "heading": "Why These Packages?",
+          "level": 2,
+          "line": 45
+        },
+        {
+          "heading": "Verification Log",
+          "level": 2,
+          "line": 59
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 11
+      }
+    },
+    {
+      "path": "GEMINI.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 347,
+      "nonEmptyLines": 277,
+      "sections": [
+        {
+          "heading": "Development guidelines",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Foundation: Challenge your first instinct with chain-of-thought",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "CoT reasoning template",
+          "level": 3,
+          "line": 7
+        },
+        {
+          "heading": "No sycophancy, accuracy first",
+          "level": 2,
+          "line": 15
+        },
+        {
+          "heading": "Complete execution",
+          "level": 2,
+          "line": 26
+        },
+        {
+          "heading": "Absolute priority: never overcomplicate, always verify",
+          "level": 2,
+          "line": 33
+        },
+        {
+          "heading": "Verification workflow: mandatory",
+          "level": 2,
+          "line": 43
+        },
+        {
+          "heading": "Before writing any code",
+          "level": 2,
+          "line": 52
+        },
+        {
+          "heading": "Never assume: always verify",
+          "level": 2,
+          "line": 60
+        },
+        {
+          "heading": "Test-first development",
+          "level": 2,
+          "line": 70
+        },
+        {
+          "heading": "Complexity detection triggers: rethink your approach immediately",
+          "level": 2,
+          "line": 82
+        },
+        {
+          "heading": "Before starting any work",
+          "level": 2,
+          "line": 95
+        },
+        {
+          "heading": "Project documentation to maintain",
+          "level": 2,
+          "line": 104
+        },
+        {
+          "heading": "Code quality standards",
+          "level": 2,
+          "line": 113
+        },
+        {
+          "heading": "Testing standards",
+          "level": 2,
+          "line": 126
+        },
+        {
+          "heading": "Tool usage",
+          "level": 2,
+          "line": 138
+        },
+        {
+          "heading": "File path tracking",
+          "level": 2,
+          "line": 144
+        },
+        {
+          "heading": "For Python",
+          "level": 2,
+          "line": 153
+        },
+        {
+          "heading": "Package-first Python",
+          "level": 3,
+          "line": 172
+        },
+        {
+          "heading": "Python CLI scripts",
+          "level": 3,
+          "line": 184
+        },
+        {
+          "heading": "Post-work activities",
+          "level": 2,
+          "line": 196
+        },
+        {
+          "heading": "Critical reflection",
+          "level": 3,
+          "line": 198
+        },
+        {
+          "heading": "Documentation updates",
+          "level": 3,
+          "line": 207
+        },
+        {
+          "heading": "Special commands",
+          "level": 2,
+          "line": 214
+        },
+        {
+          "heading": "/plan command: transform requirements into detailed plans",
+          "level": 3,
+          "line": 216
+        },
+        {
+          "heading": "/report command",
+          "level": 3,
+          "line": 261
+        },
+        {
+          "heading": "/work command",
+          "level": 4,
+          "line": 269
+        },
+        {
+          "heading": "/test command: run comprehensive tests",
+          "level": 4,
+          "line": 285
+        },
+        {
+          "heading": "Anti-enterprise bloat guidelines",
+          "level": 2,
+          "line": 295
+        },
+        {
+          "heading": "RED LIST: NEVER ADD these unless requested",
+          "level": 3,
+          "line": 303
+        },
+        {
+          "heading": "GREEN LIST: what is appropriate",
+          "level": 3,
+          "line": 319
+        },
+        {
+          "heading": "Prose",
+          "level": 2,
+          "line": 329
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 32
+      }
+    },
+    {
+      "path": "IDEA.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 169,
+      "nonEmptyLines": 142,
+      "sections": [
+        {
+          "heading": "@TASKS.md",
+          "level": 2,
+          "line": 5
+        },
+        {
+          "heading": "@TODO.md",
+          "level": 2,
+          "line": 101
+        },
+        {
+          "heading": "@README.md",
+          "level": 2,
+          "line": 132
+        },
+        {
+          "heading": "Translate a file or",
+          "level": 1,
+          "line": 169
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 4
+      }
+    },
+    {
+      "path": "LLXPRT.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 347,
+      "nonEmptyLines": 277,
+      "sections": [
+        {
+          "heading": "Development guidelines",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Foundation: Challenge your first instinct with chain-of-thought",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "CoT reasoning template",
+          "level": 3,
+          "line": 7
+        },
+        {
+          "heading": "No sycophancy, accuracy first",
+          "level": 2,
+          "line": 15
+        },
+        {
+          "heading": "Complete execution",
+          "level": 2,
+          "line": 26
+        },
+        {
+          "heading": "Absolute priority: never overcomplicate, always verify",
+          "level": 2,
+          "line": 33
+        },
+        {
+          "heading": "Verification workflow: mandatory",
+          "level": 2,
+          "line": 43
+        },
+        {
+          "heading": "Before writing any code",
+          "level": 2,
+          "line": 52
+        },
+        {
+          "heading": "Never assume: always verify",
+          "level": 2,
+          "line": 60
+        },
+        {
+          "heading": "Test-first development",
+          "level": 2,
+          "line": 70
+        },
+        {
+          "heading": "Complexity detection triggers: rethink your approach immediately",
+          "level": 2,
+          "line": 82
+        },
+        {
+          "heading": "Before starting any work",
+          "level": 2,
+          "line": 95
+        },
+        {
+          "heading": "Project documentation to maintain",
+          "level": 2,
+          "line": 104
+        },
+        {
+          "heading": "Code quality standards",
+          "level": 2,
+          "line": 113
+        },
+        {
+          "heading": "Testing standards",
+          "level": 2,
+          "line": 126
+        },
+        {
+          "heading": "Tool usage",
+          "level": 2,
+          "line": 138
+        },
+        {
+          "heading": "File path tracking",
+          "level": 2,
+          "line": 144
+        },
+        {
+          "heading": "For Python",
+          "level": 2,
+          "line": 153
+        },
+        {
+          "heading": "Package-first Python",
+          "level": 3,
+          "line": 172
+        },
+        {
+          "heading": "Python CLI scripts",
+          "level": 3,
+          "line": 184
+        },
+        {
+          "heading": "Post-work activities",
+          "level": 2,
+          "line": 196
+        },
+        {
+          "heading": "Critical reflection",
+          "level": 3,
+          "line": 198
+        },
+        {
+          "heading": "Documentation updates",
+          "level": 3,
+          "line": 207
+        },
+        {
+          "heading": "Special commands",
+          "level": 2,
+          "line": 214
+        },
+        {
+          "heading": "/plan command: transform requirements into detailed plans",
+          "level": 3,
+          "line": 216
+        },
+        {
+          "heading": "/report command",
+          "level": 3,
+          "line": 261
+        },
+        {
+          "heading": "/work command",
+          "level": 4,
+          "line": 269
+        },
+        {
+          "heading": "/test command: run comprehensive tests",
+          "level": 4,
+          "line": 285
+        },
+        {
+          "heading": "Anti-enterprise bloat guidelines",
+          "level": 2,
+          "line": 295
+        },
+        {
+          "heading": "RED LIST: NEVER ADD these unless requested",
+          "level": 3,
+          "line": 303
+        },
+        {
+          "heading": "GREEN LIST: what is appropriate",
+          "level": 3,
+          "line": 319
+        },
+        {
+          "heading": "Prose",
+          "level": 2,
+          "line": 329
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 32
+      }
+    },
+    {
+      "path": "QWEN.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 347,
+      "nonEmptyLines": 277,
+      "sections": [
+        {
+          "heading": "Development guidelines",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Foundation: Challenge your first instinct with chain-of-thought",
+          "level": 2,
+          "line": 3
+        },
+        {
+          "heading": "CoT reasoning template",
+          "level": 3,
+          "line": 7
+        },
+        {
+          "heading": "No sycophancy, accuracy first",
+          "level": 2,
+          "line": 15
+        },
+        {
+          "heading": "Complete execution",
+          "level": 2,
+          "line": 26
+        },
+        {
+          "heading": "Absolute priority: never overcomplicate, always verify",
+          "level": 2,
+          "line": 33
+        },
+        {
+          "heading": "Verification workflow: mandatory",
+          "level": 2,
+          "line": 43
+        },
+        {
+          "heading": "Before writing any code",
+          "level": 2,
+          "line": 52
+        },
+        {
+          "heading": "Never assume: always verify",
+          "level": 2,
+          "line": 60
+        },
+        {
+          "heading": "Test-first development",
+          "level": 2,
+          "line": 70
+        },
+        {
+          "heading": "Complexity detection triggers: rethink your approach immediately",
+          "level": 2,
+          "line": 82
+        },
+        {
+          "heading": "Before starting any work",
+          "level": 2,
+          "line": 95
+        },
+        {
+          "heading": "Project documentation to maintain",
+          "level": 2,
+          "line": 104
+        },
+        {
+          "heading": "Code quality standards",
+          "level": 2,
+          "line": 113
+        },
+        {
+          "heading": "Testing standards",
+          "level": 2,
+          "line": 126
+        },
+        {
+          "heading": "Tool usage",
+          "level": 2,
+          "line": 138
+        },
+        {
+          "heading": "File path tracking",
+          "level": 2,
+          "line": 144
+        },
+        {
+          "heading": "For Python",
+          "level": 2,
+          "line": 153
+        },
+        {
+          "heading": "Package-first Python",
+          "level": 3,
+          "line": 172
+        },
+        {
+          "heading": "Python CLI scripts",
+          "level": 3,
+          "line": 184
+        },
+        {
+          "heading": "Post-work activities",
+          "level": 2,
+          "line": 196
+        },
+        {
+          "heading": "Critical reflection",
+          "level": 3,
+          "line": 198
+        },
+        {
+          "heading": "Documentation updates",
+          "level": 3,
+          "line": 207
+        },
+        {
+          "heading": "Special commands",
+          "level": 2,
+          "line": 214
+        },
+        {
+          "heading": "/plan command: transform requirements into detailed plans",
+          "level": 3,
+          "line": 216
+        },
+        {
+          "heading": "/report command",
+          "level": 3,
+          "line": 261
+        },
+        {
+          "heading": "/work command",
+          "level": 4,
+          "line": 269
+        },
+        {
+          "heading": "/test command: run comprehensive tests",
+          "level": 4,
+          "line": 285
+        },
+        {
+          "heading": "Anti-enterprise bloat guidelines",
+          "level": 2,
+          "line": 295
+        },
+        {
+          "heading": "RED LIST: NEVER ADD these unless requested",
+          "level": 3,
+          "line": 303
+        },
+        {
+          "heading": "GREEN LIST: what is appropriate",
+          "level": 3,
+          "line": 319
+        },
+        {
+          "heading": "Prose",
+          "level": 2,
+          "line": 329
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 32
+      }
+    },
+    {
+      "path": "README.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 124,
+      "nonEmptyLines": 88,
+      "sections": [
+        {
+          "heading": "abersetz",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "What it does",
+          "level": 2,
+          "line": 5
+        },
+        {
+          "heading": "Engines",
+          "level": 2,
+          "line": 11
+        },
+        {
+          "heading": "Install",
+          "level": 2,
+          "line": 26
+        },
+        {
+          "heading": "Quick start",
+          "level": 2,
+          "line": 34
+        },
+        {
+          "heading": "CLI reference",
+          "level": 2,
+          "line": 52
+        },
+        {
+          "heading": "Configuration",
+          "level": 2,
+          "line": 72
+        },
+        {
+          "heading": "Python API",
+          "level": 2,
+          "line": 99
+        },
+        {
+          "heading": "How chunking works",
+          "level": 2,
+          "line": 113
+        },
+        {
+          "heading": "License",
+          "level": 2,
+          "line": 122
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 10
+      }
+    },
+    {
+      "path": "SPEC.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 110,
+      "nonEmptyLines": 75,
+      "sections": [
+        {
+          "heading": "Abersetz Technical Specification",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "1. Overview",
+          "level": 2,
+          "line": 7
+        },
+        {
+          "heading": "2. Core Functionality",
+          "level": 2,
+          "line": 11
+        },
+        {
+          "heading": "2.1. File Handling",
+          "level": 3,
+          "line": 13
+        },
+        {
+          "heading": "2.2. Translation Pipeline",
+          "level": 3,
+          "line": 21
+        },
+        {
+          "heading": "2.3. Content-Type Detection",
+          "level": 3,
+          "line": 31
+        },
+        {
+          "heading": "3. Translation Engines",
+          "level": 2,
+          "line": 35
+        },
+        {
+          "heading": "3.1. Pre-integrated Engines",
+          "level": 3,
+          "line": 39
+        },
+        {
+          "heading": "3.2. Custom LLM-based Engines",
+          "level": 3,
+          "line": 43
+        },
+        {
+          "heading": "3.2.1. `hysf` Engine",
+          "level": 4,
+          "line": 45
+        },
+        {
+          "heading": "3.2.2. `ullm` (Universal Large Language Model) Engine",
+          "level": 4,
+          "line": 53
+        },
+        {
+          "heading": "4. Configuration",
+          "level": 2,
+          "line": 72
+        },
+        {
+          "heading": "5. Command-Line Interface (CLI)",
+          "level": 2,
+          "line": 78
+        },
+        {
+          "heading": "CLI Arguments",
+          "level": 3,
+          "line": 83
+        },
+        {
+          "heading": "6. Python API",
+          "level": 2,
+          "line": 94
+        },
+        {
+          "heading": "7. Dependencies",
+          "level": 2,
+          "line": 98
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 16
+      }
+    },
+    {
+      "path": "TASKS.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 70,
+      "nonEmptyLines": 58,
+      "sections": [
+        {
+          "heading": "Abersetz Enhancements Plan (Task 108, 109 & 110)",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "Scope (One Sentence)",
+          "level": 2,
+          "line": 6
+        },
+        {
+          "heading": "Guiding Principles",
+          "level": 2,
+          "line": 9
+        },
+        {
+          "heading": "Detailed Plan",
+          "level": 2,
+          "line": 14
+        },
+        {
+          "heading": "Phase 1: Dependency Integration & LM Studio Auto-Start",
+          "level": 3,
+          "line": 16
+        },
+        {
+          "heading": "Phase 2: LLM Provider Registry & Modularization",
+          "level": 3,
+          "line": 25
+        },
+        {
+          "heading": "Phase 3: htmladapt & Twat Integration",
+          "level": 3,
+          "line": 32
+        },
+        {
+          "heading": "Phase 4: Local Model Discovery (Issue 109)",
+          "level": 3,
+          "line": 40
+        },
+        {
+          "heading": "Phase 5: Local Hunyuan-MT2 Model Support (Issue 110)",
+          "level": 3,
+          "line": 47
+        },
+        {
+          "heading": "Phase 6: Benchmarking Tool Rewrite",
+          "level": 3,
+          "line": 52
+        },
+        {
+          "heading": "Verification Plan",
+          "level": 2,
+          "line": 57
+        },
+        {
+          "heading": "Automated Tests",
+          "level": 3,
+          "line": 59
+        },
+        {
+          "heading": "Manual Verification",
+          "level": 3,
+          "line": 68
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 13
+      }
+    },
+    {
+      "path": "TESTING.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 60,
+      "nonEmptyLines": 49,
+      "sections": [
+        {
+          "heading": "Testing Guide",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "Running Tests",
+          "level": 2,
+          "line": 6
+        },
+        {
+          "heading": "Unit Tests",
+          "level": 3,
+          "line": 8
+        },
+        {
+          "heading": "Integration Tests",
+          "level": 3,
+          "line": 19
+        },
+        {
+          "heading": "Test Markers",
+          "level": 3,
+          "line": 35
+        },
+        {
+          "heading": "Continuous Testing",
+          "level": 3,
+          "line": 39
+        },
+        {
+          "heading": "Test Coverage",
+          "level": 2,
+          "line": 45
+        },
+        {
+          "heading": "Testing Best Practices",
+          "level": 2,
+          "line": 54
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 8
+      }
+    },
+    {
+      "path": "TODO.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 46,
+      "nonEmptyLines": 41,
+      "sections": [
+        {
+          "heading": "Todo List",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Task 109: Local Model Discovery",
+          "level": 2,
+          "line": 5
+        },
+        {
+          "heading": "Task 110: Local Situation Support (Hunyuan-MT2)",
+          "level": 2,
+          "line": 18
+        },
+        {
+          "heading": "Task 108.1.5: Benchmark Example Rewrite",
+          "level": 2,
+          "line": 35
+        },
+        {
+          "heading": "Task 108.2: Verification and Quality Control",
+          "level": 2,
+          "line": 42
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 5
+      }
+    },
+    {
+      "path": "WORK.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 635,
+      "nonEmptyLines": 553,
+      "sections": [
+        {
+          "heading": "Work Log",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "2026-05-25",
+          "level": 2,
+          "line": 6
+        },
+        {
+          "heading": "Config Alignment and Import Silencing",
+          "level": 3,
+          "line": 7
+        },
+        {
+          "heading": "Obsolete Files Cleanup, LMStudio, and MLX Caching Bugfixes",
+          "level": 3,
+          "line": 13
+        },
+        {
+          "heading": "CLI Enhancements, Entrypoint Routing, Subcommand Documentation, and n_threads Option",
+          "level": 3,
+          "line": 22
+        },
+        {
+          "heading": "Implemented Local Model Discovery and Hunyuan-MT2 Local Support (Issues #109 & #110)",
+          "level": 3,
+          "line": 35
+        },
+        {
+          "heading": "Removed MyMemory and Blocked Discontinued Hunyuan-MT-7B Model (Issue #107)",
+          "level": 3,
+          "line": 46
+        },
+        {
+          "heading": "Improved Language Code Resolution with Langcodes",
+          "level": 3,
+          "line": 55
+        },
+        {
+          "heading": "Added Destination Existing Check and Skipping to Benchmark",
+          "level": 3,
+          "line": 60
+        },
+        {
+          "heading": "Completed Issue #106 Verification and Testing",
+          "level": 3,
+          "line": 67
+        },
+        {
+          "heading": "Fixed PyPI Publishing Flow",
+          "level": 3,
+          "line": 75
+        },
+        {
+          "heading": "Relied on Published Abersetz in Benchmark Example",
+          "level": 3,
+          "line": 80
+        },
+        {
+          "heading": "Fixed Deep-Translator Engine Language Code Mapping",
+          "level": 3,
+          "line": 84
+        },
+        {
+          "heading": "Fully Rewrote Examples Directory and Implemented Translation Benchmark",
+          "level": 3,
+          "line": 89
+        },
+        {
+          "heading": "Split Providers and Added Hy-MT2 Support",
+          "level": 3,
+          "line": 99
+        },
+        {
+          "heading": "Repo Cleanup and Dependency Fixes",
+          "level": 3,
+          "line": 107
+        },
+        {
+          "heading": "2026-01-20",
+          "level": 2,
+          "line": 114
+        },
+        {
+          "heading": "Setup Community Provider Opt-In",
+          "level": 3,
+          "line": 115
+        },
+        {
+          "heading": "CLI Option Guardrails Sprint",
+          "level": 3,
+          "line": 120
+        },
+        {
+          "heading": "README + CLI Option Defaults",
+          "level": 3,
+          "line": 125
+        },
+        {
+          "heading": "Local MLX/GGUF Engine Integration",
+          "level": 3,
+          "line": 130
+        },
+        {
+          "heading": "2025-09-21",
+          "level": 2,
+          "line": 138
+        },
+        {
+          "heading": "Release 1.0.19 Documentation 2025-09-21 13:05 UTC",
+          "level": 3,
+          "line": 139
+        },
+        {
+          "heading": "/report – Verification Sweep 2025-09-21 12:39 UTC",
+          "level": 3,
+          "line": 144
+        },
+        {
+          "heading": "/report – Verification Sweep 2025-09-21 12:16 UTC",
+          "level": 3,
+          "line": 151
+        },
+        {
+          "heading": "/work – Residual Type & Coverage Polish Task 1 2025-09-21 12:24 UTC",
+          "level": 3,
+          "line": 160
+        },
+        {
+          "heading": "/work – Residual Type & Coverage Polish Task 2 2025-09-21 12:33 UTC",
+          "level": 3,
+          "line": 167
+        },
+        {
+          "heading": "/work – Residual Type & Coverage Polish Task 3 2025-09-21 12:40 UTC",
+          "level": 3,
+          "line": 172
+        },
+        {
+          "heading": "/report – Verification Sweep 2025-09-21 12:45 UTC",
+          "level": 3,
+          "line": 177
+        },
+        {
+          "heading": "/work – Type Hygiene & Chunking 2025-09-21 11:55 UTC",
+          "level": 3,
+          "line": 185
+        },
+        {
+          "heading": "/report – Verification Sweep 2025-09-21 11:50 UTC",
+          "level": 3,
+          "line": 197
+        },
+        {
+          "heading": "/report – Regression Sweep 2025-09-21 11:28 UTC",
+          "level": 3,
+          "line": 204
+        },
+        {
+          "heading": "/work – Advanced Examples Hardening 2025-09-21 11:40 UTC",
+          "level": 3,
+          "line": 211
+        },
+        {
+          "heading": "/report – Verification Sweep 2025-09-21 09:14 UTC",
+          "level": 3,
+          "line": 223
+        },
+        {
+          "heading": "/work – Coverage Touchups 2025-09-21 09:24 UTC",
+          "level": 3,
+          "line": 229
+        },
+        {
+          "heading": "/report – QA Sweep 2025-09-21 08:46 UTC",
+          "level": 3,
+          "line": 240
+        },
+        {
+          "heading": "/work – Reliability Polish 2025-09-21 11:03 UTC",
+          "level": 3,
+          "line": 247
+        },
+        {
+          "heading": "/work – Mypy Noise Reduction 2025-09-21 10:38 UTC",
+          "level": 3,
+          "line": 257
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 10:29 UTC",
+          "level": 3,
+          "line": 266
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 10:20 UTC",
+          "level": 3,
+          "line": 273
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 10:02 UTC",
+          "level": 3,
+          "line": 281
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 09:36 UTC",
+          "level": 3,
+          "line": 289
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 09:31 UTC",
+          "level": 3,
+          "line": 296
+        },
+        {
+          "heading": "Current Iteration – Type & Setup Reliability",
+          "level": 3,
+          "line": 304
+        },
+        {
+          "heading": "Current Iteration – Coverage & Typing Polish",
+          "level": 3,
+          "line": 309
+        },
+        {
+          "heading": "Verification – Coverage & Typing Polish",
+          "level": 4,
+          "line": 314
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 09:19 UTC",
+          "level": 3,
+          "line": 323
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 09:11 UTC",
+          "level": 3,
+          "line": 330
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 08:57 UTC",
+          "level": 3,
+          "line": 337
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 08:46 UTC",
+          "level": 3,
+          "line": 344
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 08:36 UTC",
+          "level": 3,
+          "line": 351
+        },
+        {
+          "heading": "Current Iteration – Coverage Guard V",
+          "level": 3,
+          "line": 358
+        },
+        {
+          "heading": "Verification – Coverage Guard V",
+          "level": 3,
+          "line": 363
+        },
+        {
+          "heading": "Current Iteration – Reliability Guard IV",
+          "level": 3,
+          "line": 370
+        },
+        {
+          "heading": "Verification – Reliability Guard IV",
+          "level": 3,
+          "line": 375
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 08:16 UTC",
+          "level": 3,
+          "line": 380
+        },
+        {
+          "heading": "Current Iteration – Coverage Polish III",
+          "level": 3,
+          "line": 387
+        },
+        {
+          "heading": "Verification – Coverage Polish III",
+          "level": 3,
+          "line": 392
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 08:25 UTC",
+          "level": 3,
+          "line": 401
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 07:57 UTC",
+          "level": 3,
+          "line": 408
+        },
+        {
+          "heading": "Current Iteration – Coverage Polish II",
+          "level": 3,
+          "line": 415
+        },
+        {
+          "heading": "Verification – Coverage Polish II",
+          "level": 3,
+          "line": 420
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 07:36 UTC",
+          "level": 3,
+          "line": 430
+        },
+        {
+          "heading": "Verification – Engine Factory Reliability",
+          "level": 3,
+          "line": 442
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 07:20 UTC",
+          "level": 3,
+          "line": 452
+        },
+        {
+          "heading": "Current Iteration – Config & CLI Reliability",
+          "level": 3,
+          "line": 459
+        },
+        {
+          "heading": "Verification – 2025-09-21 07:30 UTC",
+          "level": 3,
+          "line": 464
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 07:08 UTC",
+          "level": 3,
+          "line": 473
+        },
+        {
+          "heading": "Current Iteration – CLI Shell Coverage",
+          "level": 3,
+          "line": 480
+        },
+        {
+          "heading": "Verification – 2025-09-21 07:16 UTC",
+          "level": 3,
+          "line": 485
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 04:53 UTC",
+          "level": 3,
+          "line": 492
+        },
+        {
+          "heading": "Current Iteration – Coverage Hardening",
+          "level": 3,
+          "line": 499
+        },
+        {
+          "heading": "Coverage Hardening Verification – 2025-09-21 05:02 UTC",
+          "level": 3,
+          "line": 504
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 06:13 UTC",
+          "level": 3,
+          "line": 513
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 06:25 UTC",
+          "level": 3,
+          "line": 521
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 06:35 UTC",
+          "level": 3,
+          "line": 529
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 06:44 UTC",
+          "level": 3,
+          "line": 536
+        },
+        {
+          "heading": "Issue #200 Kickoff",
+          "level": 3,
+          "line": 544
+        },
+        {
+          "heading": "Maintenance Snapshot",
+          "level": 3,
+          "line": 547
+        },
+        {
+          "heading": "Current Iteration Targets",
+          "level": 3,
+          "line": 552
+        },
+        {
+          "heading": "Reliability Boost Sprint – Active",
+          "level": 3,
+          "line": 562
+        },
+        {
+          "heading": "Release Readiness Checklist (Completed)",
+          "level": 3,
+          "line": 566
+        },
+        {
+          "heading": "Maintenance Sprint Targets",
+          "level": 3,
+          "line": 570
+        },
+        {
+          "heading": "Test Results",
+          "level": 3,
+          "line": 574
+        },
+        {
+          "heading": "Manual Smoke Tests (2025-09-21)",
+          "level": 3,
+          "line": 579
+        },
+        {
+          "heading": "QA Sweep – 2025-09-21",
+          "level": 3,
+          "line": 585
+        },
+        {
+          "heading": "Configuration & Catalog Hardening – Completed 2025-09-21",
+          "level": 3,
+          "line": 592
+        },
+        {
+          "heading": "Active Tasks – CLI Reliability",
+          "level": 3,
+          "line": 597
+        },
+        {
+          "heading": "Verification – CLI Reliability",
+          "level": 3,
+          "line": 602
+        },
+        {
+          "heading": "Automated Report – 2025-09-21",
+          "level": 3,
+          "line": 606
+        },
+        {
+          "heading": "Automated Report – 2025-09-21 (Follow-up)",
+          "level": 3,
+          "line": 613
+        },
+        {
+          "heading": "Quality Guardrails Sprint – 2025-09-21",
+          "level": 3,
+          "line": 628
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 92
+      }
+    },
+    {
+      "path": "build.sh",
+      "language": "shell",
+      "fileCategory": "script",
+      "totalLines": 18,
+      "nonEmptyLines": 14,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "install.sh",
+      "language": "shell",
+      "fileCategory": "script",
+      "totalLines": 10,
+      "nonEmptyLines": 9,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "package.toml",
+      "language": "toml",
+      "fileCategory": "config",
+      "totalLines": 11,
+      "nonEmptyLines": 10,
+      "sections": [
+        {
+          "heading": "package",
+          "level": 1,
+          "line": 2
+        },
+        {
+          "heading": "features",
+          "level": 1,
+          "line": 8
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 2
+      }
+    },
+    {
+      "path": "publish.sh",
+      "language": "shell",
+      "fileCategory": "script",
+      "totalLines": 30,
+      "nonEmptyLines": 22,
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "pyproject.toml",
+      "language": "toml",
+      "fileCategory": "config",
+      "totalLines": 171,
+      "nonEmptyLines": 148,
+      "sections": [
+        {
+          "heading": "build-system",
+          "level": 1,
+          "line": 3
+        },
+        {
+          "heading": "project",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "[[project.authors]]",
+          "level": 2,
+          "line": 34
+        },
+        {
+          "heading": "project.license",
+          "level": 2,
+          "line": 38
+        },
+        {
+          "heading": "project.urls",
+          "level": 2,
+          "line": 41
+        },
+        {
+          "heading": "project.optional-dependencies",
+          "level": 2,
+          "line": 46
+        },
+        {
+          "heading": "project.scripts",
+          "level": 2,
+          "line": 62
+        },
+        {
+          "heading": "dependency-groups",
+          "level": 1,
+          "line": 66
+        },
+        {
+          "heading": "tool.hatch.version",
+          "level": 3,
+          "line": 75
+        },
+        {
+          "heading": "tool.hatch.build",
+          "level": 3,
+          "line": 78
+        },
+        {
+          "heading": "tool.hatch.build.targets.wheel",
+          "level": 5,
+          "line": 81
+        },
+        {
+          "heading": "tool.hatch.build.hooks.vcs",
+          "level": 5,
+          "line": 84
+        },
+        {
+          "heading": "tool.hatch.envs.default",
+          "level": 4,
+          "line": 87
+        },
+        {
+          "heading": "tool.hatch.envs.default.scripts",
+          "level": 5,
+          "line": 97
+        },
+        {
+          "heading": "tool.hatch.envs.hatch-test",
+          "level": 4,
+          "line": 103
+        },
+        {
+          "heading": "tool.uv",
+          "level": 2,
+          "line": 108
+        },
+        {
+          "heading": "tool.uv.sources",
+          "level": 3,
+          "line": 112
+        },
+        {
+          "heading": "tool.ruff",
+          "level": 2,
+          "line": 118
+        },
+        {
+          "heading": "tool.ruff.lint",
+          "level": 3,
+          "line": 122
+        },
+        {
+          "heading": "tool.ruff.format",
+          "level": 3,
+          "line": 126
+        },
+        {
+          "heading": "tool.pytest.ini_options",
+          "level": 3,
+          "line": 130
+        },
+        {
+          "heading": "tool.mypy",
+          "level": 2,
+          "line": 137
+        },
+        {
+          "heading": "[[tool.mypy.overrides]]",
+          "level": 3,
+          "line": 140
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 23
+      }
+    }
+  ]
+}

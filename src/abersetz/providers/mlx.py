@@ -89,6 +89,16 @@ KNOWN_MAPPING = {
         "lmstudio_path": "/Volumes/Falstaff4T/RomeoData2/lmstudio/models/p0we7/Hy-MT2-1.8B-oQ8-fp16",
         "type": "mlx",
     },
+    "tevino/Hy-MT2-7B-oQ8": {
+        "repo": "tevino/Hy-MT2-7B-oQ8",
+        "lmstudio_path": "/Volumes/Falstaff4T/RomeoData2/lmstudio/models/tevino/Hy-MT2-7B-oQ8",
+        "type": "mlx",
+    },
+    "sahilchachra/hy-mt2-7b-8bit-mlx": {
+        "repo": "sahilchachra/hy-mt2-7b-8bit-mlx",
+        "lmstudio_path": "/Volumes/Falstaff4T/RomeoData2/lmstudio/models/sahilchachra/hy-mt2-7b-8bit-mlx",
+        "type": "mlx",
+    },
     # GGUF
     "tencent/Hy-MT2-7B-GGUF": {
         "repo": "tencent/Hy-MT2-7B-GGUF",
@@ -126,6 +136,8 @@ ALIASES = {
     # MLX
     "30b-mlx": "QwQbb/Hy-MT2-30B-A3B-MLX-4bit",
     "1.8b-mlx": "p0we7/Hy-MT2-1.8B-oQ8-fp16",
+    "7b-mlx": "tevino/Hy-MT2-7B-oQ8",
+    "7b-8bit-mlx": "sahilchachra/hy-mt2-7b-8bit-mlx",
     # GGUF
     "7b-gguf": "tencent/Hy-MT2-7B-GGUF",
     "1.8b-heretic": "mradermacher/Hy-MT2-1.8B-heretic-GGUF",
@@ -133,6 +145,54 @@ ALIASES = {
     "1.8b-2bit": "tencent/Hy-MT2-1.8B-2Bit-GGUF",
     "1.8b-1.25bit": "tencent/Hy-MT2-1.8B-1.25Bit-GGUF",
 }
+
+
+def find_local_model_path(model_identifier: str, backend: str) -> str | None:
+    """Query LocalModelFinder to locate the model locally on disk."""
+    try:
+        from .llm.local_discovery import LocalModelFinder
+
+        finder = LocalModelFinder()
+
+        # Determine format filter for discovery
+        fmt_filter = "gguf" if backend == "gguf" else None
+        discovered = finder.discover_models(format_filter=fmt_filter)
+
+        target = model_identifier.replace("\\", "/").strip().lower()
+        target_parts = [p for p in target.split("/") if p]
+
+        for m in discovered:
+            path_str = str(m.path).replace("\\", "/").lower()
+
+            def get_return_path(p: Path) -> str:
+                if backend == "mlx" and p.is_file():
+                    return str(p.parent)
+                return str(p)
+
+            # 1. Direct containment match (e.g. "p0we7/hy-mt2-1.8b-oq8-fp16")
+            if target in path_str:
+                return get_return_path(m.path)
+
+            # 2. Hugging Face snapshot path style (replaces / with --)
+            hf_target = target.replace("/", "--")
+            if hf_target in path_str:
+                return get_return_path(m.path)
+
+            # 3. Match suffix parts if multiple parts present
+            if len(target_parts) >= 2:
+                subtarget = "/".join(target_parts[-2:])
+                if subtarget in path_str:
+                    return get_return_path(m.path)
+                hf_subtarget = "--".join(target_parts[-2:])
+                if hf_subtarget in path_str:
+                    return get_return_path(m.path)
+
+            # 4. Match by exact model name
+            if target_parts and target_parts[-1] == m.name.lower():
+                return get_return_path(m.path)
+    except Exception:
+        pass
+    return None
 
 
 def resolve_and_download_model(model_name_or_path: str | None, backend: str) -> str:
@@ -143,7 +203,9 @@ def resolve_and_download_model(model_name_or_path: str | None, backend: str) -> 
         )
 
     normalized_path = str(model_name_or_path).replace("\\", "/")
-    if any(legacy in normalized_path for legacy in ["Hunyuan-MT", "Hy-MT1", "HY-MT1"]):
+    if any(
+        legacy in normalized_path for legacy in ["Hunyuan-MT-7B", "Hunyuan-MT1", "Hy-MT1", "HY-MT1"]
+    ):
         raise EngineError("Hy-MT1.x models are no longer supported. Please upgrade to Hy-MT2.")
 
     # 1. Direct path that exists
@@ -154,7 +216,12 @@ def resolve_and_download_model(model_name_or_path: str | None, backend: str) -> 
     # 2. Check aliases
     key = ALIASES.get(model_name_or_path.lower(), model_name_or_path)
 
-    # 3. Check known mapping
+    # 3. Try to discover model locally on disk
+    local_path = find_local_model_path(key, backend)
+    if local_path:
+        return local_path
+
+    # 4. Check known mapping fallback (if not found in standard discovery, check specified lmstudio_path)
     info = KNOWN_MAPPING.get(key)
     if info:
         lm_path = Path(info["lmstudio_path"])
@@ -182,7 +249,7 @@ def resolve_and_download_model(model_name_or_path: str | None, backend: str) -> 
                     f"Failed to resolve/download GGUF model {repo}/{filename} from Hugging Face"
                 ) from exc
 
-    # 4. Fallback to direct repo ID download
+    # 5. Fallback to direct repo ID download
     if "/" in key:
         if backend == "mlx":
             try:
@@ -215,6 +282,7 @@ class LocalMlxEngine(EngineBase):
         self._max_tokens = max_tokens
 
         resolved_path = resolve_and_download_model(model_path, "mlx")
+        self._model_name = Path(resolved_path).name
         try:
             from mlx_lm import generate, load
         except Exception as exc:  # pragma: no cover

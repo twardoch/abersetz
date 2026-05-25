@@ -1,0 +1,601 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 3,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "src/abersetz/providers/llm/__init__.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 22,
+      "nonEmptyLines": 20,
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/abersetz/providers/llm/discovery.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 196,
+      "nonEmptyLines": 169,
+      "functions": [
+        {
+          "name": "discover_env_endpoints",
+          "startLine": 60,
+          "endLine": 75,
+          "params": []
+        },
+        {
+          "name": "all_endpoints",
+          "startLine": 78,
+          "endLine": 81,
+          "params": []
+        },
+        {
+          "name": "fetch_models",
+          "startLine": 84,
+          "endLine": 121,
+          "params": [
+            "endpoint"
+          ]
+        },
+        {
+          "name": "resolve_model",
+          "startLine": 124,
+          "endLine": 162,
+          "params": [
+            "selector"
+          ]
+        },
+        {
+          "name": "resolve_wildcard_to_model",
+          "startLine": 165,
+          "endLine": 179,
+          "params": [
+            "provider_name",
+            "endpoint",
+            "pattern"
+          ]
+        },
+        {
+          "name": "load_recommended_settings",
+          "startLine": 182,
+          "endLine": 196,
+          "params": [
+            "provider_name"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "Endpoint",
+          "startLine": 28,
+          "endLine": 32,
+          "methods": [],
+          "properties": [
+            "name",
+            "base_url",
+            "api_key_env",
+            "known_models"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "Endpoint",
+          "line": 27,
+          "isDefault": false
+        },
+        {
+          "name": "discover_env_endpoints",
+          "line": 60,
+          "isDefault": false
+        },
+        {
+          "name": "all_endpoints",
+          "line": 78,
+          "isDefault": false
+        },
+        {
+          "name": "fetch_models",
+          "line": 84,
+          "isDefault": false
+        },
+        {
+          "name": "resolve_model",
+          "line": 124,
+          "isDefault": false
+        },
+        {
+          "name": "resolve_wildcard_to_model",
+          "line": 165,
+          "isDefault": false
+        },
+        {
+          "name": "load_recommended_settings",
+          "line": 182,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "discover_env_endpoints",
+          "callee": "os.environ.items",
+          "lineNumber": 62
+        },
+        {
+          "caller": "discover_env_endpoints",
+          "callee": "key.endswith",
+          "lineNumber": 67
+        },
+        {
+          "caller": "discover_env_endpoints",
+          "callee": "key[: -len(suffix)].lower",
+          "lineNumber": 68
+        },
+        {
+          "caller": "discover_env_endpoints",
+          "callee": "len",
+          "lineNumber": 68
+        },
+        {
+          "caller": "discover_env_endpoints",
+          "callee": "provider_name.upper",
+          "lineNumber": 71
+        },
+        {
+          "caller": "discover_env_endpoints",
+          "callee": "Endpoint",
+          "lineNumber": 72
+        },
+        {
+          "caller": "all_endpoints",
+          "callee": "dict",
+          "lineNumber": 79
+        },
+        {
+          "caller": "all_endpoints",
+          "callee": "eps.update",
+          "lineNumber": 80
+        },
+        {
+          "caller": "all_endpoints",
+          "callee": "discover_env_endpoints",
+          "lineNumber": 80
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "os.getenv",
+          "lineNumber": 86
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "os.getenv",
+          "lineNumber": 88
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "endpoint.base_url.rstrip",
+          "lineNumber": 94
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "httpx.Client",
+          "lineNumber": 96
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "client.get",
+          "lineNumber": 97
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "resp.json",
+          "lineNumber": 99
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "isinstance",
+          "lineNumber": 100
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "isinstance",
+          "lineNumber": 101
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "str",
+          "lineNumber": 103
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "isinstance",
+          "lineNumber": 105
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "isinstance",
+          "lineNumber": 107
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "str",
+          "lineNumber": 109
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "item.get",
+          "lineNumber": 109
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "item.get",
+          "lineNumber": 109
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "isinstance",
+          "lineNumber": 111
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "isinstance",
+          "lineNumber": 113
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "str",
+          "lineNumber": 115
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "item.get",
+          "lineNumber": 115
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "item.get",
+          "lineNumber": 115
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "isinstance",
+          "lineNumber": 117
+        },
+        {
+          "caller": "fetch_models",
+          "callee": "logger.debug",
+          "lineNumber": 120
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "all_endpoints",
+          "lineNumber": 126
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "selector.strip().lower",
+          "lineNumber": 128
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "selector.strip",
+          "lineNumber": 128
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "selector.split",
+          "lineNumber": 134
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "parts[0].strip().lower",
+          "lineNumber": 135
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "parts[0].strip",
+          "lineNumber": 135
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "parts[1].strip",
+          "lineNumber": 136
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "selector.strip",
+          "lineNumber": 138
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "eps.items",
+          "lineNumber": 140
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "provider_name.startswith",
+          "lineNumber": 147
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "Endpoint",
+          "lineNumber": 148
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "os.getenv",
+          "lineNumber": 150
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "provider_name.upper",
+          "lineNumber": 150
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "Endpoint",
+          "lineNumber": 152
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "provider_name.upper",
+          "lineNumber": 153
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "any",
+          "lineNumber": 159
+        },
+        {
+          "caller": "resolve_model",
+          "callee": "resolve_wildcard_to_model",
+          "lineNumber": 160
+        },
+        {
+          "caller": "resolve_wildcard_to_model",
+          "callee": "fnmatch.filter",
+          "lineNumber": 168
+        },
+        {
+          "caller": "resolve_wildcard_to_model",
+          "callee": "fetch_models",
+          "lineNumber": 173
+        },
+        {
+          "caller": "resolve_wildcard_to_model",
+          "callee": "fnmatch.filter",
+          "lineNumber": 174
+        },
+        {
+          "caller": "load_recommended_settings",
+          "callee": "Path",
+          "lineNumber": 185
+        },
+        {
+          "caller": "load_recommended_settings",
+          "callee": "json_path.exists",
+          "lineNumber": 186
+        },
+        {
+          "caller": "load_recommended_settings",
+          "callee": "json.loads",
+          "lineNumber": 187
+        },
+        {
+          "caller": "load_recommended_settings",
+          "callee": "json_path.read_text",
+          "lineNumber": 187
+        },
+        {
+          "caller": "load_recommended_settings",
+          "callee": "data.get",
+          "lineNumber": 188
+        },
+        {
+          "caller": "load_recommended_settings",
+          "callee": "data.get",
+          "lineNumber": 188
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 7,
+        "functionCount": 6,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/abersetz/providers/llm/inference.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 102,
+      "nonEmptyLines": 91,
+      "classes": [
+        {
+          "name": "LlmEngine",
+          "startLine": 15,
+          "endLine": 102,
+          "methods": [
+            "__init__",
+            "_invoke",
+            "translate",
+            "_build_messages",
+            "_parse_payload"
+          ],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "LlmEngine",
+          "line": 15,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "__init__",
+          "callee": "super().__init__",
+          "lineNumber": 30
+        },
+        {
+          "caller": "__init__",
+          "callee": "super",
+          "lineNumber": 30
+        },
+        {
+          "caller": "__init__",
+          "callee": "dict",
+          "lineNumber": 34
+        },
+        {
+          "caller": "_invoke",
+          "callee": "self._client.chat.completions.create",
+          "lineNumber": 38
+        },
+        {
+          "caller": "translate",
+          "callee": "dict",
+          "lineNumber": 46
+        },
+        {
+          "caller": "translate",
+          "callee": "voc.update",
+          "lineNumber": 47
+        },
+        {
+          "caller": "translate",
+          "callee": "dict",
+          "lineNumber": 48
+        },
+        {
+          "caller": "translate",
+          "callee": "self._build_messages",
+          "lineNumber": 49
+        },
+        {
+          "caller": "translate",
+          "callee": "self._invoke",
+          "lineNumber": 50
+        },
+        {
+          "caller": "translate",
+          "callee": "self._parse_payload",
+          "lineNumber": 51
+        },
+        {
+          "caller": "translate",
+          "callee": "merged.update",
+          "lineNumber": 52
+        },
+        {
+          "caller": "translate",
+          "callee": "EngineResult",
+          "lineNumber": 53
+        },
+        {
+          "caller": "_build_messages",
+          "callee": "dict",
+          "lineNumber": 61
+        },
+        {
+          "caller": "_build_messages",
+          "callee": "vocab_payload.setdefault",
+          "lineNumber": 63
+        },
+        {
+          "caller": "_build_messages",
+          "callee": "json.dumps",
+          "lineNumber": 63
+        },
+        {
+          "caller": "_build_messages",
+          "callee": "json.dumps",
+          "lineNumber": 64
+        },
+        {
+          "caller": "_build_messages",
+          "callee": "str(request.is_html).lower",
+          "lineNumber": 68
+        },
+        {
+          "caller": "_build_messages",
+          "callee": "str",
+          "lineNumber": 68
+        },
+        {
+          "caller": "_build_messages",
+          "callee": "json.dumps",
+          "lineNumber": 76
+        },
+        {
+          "caller": "_parse_payload",
+          "callee": "self.OUTPUT_RE.search",
+          "lineNumber": 91
+        },
+        {
+          "caller": "_parse_payload",
+          "callee": "text_match.group(\"body\").strip",
+          "lineNumber": 92
+        },
+        {
+          "caller": "_parse_payload",
+          "callee": "text_match.group",
+          "lineNumber": 92
+        },
+        {
+          "caller": "_parse_payload",
+          "callee": "payload.strip",
+          "lineNumber": 92
+        },
+        {
+          "caller": "_parse_payload",
+          "callee": "self.VOCAB_RE.search",
+          "lineNumber": 93
+        },
+        {
+          "caller": "_parse_payload",
+          "callee": "json.loads",
+          "lineNumber": 97
+        },
+        {
+          "caller": "_parse_payload",
+          "callee": "vocab_match.group",
+          "lineNumber": 97
+        },
+        {
+          "caller": "_parse_payload",
+          "callee": "isinstance",
+          "lineNumber": 100
+        },
+        {
+          "caller": "_parse_payload",
+          "callee": "str",
+          "lineNumber": 101
+        },
+        {
+          "caller": "_parse_payload",
+          "callee": "str",
+          "lineNumber": 101
+        },
+        {
+          "caller": "_parse_payload",
+          "callee": "vocab.items",
+          "lineNumber": 101
+        }
+      ],
+      "metrics": {
+        "importCount": 2,
+        "exportCount": 1,
+        "functionCount": 0,
+        "classCount": 1
+      }
+    }
+  ]
+}

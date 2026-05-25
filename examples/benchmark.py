@@ -3,6 +3,7 @@
 # dependencies = [
 #     "fire>=0.5",
 #     "rich>=13.9",
+#     "abersetz[all]",
 # ]
 # ///
 # this_file: examples/benchmark.py
@@ -19,9 +20,6 @@ from typing import Any
 import fire  # type: ignore[import-untyped]
 from rich.console import Console
 from rich.table import Table
-
-# Add src/ to sys.path to run from source if not installed
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from abersetz.config import load_config
 from abersetz.engine_catalog import normalize_selector
@@ -59,9 +57,6 @@ def get_engine_descriptor(selector: str, cfg: Any) -> str:
         backend = "mlx" if "mlx" in variant else "gguf"
         return f"mthy-{backend}-{variant}"
 
-    if base == "ullm" and variant == "lmstudio":
-        return "ullm-lmstudio-local-model"
-
     engine_cfg = cfg.engines.get(base)
     if not engine_cfg:
         return sanitize_name(selector_norm)
@@ -72,14 +67,14 @@ def get_engine_descriptor(selector: str, cfg: Any) -> str:
     if base == "deep-translator":
         provider = variant or engine_cfg.options.get("provider", "google")
         return f"dt-{provider}"
-    if base == "hysf":
-        model = engine_cfg.options.get("model", "Hunyuan-MT-7B")
-        return f"hysf-siliconflow-{sanitize_name(model)}"
+    if base == "lmstudio":
+        model = engine_cfg.options.get("model", "local-model")
+        return f"lms-{sanitize_name(model)}"
     if base == "ullm":
         profile_name = variant or "default"
         profiles = engine_cfg.options.get("profiles", {})
         profile = profiles.get(profile_name, {}) if isinstance(profiles, dict) else {}
-        model = profile.get("model", "Hunyuan-MT-7B")
+        model = profile.get("model", "Qwen/Qwen2.5-7B-Instruct")
         return f"ullm-{profile_name}-{sanitize_name(model)}"
     if base in {"mthy", "gemma"}:
         backend = variant or engine_cfg.options.get("backend", "local")
@@ -92,49 +87,97 @@ def get_engine_descriptor(selector: str, cfg: Any) -> str:
     return sanitize_name(selector_norm)
 
 
+def resolve_provider_to_engines(provider: str, cfg: Any) -> list[str]:
+    """Resolve a provider name (e.g. 'google') to a list of matching engine selectors."""
+    provider = provider.strip().lower()
+
+    if provider in {"lmstudio", "lms"}:
+        return ["lms"]
+    if provider in {"tencent", "mthy", "hy", "hy-mt2", "hunyuan"}:
+        return [f"mthy/{k}" for k in MODEL_PATHS]
+
+    matched = []
+    # Check translators providers
+    if "translators" in cfg.engines:
+        matched.append(f"tr/{provider}")
+    # Check deep-translator providers
+    if "deep-translator" in cfg.engines:
+        matched.append(f"dt/{provider}")
+    # Check LLM providers
+    try:
+        from abersetz.providers.llm.discovery import BUILTIN_ENDPOINTS
+
+        if provider in BUILTIN_ENDPOINTS:
+            matched.append(f"ullm/{provider}")
+    except ImportError:
+        pass
+
+    return matched
+
+
 class BenchmarkRunner:
     """Benchmark Abersetz translation engines on example files."""
 
     def run(
         self,
         engines: str | list[str] | None = None,
+        providers: str | list[str] | None = None,
         max_chunks: int | None = None,
         dry_run: bool = False,
+        force: bool = False,
         verbose: bool = False,
     ) -> None:
         """Run the speed benchmark.
 
         Args:
-            engines: Comma-separated selectors or list of selectors. Defaults to auto-discovered.
+            engines: Comma-separated selectors or list of selectors.
+            providers: Comma-separated provider names or list of provider names.
             max_chunks: Limit the number of chunks translated per file (useful for fast tests).
             dry_run: Perform a dry run without invoking external translation APIs.
+            force: Force translation even if the destination file already exists.
             verbose: Enable verbose logging outputs.
         """
         cfg = load_config()
 
-        # 1. Resolve engines
+        # Resolve target engines
         target_engines: list[str] = []
-        if isinstance(engines, str):
-            target_engines = [e.strip() for e in engines.split(",") if e.strip()]
-        elif isinstance(engines, list):
-            target_engines = engines
-        else:
-            # Auto-discover working engines
-            target_engines = ["tr/google", "tr/bing", "dt/google", "dt/my_memory"]
-            # Add siliconflow models if API key present
-            if os.environ.get("SILICONFLOW_API_KEY"):
-                if "hysf" in cfg.engines:
-                    target_engines.append("hysf")
-                if "ullm" in cfg.engines:
-                    target_engines.append("ullm/default")
-            # Add all local models and LMStudio
+
+        if engines:
+            if isinstance(engines, str):
+                target_engines.extend([e.strip() for e in engines.split(",") if e.strip()])
+            elif isinstance(engines, list):
+                target_engines.extend(engines)
+
+        if providers:
+            provider_list: list[str] = []
+            if isinstance(providers, str):
+                provider_list = [p.strip() for p in providers.split(",") if p.strip()]
+            elif isinstance(providers, list):
+                provider_list = providers
+
+            for p in provider_list:
+                if p.lower() == "all":
+                    target_engines = []  # Force auto-discovery
+                    break
+                else:
+                    target_engines.extend(resolve_provider_to_engines(p, cfg))
+
+        # Fallback to defaults if neither engines nor providers resolved to any targets
+        if not target_engines:
+            target_engines = ["tr/google", "tr/bing", "dt/google"]
+            if os.environ.get("SILICONFLOW_API_KEY") and "ullm" in cfg.engines:
+                target_engines.append("ullm/default")
             for model_key in MODEL_PATHS:
                 target_engines.append(f"mthy/{model_key}")
-            target_engines.append("ullm/lmstudio")
+            target_engines.append("lms")
+
+        # Deduplicate preserving order
+        seen = set()
+        target_engines = [x for x in target_engines if not (x in seen or seen.add(x))]
 
         console.print("\n[bold cyan]🚀 Starting Abersetz Speed Benchmark[/bold cyan]")
         console.print(f"Target Engines: {', '.join(target_engines)}")
-        console.print(f"Dry Run: {dry_run} | Max Chunks: {max_chunks}\n")
+        console.print(f"Dry Run: {dry_run} | Force: {force} | Max Chunks: {max_chunks}\n")
 
         # Example files paths
         root_dir = Path(__file__).resolve().parents[1]
@@ -167,7 +210,6 @@ class BenchmarkRunner:
                 normalized = normalize_selector(selector_str) or selector_str
                 base, variant = resolve_engine_reference(normalized)
 
-                # Dynamically mock configuration changes so it mirrors real initialization
                 if base == "mthy" and variant in MODEL_PATHS:
                     backend = "mlx" if "mlx" in variant else "gguf"
                     resolved_path = MODEL_PATHS[variant]
@@ -178,17 +220,13 @@ class BenchmarkRunner:
                     config_obj.engines["mthy"].options["backend"] = backend
                     config_obj.engines["mthy"].options[f"{backend}_path"] = resolved_path
 
-                if base == "ullm" and variant == "lmstudio":
+                if base == "lmstudio":
                     from abersetz.config import EngineConfig
 
-                    if "ullm" not in config_obj.engines:
-                        config_obj.engines["ullm"] = EngineConfig(name="ullm", options={})
-                    config_obj.engines["ullm"].options.setdefault("profiles", {})
-                    config_obj.engines["ullm"].options["profiles"]["lmstudio"] = {
-                        "base_url": "http://localhost:1234/v1",
-                        "model": "local-model",
-                        "temperature": 0.3,
-                    }
+                    if "lmstudio" not in config_obj.engines:
+                        config_obj.engines["lmstudio"] = EngineConfig(name="lmstudio", options={})
+                    config_obj.engines["lmstudio"].options["base_url"] = "localhost:1234"
+                    config_obj.engines["lmstudio"].options["model"] = "local-model"
 
                 engine_cfg = config_obj.engines.get(base)
                 chunk_size = engine_cfg.chunk_size if engine_cfg else None
@@ -216,17 +254,13 @@ class BenchmarkRunner:
                     config_obj.engines["mthy"].options[f"{backend}_path"] = resolved_path
                     return real_create_engine(f"mthy/{backend}", config_obj, client=client)
 
-                if base == "ullm" and variant == "lmstudio":
+                if base == "lmstudio":
                     from abersetz.config import EngineConfig
 
-                    if "ullm" not in config_obj.engines:
-                        config_obj.engines["ullm"] = EngineConfig(name="ullm", options={})
-                    config_obj.engines["ullm"].options.setdefault("profiles", {})
-                    config_obj.engines["ullm"].options["profiles"]["lmstudio"] = {
-                        "base_url": "http://localhost:1234/v1",
-                        "model": "local-model",
-                        "temperature": 0.3,
-                    }
+                    if "lmstudio" not in config_obj.engines:
+                        config_obj.engines["lmstudio"] = EngineConfig(name="lmstudio", options={})
+                    config_obj.engines["lmstudio"].options["base_url"] = "localhost:1234"
+                    config_obj.engines["lmstudio"].options["model"] = "local-model"
                     return real_create_engine(selector_str, config_obj, client=client)
 
                 return real_create_engine(selector_str, config_obj, client=client)
@@ -258,36 +292,40 @@ class BenchmarkRunner:
                         chunk_size=max_chunks * 200 if max_chunks else None,
                     )
 
-                    # Read source to count characters
                     src_text = source_file.read_text(encoding="utf-8")
                     char_count = len(src_text)
 
-                    start_time = time.perf_counter()
-                    success = True
-                    error_msg = ""
+                    skipped = False
+                    if dest_path.exists() and not force:
+                        skipped = True
+                        elapsed = 0.0
+                        chars_per_sec = 0.0
+                        success = True
+                        error_msg = ""
+                    else:
+                        start_time = time.perf_counter()
+                        success = True
+                        error_msg = ""
 
-                    try:
-                        # Execute translation
-                        results = translate_path(source_file, opts, config=cfg)
-                        if results:
-                            # Rename output to the required format
-                            res_path = results[0].destination
-                            if res_path.exists() and res_path != dest_path:
-                                if dest_path.exists():
-                                    dest_path.unlink()
-                                res_path.rename(dest_path)
-                            # Clean up the empty target-lang directory
-                            with contextlib.suppress(OSError):
-                                res_path.parent.rmdir()
-                        else:
+                        try:
+                            results = translate_path(source_file, opts, config=cfg)
+                            if results:
+                                res_path = results[0].destination
+                                if res_path.exists() and res_path != dest_path:
+                                    if dest_path.exists():
+                                        dest_path.unlink()
+                                    res_path.rename(dest_path)
+                                with contextlib.suppress(OSError):
+                                    res_path.parent.rmdir()
+                            else:
+                                success = False
+                                error_msg = "No results returned"
+                        except Exception as e:
                             success = False
-                            error_msg = "No results returned"
-                    except Exception as e:
-                        success = False
-                        error_msg = str(e)
+                            error_msg = str(e)
 
-                    elapsed = time.perf_counter() - start_time
-                    chars_per_sec = char_count / elapsed if elapsed > 0 else 0
+                        elapsed = time.perf_counter() - start_time
+                        chars_per_sec = char_count / elapsed if elapsed > 0 else 0
 
                     benchmarks.append(
                         {
@@ -298,12 +336,18 @@ class BenchmarkRunner:
                             "time_s": elapsed,
                             "speed_cps": chars_per_sec,
                             "success": success,
+                            "skipped": skipped,
                             "output": dest_filename if success else "-",
                             "error": error_msg,
                         }
                     )
 
-                    if success:
+                    if skipped:
+                        console.print(
+                            f"  - {source_file.name} -> skipped (destination exists)",
+                            style="yellow",
+                        )
+                    elif success:
                         console.print(
                             f"  ✓ {source_file.name} -> {dest_filename} | "
                             f"Time: {elapsed:.2f}s | Speed: {chars_per_sec:.1f} char/s"
@@ -311,7 +355,28 @@ class BenchmarkRunner:
                     else:
                         console.print(f"  ✗ {source_file.name} failed: {error_msg}", style="red")
 
-        # 2. Render Benchmark Results Table
+        # Load existing results for non-destructive update
+        summary_path = root_dir / "examples" / "benchmark_results.json"
+        existing_benchmarks = []
+        if summary_path.exists():
+            try:
+                existing_benchmarks = json.loads(summary_path.read_text(encoding="utf-8"))
+                if not isinstance(existing_benchmarks, list):
+                    existing_benchmarks = []
+            except Exception:
+                existing_benchmarks = []
+
+        # Merge new results over existing ones by (engine, file) key
+        merged_map = {}
+        for b in existing_benchmarks:
+            if isinstance(b, dict) and "engine" in b and "file" in b:
+                merged_map[(b["engine"], b["file"])] = b
+        for b in benchmarks:
+            merged_map[(b["engine"], b["file"])] = b
+
+        final_benchmarks = list(merged_map.values())
+
+        # Render Benchmark Results Table (based on all merged benchmarks)
         table = Table(
             title="Abersetz Translation Benchmark Summary",
             show_header=True,
@@ -324,10 +389,15 @@ class BenchmarkRunner:
         table.add_column("Speed (cps)", justify="right")
         table.add_column("Output File")
 
-        for b in benchmarks:
-            status = "[green]Success[/green]" if b["success"] else "[red]Failed[/red]"
-            time_str = f"{b['time_s']:.2f}"
-            speed_str = f"{b['speed_cps']:.1f}" if b["success"] else "-"
+        for b in final_benchmarks:
+            if b.get("skipped"):
+                status = "[yellow]Skipped[/yellow]"
+                time_str = "-"
+                speed_str = "-"
+            else:
+                status = "[green]Success[/green]" if b["success"] else "[red]Failed[/red]"
+                time_str = f"{b['time_s']:.2f}"
+                speed_str = f"{b['speed_cps']:.1f}" if b["success"] else "-"
             table.add_row(
                 str(b["engine"]),
                 str(b["file"]),
@@ -340,10 +410,9 @@ class BenchmarkRunner:
         console.print("\n")
         console.print(table)
 
-        # 3. Save benchmark summary results
-        summary_path = root_dir / "examples" / "benchmark_results.json"
-        summary_path.write_text(json.dumps(benchmarks, indent=2), encoding="utf-8")
-        console.print(f"\n[green]✓[/green] Benchmark JSON saved to {summary_path}")
+        # Save merged results
+        summary_path.write_text(json.dumps(final_benchmarks, indent=2), encoding="utf-8")
+        console.print(f"\n[green]✓[/green] Benchmark JSON updated at {summary_path}")
 
 
 def main() -> None:

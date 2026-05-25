@@ -8,6 +8,13 @@ All notable changes to abersetz will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- Added unified CLI entrypoint routing in `pyproject.toml` pointing `abersetz` to `abersetz.__main__:main` so that both `uvx abersetz` and `python -m abersetz` execute the same entry point.
+- Added return type annotations and descriptive docstrings to all Fire CLI subcommands (`config`, `config show`, `config path`, `lang`) to enable clean `--help` synopses.
+- Added `n_threads` option (CPU threads limit) parameter support to `AbersetzCLI.tr`, `TranslatorOptions`, `create_engine`, and `LocalGgufEngine` for local GGUF CPU threads tuning.
+- Added smart language code and name resolution to `DeepTranslatorEngine` using `langcodes` to cleanly map codes/names (like `pl` or `polish`) to provider-supported identifiers (like `pl-PL`) without hardcoding mapping tables.
+- Added destination existence checking to `examples/benchmark.py` to skip translation if the output file exists, with a new `--force` flag to override this behavior.
+- Added dedicated local translation engine using the official `lmstudio` Python SDK (alias `lms`/`lmstudio`).
+- Added optional dependency groups (`mlx`, `gguf`, `lms`, and `all`) with macOS platform markers to `pyproject.toml`.
 - Added `examples/benchmark.py` speed benchmarking tool to compare translation engine throughput and accuracy across providers, with auto-discovery for all 7 local Hy-MT2 MLX/GGUF models and local LMStudio servers.
 - Added `examples/README.md` explaining benchmark configuration, dry-runs, and option flags.
 - Added support for local `Hy-MT2` translation models (MLX and GGUF backends) with automatic resolution of local/LMStudio paths.
@@ -20,8 +27,22 @@ All notable changes to abersetz will be documented in this file.
 - Added CLI regression tests for include defaults and output directory resolution.
 - Added `--include-community` flag to `abersetz setup` for opting into community/self-hosted engines.
 - Added `pytest-asyncio` development dependency to support testing of async code.
+- Added local model discovery module (`LocalModelFinder` in `src/abersetz/providers/llm/local_discovery.py`) that portable-scans HuggingFace, Ollama, LM Studio, Pinokio, and GPT4All directories for LLM weights.
+- Added `discover` subcommand to the main `abersetz` CLI, allowing users to scan and display local system models directly from the command line.
+- Added support for passing GGUF/MLX inference parameters (`n_gpu_layers`, `n_ctx`, `max_tokens`) as CLI flags and options in `tr` and propagating them dynamically to the engines.
+- Added uppercase option aliases for `tr` (`Overwrite`, `Temperature`, `Vocabulary`) and `validate` (`Selectors`, `Text`) to avoid single-letter option collisions under python-fire (letting `-O`, `-T`, `-V`, and `-S` map cleanly alongside lowercase parameters).
+- Updated `__main__.py` to use `cli_fast` to speed up module-level version and help lookups.
+
 
 ### Changed
+- Removed the `my_memory` translation provider from the `deep-translator` providers list (both engine catalog and provider classes) due to its highly restrictive 500-character text limit that fails typical benchmark translations.
+- Rejected the discontinued `tencent/Hunyuan-MT-7B` SiliconFlow model in `engines.py` and raised a configuration update suggestion asking users to migrate to `Qwen/Qwen2.5-7B-Instruct`.
+- Removed `tencent-Hunyuan-MT-7B` (`hysf`/`hy` engine family) support as it was discontinued by SiliconFlow.
+- Updated the default model and temperature for SiliconFlow-based `ullm` defaults to `Qwen/Qwen2.5-7B-Instruct` and `0.3`.
+- Updated default engine priorities in setup to prefer SiliconFlow/ULLM over the removed Hunyuan engine.
+- Updated validation sort order to position `lms` before `ll` (ULLM).
+- Updated `examples/benchmark.py` and `README.md` to remove `hysf` and incorporate `lms` engine.
+- Updated `examples/benchmark.py` to rely on the published `abersetz` package via its `uv` script shebang dependencies block instead of manually modifying `sys.path` to target local source files.
 - Rewrote `examples/` directory to keep only `./examples/data/` source files while deleting legacy scripts.
 - Rewrote `tests/test_examples.py` to cover the new benchmark runner.
 - Updated `get_engine_descriptor` helper in the benchmark runner to resolve short selectors to canonical config keys for correct descriptor output.
@@ -29,11 +50,26 @@ All notable changes to abersetz will be documented in this file.
 - Removed support for legacy `Hy-MT1.x` models (which now raise an `EngineError` if loaded locally).
 - Removed assistant preamble/outro text from `README.md`.
 - Removed transient one-off files: `update_*.py` refactoring scripts, `md.txt`, and `translation_report.json`.
+- Updated user `config.toml` to align deep-translator and translators provider lists with current codebase catalog (removing obsolete `my_memory` from deep-translator, and ensuring `libre` and `linguee` are correctly configured).
 
 ### Fixed
+- Fixed duplicate client configuration conflict in `LmstudioEngine` by catching and handling the ValueError from `configure_default_client` gracefully.
+- Fixed a cache key serialization error in `pipeline.py` by safely extracting string model names instead of passing full loaded model weight objects (which exceeded SQLite capacity and caused indexing errors).
+- Fixed a log formatting `IndexError` in the `twat_cache` diskcache logger by removing formatted variables from `logger.exception` calls.
+- Fixed CLI log noise by defaulting loguru to `WARNING` level on package import, suppressing early diagnostic `DEBUG` messages (like `redis not available`) from downstream libraries.
+- Silenced raw diagnostic print calls (`CACHE_KWARGS` and `[FUNCTOOLS] KEY`) in `twat_cache`'s diskcache and functools engines by converting them to standard `logger.debug` statements.
+- Configured local workspace dependencies (`htmladapt`, `twat`, `twat-cache`, `twat-task`) as editable in `pyproject.toml` so that environment updates align instantly with local repository edits.
+- Silenced import-time print and warning noise in `cli.py` by redirecting stdout/stderr to `/dev/null` during heavy module imports (such as `pipeline.py` which transitively imports `twat_cache`), ensuring that CLI commands are completely clean of diagnostic print pollution.
+- Fixed local MLX model directory resolution to return the parent directory containing the model weights rather than the individual file path, ensuring compatibility with `mlx_lm.load`.
+- Fixed python-fire help program name display by specifying `name="abersetz"` and `name="abtr"` inside the `fire.Fire()` calls to ensure clean synopsis outputs.
+- Cleaned up import statement sorting and non-top-level import warnings (E402/F823) in engines, pipeline, and discovery modules.
+- Fixed exception chaining (B904) in `LmstudioEngine` and `src/abersetz/pipeline.py`.
+- Fixed unused loop control variables (B007) in `DeepTranslatorEngine._resolve_lang`.
+- Fixed `deep-translator` engine initialization by automatically mapping standard 2-letter language codes to their region-specific equivalents for providers with stricter language requirements (e.g. mapping `en` to `en-GB` and `pl` to `pl-PL` for `MyMemoryTranslator`).
 - Fixed PyPI publishing flow in `publish.sh` by cleaning the `dist/` directory before building the release package, preventing local development version files from being uploaded and rejected by PyPI due to local version identifier restrictions.
 - Fixed `test_cli_setup_forwards_flags` to support `include_community` keyword argument.
-- Cleaned up lint warnings: fixed B904 (exception chaining via `from e`) in `src/abersetz/pipeline.py`, silenced useless expression warning B018 in `tests/test_package.py`, and refactored try-except-pass block in `src/abersetz/config.py` using `contextlib.suppress`.
+- Silenced useless expression warning B018 in `tests/test_package.py`, and refactored try-except-pass block in `src/abersetz/config.py` using `contextlib.suppress`.
+
 
 ## [1.0.19] - 2025-09-21
 

@@ -39,23 +39,19 @@ env = "SILICONFLOW_API_KEY"
 [credentials.deepseek]
 env = "DEEPSEEK_API_KEY"
 
-[engines.hysf]
+[engines.lmstudio]
 chunk_size = 2400
 
-[engines.hysf.credential]
-name = "siliconflow"
-
-[engines.hysf.options]
-model = "tencent/Hunyuan-MT-7B"
-base_url = "https://api.siliconflow.com/v1"
-temperature = 0.3
+[engines.lmstudio.options]
+base_url = "localhost:1234"
+model = "local-model"
 
 [engines.ullm]
 chunk_size = 2400
 
 [engines.ullm.options.profiles.default]
 base_url = "https://api.siliconflow.com/v1"
-model = "tencent/Hunyuan-MT-7B"
+model = "Qwen/Qwen2.5-7B-Instruct"
 credential = { name = "siliconflow" }
 temperature = 0.3
 max_input_tokens = 32000

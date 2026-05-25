@@ -22,6 +22,7 @@ uv run python examples/benchmark.py run --engines "tr/google,dt/google"
 - `--engines`: Comma-separated list of selector names (e.g. `tr/google,dt/google,hysf`). Defaults to auto-discovery.
 - `--max-chunks`: Limit number of chunks processed per file (useful for rapid rate-safe testing).
 - `--dry-run`: Evaluate chunking structures and pipeline speeds without hitting remote translation APIs.
+- `--force`: Force translation even if the destination file already exists (by default, existing translations are skipped).
 - `--verbose`: Print extra pipeline logs during processing.
 
 ## Test Data

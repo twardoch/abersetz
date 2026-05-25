@@ -1,0 +1,15 @@
+{
+  "projectRoot": "/Users/adam/Developer/vcs3/github.twardoch/pub/abersetz",
+  "batchFiles": [
+    {"path": "src/abersetz/abersetz.py", "language": "python", "sizeLines": 15, "fileCategory": "code"},
+    {"path": "src/abersetz/chunking.py", "language": "python", "sizeLines": 65, "fileCategory": "code"},
+    {"path": "src/abersetz/pipeline.py", "language": "python", "sizeLines": 475, "fileCategory": "code"},
+    {"path": "src/abersetz/tasks.py", "language": "python", "sizeLines": 51, "fileCategory": "code"}
+  ],
+  "batchImportData": {
+    "src/abersetz/abersetz.py": ["src/abersetz/pipeline.py"],
+    "src/abersetz/chunking.py": [],
+    "src/abersetz/pipeline.py": ["src/abersetz/chunking.py", "src/abersetz/config.py", "src/abersetz/engine_catalog.py", "src/abersetz/engines.py"],
+    "src/abersetz/tasks.py": ["src/abersetz/pipeline.py"]
+  }
+}

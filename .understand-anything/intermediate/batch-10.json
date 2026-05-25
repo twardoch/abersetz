@@ -1,0 +1,79 @@
+{
+  "nodes": [
+    {
+      "id": "document:examples/data/poem/poem.en.md",
+      "type": "document",
+      "name": "poem.en.md",
+      "filePath": "examples/data/poem/poem.en.md",
+      "summary": "English source poem used as the input fixture for translation examples and tests.",
+      "tags": ["documentation", "test-fixture", "sample-data", "source"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:examples/data/poem/poem.pl--dt-google.md",
+      "type": "document",
+      "name": "poem.pl--dt-google.md",
+      "filePath": "examples/data/poem/poem.pl--dt-google.md",
+      "summary": "Polish translation of the sample poem produced via the deep-translator Google engine, kept as an example output fixture.",
+      "tags": ["documentation", "test-fixture", "sample-data", "translation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:examples/data/poem/poem.pl--mthy-gguf-1.8b-gguf.md",
+      "type": "document",
+      "name": "poem.pl--mthy-gguf-1.8b-gguf.md",
+      "filePath": "examples/data/poem/poem.pl--mthy-gguf-1.8b-gguf.md",
+      "summary": "Polish translation of the sample poem produced via the GGUF 1.8B local model engine, kept as an example output fixture.",
+      "tags": ["documentation", "test-fixture", "sample-data", "translation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:examples/data/poem/poem.pl--mthy-mlx-1.8b-mlx.md",
+      "type": "document",
+      "name": "poem.pl--mthy-mlx-1.8b-mlx.md",
+      "filePath": "examples/data/poem/poem.pl--mthy-mlx-1.8b-mlx.md",
+      "summary": "Polish translation of the sample poem produced via the MLX 1.8B local model engine, kept as an example output fixture.",
+      "tags": ["documentation", "test-fixture", "sample-data", "translation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:examples/data/poem/poem.pl--tr-google.md",
+      "type": "document",
+      "name": "poem.pl--tr-google.md",
+      "filePath": "examples/data/poem/poem.pl--tr-google.md",
+      "summary": "Polish translation of the sample poem produced via the translators (tr) Google engine, kept as an example output fixture.",
+      "tags": ["documentation", "test-fixture", "sample-data", "translation"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "document:examples/data/poem/poem.pl--dt-google.md",
+      "target": "document:examples/data/poem/poem.en.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:examples/data/poem/poem.pl--mthy-gguf-1.8b-gguf.md",
+      "target": "document:examples/data/poem/poem.en.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:examples/data/poem/poem.pl--mthy-mlx-1.8b-mlx.md",
+      "target": "document:examples/data/poem/poem.en.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:examples/data/poem/poem.pl--tr-google.md",
+      "target": "document:examples/data/poem/poem.en.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

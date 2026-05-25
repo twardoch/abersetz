@@ -12,7 +12,7 @@ ENGINE_FAMILY_SHORT_TO_LONG: dict[str, str] = {
     "tr": "translators",
     "dt": "deep-translator",
     "ll": "ullm",
-    "hy": "hysf",
+    "lms": "lmstudio",
 }
 
 ENGINE_FAMILY_LONG_TO_SHORT: dict[str, str] = {
@@ -120,7 +120,6 @@ DEEP_TRANSLATOR_FREE_PROVIDERS = (
     "google",
     "libre",
     "linguee",
-    "my_memory",
 )
 COMMUNITY_DEEP_TRANSLATOR_PROVIDERS = ("libre",)
 DEEP_TRANSLATOR_PAID_PROVIDERS = (
@@ -129,8 +128,8 @@ DEEP_TRANSLATOR_PAID_PROVIDERS = (
     "papago",
 )
 
-HYSF_DEFAULT_MODEL = "tencent/Hunyuan-MT-7B"
-HYSF_DEFAULT_TEMPERATURE = 0.9
+ULLM_DEFAULT_MODEL = "Qwen/Qwen2.5-7B-Instruct"
+ULLM_DEFAULT_TEMPERATURE = 0.3
 
 
 def _filter_available(pool: Iterable[str], allowed: Iterable[str]) -> list[str]:

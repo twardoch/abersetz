@@ -1,0 +1,239 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/abersetz/providers/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "src/abersetz/providers/__init__.py",
+      "summary": "Package barrel for the translation providers, re-exporting the base engine types and every concrete engine implementation (deep_translator, gguf, llm, lmstudio, mlx, translators).",
+      "tags": ["entry-point", "barrel", "providers"],
+      "complexity": "simple",
+      "languageNotes": "Python package __init__ acting as a re-export barrel for the provider engines."
+    },
+    {
+      "id": "file:src/abersetz/providers/base.py",
+      "type": "file",
+      "name": "base.py",
+      "filePath": "src/abersetz/providers/base.py",
+      "summary": "Defines the shared engine contract: the EngineError exception, EngineRequest/EngineResult data structures, the Engine protocol, and the EngineBase class with chunk-size resolution used by all concrete providers.",
+      "tags": ["type-definition", "data-model", "providers", "interface"],
+      "complexity": "simple",
+      "languageNotes": "Uses a Protocol-style Engine contract plus dataclasses for request/result payloads."
+    },
+    {
+      "id": "file:src/abersetz/providers/deep_translator.py",
+      "type": "file",
+      "name": "deep_translator.py",
+      "filePath": "src/abersetz/providers/deep_translator.py",
+      "summary": "Engine wrapping the deep-translator library, resolving language codes against provider-supported languages with langcodes fallback and translating text with retry.",
+      "tags": ["service", "providers", "translation", "api-handler"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/abersetz/providers/gguf.py",
+      "type": "file",
+      "name": "gguf.py",
+      "filePath": "src/abersetz/providers/gguf.py",
+      "summary": "Local GGUF translation engine that downloads/loads a llama.cpp model and runs chat-completion translation using the shared mthy prompt builder.",
+      "tags": ["service", "providers", "translation", "local-model"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/abersetz/providers/lmstudio.py",
+      "type": "file",
+      "name": "lmstudio.py",
+      "filePath": "src/abersetz/providers/lmstudio.py",
+      "summary": "Engine driving a local LM Studio model, ensuring the lmstudio daemon is running before invoking the loaded model for translation.",
+      "tags": ["service", "providers", "translation", "local-model"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/abersetz/providers/mlx.py",
+      "type": "file",
+      "name": "mlx.py",
+      "filePath": "src/abersetz/providers/mlx.py",
+      "summary": "Apple MLX translation engine plus shared model-resolution helpers: language mapping, mthy prompt construction, local model discovery, and Hugging Face download fallback.",
+      "tags": ["service", "providers", "translation", "local-model", "utility"],
+      "complexity": "complex",
+      "languageNotes": "Largest provider file; mixes module-level helper functions (reused by the gguf engine) with the LocalMlxEngine class."
+    },
+    {
+      "id": "file:src/abersetz/providers/translators.py",
+      "type": "file",
+      "name": "translators.py",
+      "filePath": "src/abersetz/providers/translators.py",
+      "summary": "Engine wrapping the translators library, dispatching HTML or plain-text translation with retry handling.",
+      "tags": ["service", "providers", "translation", "api-handler"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/providers/base.py:EngineRequest",
+      "type": "class",
+      "name": "EngineRequest",
+      "filePath": "src/abersetz/providers/base.py",
+      "lineRange": [16, 26],
+      "summary": "Data structure carrying a translation request: text, source/target languages, HTML flag, vocabulary, prolog, and chunk indices.",
+      "tags": ["data-model", "type-definition", "providers"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/providers/base.py:Engine",
+      "type": "class",
+      "name": "Engine",
+      "filePath": "src/abersetz/providers/base.py",
+      "lineRange": [37, 48],
+      "summary": "Protocol defining the translation engine interface with translate and chunk_size_for plus name and chunk-size attributes.",
+      "tags": ["interface", "type-definition", "providers"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/providers/base.py:EngineBase",
+      "type": "class",
+      "name": "EngineBase",
+      "filePath": "src/abersetz/providers/base.py",
+      "lineRange": [51, 67],
+      "summary": "Base class for concrete engines providing common initialization and chunk-size resolution shared across providers.",
+      "tags": ["base-class", "providers", "factory"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/providers/deep_translator.py:DeepTranslatorEngine",
+      "type": "class",
+      "name": "DeepTranslatorEngine",
+      "filePath": "src/abersetz/providers/deep_translator.py",
+      "lineRange": [13, 140],
+      "summary": "Engine adapter for the deep-translator library, resolving language codes to provider-supported forms and translating text with retry logic.",
+      "tags": ["service", "translation", "api-handler", "providers"],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/abersetz/providers/gguf.py:LocalGgufEngine",
+      "type": "class",
+      "name": "LocalGgufEngine",
+      "filePath": "src/abersetz/providers/gguf.py",
+      "lineRange": [13, 80],
+      "summary": "Loads a local GGUF model via llama.cpp and translates text through chat completion using the mthy prompt.",
+      "tags": ["service", "translation", "local-model", "providers"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/abersetz/providers/lmstudio.py:LmstudioEngine",
+      "type": "class",
+      "name": "LmstudioEngine",
+      "filePath": "src/abersetz/providers/lmstudio.py",
+      "lineRange": [11, 116],
+      "summary": "Manages the LM Studio daemon lifecycle and invokes a loaded model to translate text per target language.",
+      "tags": ["service", "translation", "local-model", "providers"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/providers/mlx.py:find_local_model_path",
+      "type": "function",
+      "name": "find_local_model_path",
+      "filePath": "src/abersetz/providers/mlx.py",
+      "lineRange": [150, 195],
+      "summary": "Discovers a locally cached model directory matching a model identifier across several naming conventions.",
+      "tags": ["utility", "local-model", "discovery"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/providers/mlx.py:resolve_and_download_model",
+      "type": "function",
+      "name": "resolve_and_download_model",
+      "filePath": "src/abersetz/providers/mlx.py",
+      "lineRange": [198, 266],
+      "summary": "Resolves a model name or path to a local directory, applying aliases and falling back to Hugging Face snapshot/file download when not cached.",
+      "tags": ["utility", "local-model", "download"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/abersetz/providers/mlx.py:build_mthy_prompt",
+      "type": "function",
+      "name": "build_mthy_prompt",
+      "filePath": "src/abersetz/providers/mlx.py",
+      "lineRange": [68, 76],
+      "summary": "Builds the mthy translation prompt from source text, target language, and optional vocabulary mapping. Reused by the gguf engine.",
+      "tags": ["utility", "translation", "prompt"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/providers/mlx.py:LocalMlxEngine",
+      "type": "class",
+      "name": "LocalMlxEngine",
+      "filePath": "src/abersetz/providers/mlx.py",
+      "lineRange": [269, 343],
+      "summary": "Apple MLX translation engine that loads a local model and generates translations via chat-templated prompts.",
+      "tags": ["service", "translation", "local-model", "providers"],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/abersetz/providers/translators.py:TranslatorsEngine",
+      "type": "class",
+      "name": "TranslatorsEngine",
+      "filePath": "src/abersetz/providers/translators.py",
+      "lineRange": [11, 45],
+      "summary": "Engine adapter for the translators library, dispatching HTML or plain-text translation with retry handling.",
+      "tags": ["service", "translation", "api-handler", "providers"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {"source": "file:src/abersetz/providers/__init__.py", "target": "file:src/abersetz/providers/base.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/__init__.py", "target": "file:src/abersetz/providers/deep_translator.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/__init__.py", "target": "file:src/abersetz/providers/gguf.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/__init__.py", "target": "file:src/abersetz/providers/llm/__init__.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/__init__.py", "target": "file:src/abersetz/providers/lmstudio.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/__init__.py", "target": "file:src/abersetz/providers/mlx.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/__init__.py", "target": "file:src/abersetz/providers/translators.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/base.py", "target": "file:src/abersetz/chunking.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/deep_translator.py", "target": "file:src/abersetz/config.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/deep_translator.py", "target": "file:src/abersetz/providers/base.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/gguf.py", "target": "file:src/abersetz/config.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/gguf.py", "target": "file:src/abersetz/providers/base.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/gguf.py", "target": "file:src/abersetz/providers/mlx.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/lmstudio.py", "target": "file:src/abersetz/config.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/lmstudio.py", "target": "file:src/abersetz/providers/base.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/mlx.py", "target": "file:src/abersetz/config.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/mlx.py", "target": "file:src/abersetz/providers/base.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/translators.py", "target": "file:src/abersetz/config.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/translators.py", "target": "file:src/abersetz/providers/base.py", "type": "imports", "direction": "forward", "weight": 0.7},
+
+    {"source": "file:src/abersetz/providers/base.py", "target": "class:src/abersetz/providers/base.py:EngineRequest", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/abersetz/providers/base.py", "target": "class:src/abersetz/providers/base.py:Engine", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/abersetz/providers/base.py", "target": "class:src/abersetz/providers/base.py:EngineBase", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/abersetz/providers/base.py", "target": "class:src/abersetz/providers/base.py:EngineRequest", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:src/abersetz/providers/base.py", "target": "class:src/abersetz/providers/base.py:Engine", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:src/abersetz/providers/base.py", "target": "class:src/abersetz/providers/base.py:EngineBase", "type": "exports", "direction": "forward", "weight": 0.8},
+
+    {"source": "file:src/abersetz/providers/deep_translator.py", "target": "class:src/abersetz/providers/deep_translator.py:DeepTranslatorEngine", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/abersetz/providers/deep_translator.py", "target": "class:src/abersetz/providers/deep_translator.py:DeepTranslatorEngine", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "class:src/abersetz/providers/deep_translator.py:DeepTranslatorEngine", "target": "class:src/abersetz/providers/base.py:EngineBase", "type": "inherits", "direction": "forward", "weight": 0.9},
+
+    {"source": "file:src/abersetz/providers/gguf.py", "target": "class:src/abersetz/providers/gguf.py:LocalGgufEngine", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/abersetz/providers/gguf.py", "target": "class:src/abersetz/providers/gguf.py:LocalGgufEngine", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "class:src/abersetz/providers/gguf.py:LocalGgufEngine", "target": "class:src/abersetz/providers/base.py:EngineBase", "type": "inherits", "direction": "forward", "weight": 0.9},
+    {"source": "class:src/abersetz/providers/gguf.py:LocalGgufEngine", "target": "function:src/abersetz/providers/mlx.py:build_mthy_prompt", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "class:src/abersetz/providers/gguf.py:LocalGgufEngine", "target": "function:src/abersetz/providers/mlx.py:resolve_and_download_model", "type": "calls", "direction": "forward", "weight": 0.8},
+
+    {"source": "file:src/abersetz/providers/lmstudio.py", "target": "class:src/abersetz/providers/lmstudio.py:LmstudioEngine", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/abersetz/providers/lmstudio.py", "target": "class:src/abersetz/providers/lmstudio.py:LmstudioEngine", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "class:src/abersetz/providers/lmstudio.py:LmstudioEngine", "target": "class:src/abersetz/providers/base.py:EngineBase", "type": "inherits", "direction": "forward", "weight": 0.9},
+
+    {"source": "file:src/abersetz/providers/mlx.py", "target": "function:src/abersetz/providers/mlx.py:build_mthy_prompt", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/abersetz/providers/mlx.py", "target": "function:src/abersetz/providers/mlx.py:find_local_model_path", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/abersetz/providers/mlx.py", "target": "function:src/abersetz/providers/mlx.py:resolve_and_download_model", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/abersetz/providers/mlx.py", "target": "class:src/abersetz/providers/mlx.py:LocalMlxEngine", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/abersetz/providers/mlx.py", "target": "function:src/abersetz/providers/mlx.py:build_mthy_prompt", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:src/abersetz/providers/mlx.py", "target": "function:src/abersetz/providers/mlx.py:find_local_model_path", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:src/abersetz/providers/mlx.py", "target": "function:src/abersetz/providers/mlx.py:resolve_and_download_model", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:src/abersetz/providers/mlx.py", "target": "class:src/abersetz/providers/mlx.py:LocalMlxEngine", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "class:src/abersetz/providers/mlx.py:LocalMlxEngine", "target": "class:src/abersetz/providers/base.py:EngineBase", "type": "inherits", "direction": "forward", "weight": 0.9},
+    {"source": "class:src/abersetz/providers/mlx.py:LocalMlxEngine", "target": "function:src/abersetz/providers/mlx.py:build_mthy_prompt", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "class:src/abersetz/providers/mlx.py:LocalMlxEngine", "target": "function:src/abersetz/providers/mlx.py:resolve_and_download_model", "type": "calls", "direction": "forward", "weight": 0.8},
+    {"source": "function:src/abersetz/providers/mlx.py:resolve_and_download_model", "target": "function:src/abersetz/providers/mlx.py:find_local_model_path", "type": "calls", "direction": "forward", "weight": 0.8},
+
+    {"source": "file:src/abersetz/providers/translators.py", "target": "class:src/abersetz/providers/translators.py:TranslatorsEngine", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/abersetz/providers/translators.py", "target": "class:src/abersetz/providers/translators.py:TranslatorsEngine", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "class:src/abersetz/providers/translators.py:TranslatorsEngine", "target": "class:src/abersetz/providers/base.py:EngineBase", "type": "inherits", "direction": "forward", "weight": 0.9}
+  ]
+}

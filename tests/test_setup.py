@@ -138,7 +138,7 @@ def test_generate_config_builds_engines(monkeypatch) -> None:
             api_key_env="SILICONFLOW_API_KEY",
             base_url="https://api.siliconflow.com/v1",
             is_available=True,
-            engine_names=["hy", "ll/default"],
+            engine_names=["ll/default"],
         ),
     ]
 
@@ -147,9 +147,10 @@ def test_generate_config_builds_engines(monkeypatch) -> None:
     assert config is not None
     assert config.engines["translators"].options["provider"] == "google"
     assert "deepl" in config.engines["deep-translator"].options["providers"]
-    assert "hysf" in config.engines
+    assert "ullm" in config.engines
+    assert "lmstudio" in config.engines
     default_engine = normalize_selector(config.defaults.engine) or config.defaults.engine
-    assert default_engine in {"tr/google", "dt/deepl", "hy", "ll/default"}
+    assert default_engine in {"tr/google", "dt/deepl", "ll/default"}
 
 
 def test_generate_config_excludes_community_providers_by_default(
@@ -204,7 +205,7 @@ def test_generate_config_includes_community_providers_when_requested(
     assert "libre" in deep
 
 
-def test_generate_config_prefers_hysf_when_translators_unavailable(monkeypatch) -> None:
+def test_generate_config_prefers_ullm_when_translators_unavailable(monkeypatch) -> None:
     wizard = SetupWizard(non_interactive=True)
     wizard.discovered_providers = [
         DiscoveredProvider(
@@ -227,9 +228,9 @@ def test_generate_config_prefers_hysf_when_translators_unavailable(monkeypatch) 
     config = wizard._generate_config()
 
     assert config is not None
-    assert "hysf" in config.engines
+    assert "ullm" in config.engines
     default_engine = normalize_selector(config.defaults.engine) or config.defaults.engine
-    assert default_engine == "hy"
+    assert default_engine == "ll/default"
 
 
 def test_generate_config_defaults_to_ullm_when_only_openai(monkeypatch) -> None:
@@ -894,12 +895,11 @@ def test_select_default_engine_prefers_deepl(monkeypatch: pytest.MonkeyPatch) ->
     assert _select_default_engine(engines, providers) == "deep-translator/deepl"
 
 
-def test_select_default_engine_prefers_translators_then_hysf(
+def test_select_default_engine_prefers_translators_then_ullm(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     engines = {
         "translators": EngineConfig(name="translators", chunk_size=800, options={}),
-        "hysf": EngineConfig(name="hysf", chunk_size=2400, options={}),
         "ullm": EngineConfig(name="ullm", chunk_size=2400, options={}),
     }
     providers = [

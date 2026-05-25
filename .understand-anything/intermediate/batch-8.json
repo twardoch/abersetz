@@ -1,0 +1,54 @@
+{
+  "nodes": [
+    {
+      "id": "document:examples/README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "examples/README.md",
+      "summary": "Usage guide for the translation engine benchmark suite, documenting how to run examples/benchmark.py with its --engines, --dry-run, --force and related options, and describing the poem and FontLab test documents.",
+      "tags": ["documentation", "benchmark", "examples", "usage-guide"],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:examples/benchmark_results.json",
+      "type": "config",
+      "name": "benchmark_results.json",
+      "filePath": "examples/benchmark_results.json",
+      "summary": "Persisted machine-readable benchmark output produced by examples/benchmark.py, recording per-engine translation speed, throughput, and success/failure metrics across the test documents.",
+      "tags": ["benchmark", "data", "metrics", "examples"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:examples/benchmark_results.md",
+      "type": "document",
+      "name": "benchmark_results.md",
+      "filePath": "examples/benchmark_results.md",
+      "summary": "Narrative analysis of the translation engine benchmark, comparing local MLX vs GGUF backends, model sizes, and cataloguing failure modes (API length limits, volume/path errors, network timeouts, LM Studio connectivity).",
+      "tags": ["documentation", "benchmark", "analysis", "examples"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "document:examples/README.md",
+      "target": "file:examples/benchmark.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:examples/README.md",
+      "target": "config:examples/benchmark_results.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:examples/benchmark_results.md",
+      "target": "config:examples/benchmark_results.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

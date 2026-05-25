@@ -1,0 +1,1073 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 4,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "src/abersetz/abersetz.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 15,
+      "nonEmptyLines": 11,
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0
+      }
+    },
+    {
+      "path": "src/abersetz/chunking.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 65,
+      "nonEmptyLines": 43,
+      "functions": [
+        {
+          "name": "detect_format",
+          "startLine": 24,
+          "endLine": 30,
+          "params": [
+            "text"
+          ]
+        },
+        {
+          "name": "_fallback_chunks",
+          "startLine": 33,
+          "endLine": 37,
+          "params": [
+            "text",
+            "max_size"
+          ]
+        },
+        {
+          "name": "_semantic_chunks",
+          "startLine": 40,
+          "endLine": 51,
+          "params": [
+            "text",
+            "max_size"
+          ]
+        },
+        {
+          "name": "chunk_text",
+          "startLine": 54,
+          "endLine": 62,
+          "params": [
+            "text",
+            "max_size",
+            "fmt"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "TextFormat",
+          "startLine": 15,
+          "endLine": 21,
+          "methods": [],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "TextFormat",
+          "line": 15,
+          "isDefault": false
+        },
+        {
+          "name": "detect_format",
+          "line": 24,
+          "isDefault": false
+        },
+        {
+          "name": "_fallback_chunks",
+          "line": 33,
+          "isDefault": false
+        },
+        {
+          "name": "_semantic_chunks",
+          "line": 40,
+          "isDefault": false
+        },
+        {
+          "name": "chunk_text",
+          "line": 54,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "detect_format",
+          "callee": "_HTML_PATTERN.search",
+          "lineNumber": 28
+        },
+        {
+          "caller": "_fallback_chunks",
+          "callee": "range",
+          "lineNumber": 37
+        },
+        {
+          "caller": "_fallback_chunks",
+          "callee": "len",
+          "lineNumber": 37
+        },
+        {
+          "caller": "_semantic_chunks",
+          "callee": "_fallback_chunks",
+          "lineNumber": 48
+        },
+        {
+          "caller": "_semantic_chunks",
+          "callee": "TextSplitter",
+          "lineNumber": 50
+        },
+        {
+          "caller": "_semantic_chunks",
+          "callee": "splitter.chunks",
+          "lineNumber": 51
+        },
+        {
+          "caller": "chunk_text",
+          "callee": "list",
+          "lineNumber": 62
+        },
+        {
+          "caller": "chunk_text",
+          "callee": "_semantic_chunks",
+          "lineNumber": 62
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 5,
+        "functionCount": 4,
+        "classCount": 1
+      }
+    },
+    {
+      "path": "src/abersetz/pipeline.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 475,
+      "nonEmptyLines": 399,
+      "functions": [
+        {
+          "name": "translate_path",
+          "startLine": 84,
+          "endLine": 140,
+          "params": [
+            "path",
+            "options",
+            "config",
+            "client"
+          ]
+        },
+        {
+          "name": "_merge_defaults",
+          "startLine": 143,
+          "endLine": 159,
+          "params": [
+            "options",
+            "config"
+          ]
+        },
+        {
+          "name": "_discover_files",
+          "startLine": 162,
+          "endLine": 170,
+          "params": [
+            "root",
+            "opts"
+          ]
+        },
+        {
+          "name": "_is_xcluded",
+          "startLine": 173,
+          "endLine": 174,
+          "params": [
+            "path",
+            "patterns"
+          ]
+        },
+        {
+          "name": "_translate_file",
+          "startLine": 177,
+          "endLine": 250,
+          "params": [
+            "source",
+            "engine",
+            "opts",
+            "config"
+          ]
+        },
+        {
+          "name": "_translate_html",
+          "startLine": 253,
+          "endLine": 321,
+          "params": [
+            "text",
+            "engine",
+            "opts",
+            "config"
+          ]
+        },
+        {
+          "name": "_cached_translate_call",
+          "startLine": 328,
+          "endLine": 357,
+          "params": [
+            "engine_name",
+            "model_name",
+            "text",
+            "source_lang",
+            "target_lang",
+            "is_html",
+            "voc_json",
+            "prolog_json",
+            "temperature"
+          ]
+        },
+        {
+          "name": "_apply_engine",
+          "startLine": 360,
+          "endLine": 408,
+          "params": [
+            "engine",
+            "chunks",
+            "fmt",
+            "opts",
+            "config"
+          ]
+        },
+        {
+          "name": "_build_request",
+          "startLine": 411,
+          "endLine": 430,
+          "params": [
+            "chunk",
+            "index",
+            "total",
+            "fmt",
+            "opts",
+            "config",
+            "voc",
+            "prolog"
+          ]
+        },
+        {
+          "name": "_select_chunk_size",
+          "startLine": 433,
+          "endLine": 445,
+          "params": [
+            "fmt",
+            "engine",
+            "opts",
+            "config"
+          ]
+        },
+        {
+          "name": "_persist_output",
+          "startLine": 448,
+          "endLine": 467,
+          "params": [
+            "source",
+            "content",
+            "voc",
+            "fmt",
+            "opts",
+            "target_lang"
+          ]
+        }
+      ],
+      "classes": [
+        {
+          "name": "TranslatorOptions",
+          "startLine": 35,
+          "endLine": 58,
+          "methods": [],
+          "properties": [
+            "engine",
+            "from_lang",
+            "to_lang",
+            "recurse",
+            "write_over",
+            "output_dir",
+            "save_voc",
+            "chunk_size",
+            "html_chunk_size",
+            "include",
+            "xclude",
+            "dry_run",
+            "prolog",
+            "initial_voc",
+            "temperature",
+            "n_gpu_layers",
+            "n_ctx",
+            "max_tokens",
+            "n_threads"
+          ]
+        },
+        {
+          "name": "TranslationResult",
+          "startLine": 62,
+          "endLine": 75,
+          "methods": [],
+          "properties": [
+            "source",
+            "destination",
+            "chunks",
+            "voc",
+            "format",
+            "engine",
+            "source_lang",
+            "target_lang",
+            "chunk_size"
+          ]
+        },
+        {
+          "name": "PipelineError",
+          "startLine": 78,
+          "endLine": 81,
+          "methods": [],
+          "properties": []
+        }
+      ],
+      "exports": [
+        {
+          "name": "TranslatorOptions",
+          "line": 34,
+          "isDefault": false
+        },
+        {
+          "name": "TranslationResult",
+          "line": 61,
+          "isDefault": false
+        },
+        {
+          "name": "PipelineError",
+          "line": 78,
+          "isDefault": false
+        },
+        {
+          "name": "translate_path",
+          "line": 84,
+          "isDefault": false
+        },
+        {
+          "name": "_merge_defaults",
+          "line": 143,
+          "isDefault": false
+        },
+        {
+          "name": "_discover_files",
+          "line": 162,
+          "isDefault": false
+        },
+        {
+          "name": "_is_xcluded",
+          "line": 173,
+          "isDefault": false
+        },
+        {
+          "name": "_translate_file",
+          "line": 177,
+          "isDefault": false
+        },
+        {
+          "name": "_translate_html",
+          "line": 253,
+          "isDefault": false
+        },
+        {
+          "name": "_cached_translate_call",
+          "line": 327,
+          "isDefault": false
+        },
+        {
+          "name": "_apply_engine",
+          "line": 360,
+          "isDefault": false
+        },
+        {
+          "name": "_build_request",
+          "line": 411,
+          "isDefault": false
+        },
+        {
+          "name": "_select_chunk_size",
+          "line": 433,
+          "isDefault": false
+        },
+        {
+          "name": "_persist_output",
+          "line": 448,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "translate_path",
+          "callee": "Path(path).resolve",
+          "lineNumber": 94
+        },
+        {
+          "caller": "translate_path",
+          "callee": "Path",
+          "lineNumber": 94
+        },
+        {
+          "caller": "translate_path",
+          "callee": "resolved.exists",
+          "lineNumber": 97
+        },
+        {
+          "caller": "translate_path",
+          "callee": "PipelineError",
+          "lineNumber": 98
+        },
+        {
+          "caller": "translate_path",
+          "callee": "resolved.is_file",
+          "lineNumber": 102
+        },
+        {
+          "caller": "translate_path",
+          "callee": "resolved.open(\"r\").close",
+          "lineNumber": 104
+        },
+        {
+          "caller": "translate_path",
+          "callee": "resolved.open",
+          "lineNumber": 104
+        },
+        {
+          "caller": "translate_path",
+          "callee": "resolved.is_dir",
+          "lineNumber": 105
+        },
+        {
+          "caller": "translate_path",
+          "callee": "list",
+          "lineNumber": 107
+        },
+        {
+          "caller": "translate_path",
+          "callee": "resolved.iterdir",
+          "lineNumber": 107
+        },
+        {
+          "caller": "translate_path",
+          "callee": "PipelineError",
+          "lineNumber": 109
+        },
+        {
+          "caller": "translate_path",
+          "callee": "load_config",
+          "lineNumber": 111
+        },
+        {
+          "caller": "translate_path",
+          "callee": "_merge_defaults",
+          "lineNumber": 112
+        },
+        {
+          "caller": "translate_path",
+          "callee": "list",
+          "lineNumber": 113
+        },
+        {
+          "caller": "translate_path",
+          "callee": "_discover_files",
+          "lineNumber": 113
+        },
+        {
+          "caller": "translate_path",
+          "callee": "PipelineError",
+          "lineNumber": 115
+        },
+        {
+          "caller": "translate_path",
+          "callee": "normalize_selector",
+          "lineNumber": 116
+        },
+        {
+          "caller": "translate_path",
+          "callee": "inspect.signature",
+          "lineNumber": 119
+        },
+        {
+          "caller": "translate_path",
+          "callee": "getattr",
+          "lineNumber": 123
+        },
+        {
+          "caller": "translate_path",
+          "callee": "getattr",
+          "lineNumber": 125
+        },
+        {
+          "caller": "translate_path",
+          "callee": "getattr",
+          "lineNumber": 127
+        },
+        {
+          "caller": "translate_path",
+          "callee": "getattr",
+          "lineNumber": 129
+        },
+        {
+          "caller": "translate_path",
+          "callee": "create_engine",
+          "lineNumber": 132
+        },
+        {
+          "caller": "translate_path",
+          "callee": "_translate_file",
+          "lineNumber": 137
+        },
+        {
+          "caller": "translate_path",
+          "callee": "results.append",
+          "lineNumber": 138
+        },
+        {
+          "caller": "_merge_defaults",
+          "callee": "TranslatorOptions",
+          "lineNumber": 144
+        },
+        {
+          "caller": "_merge_defaults",
+          "callee": "normalize_selector",
+          "lineNumber": 148
+        },
+        {
+          "caller": "_discover_files",
+          "callee": "root.is_file",
+          "lineNumber": 163
+        },
+        {
+          "caller": "_discover_files",
+          "callee": "matched.extend",
+          "lineNumber": 168
+        },
+        {
+          "caller": "_discover_files",
+          "callee": "pattern_iter",
+          "lineNumber": 168
+        },
+        {
+          "caller": "_discover_files",
+          "callee": "_is_xcluded",
+          "lineNumber": 169
+        },
+        {
+          "caller": "_discover_files",
+          "callee": "sorted",
+          "lineNumber": 170
+        },
+        {
+          "caller": "_discover_files",
+          "callee": "path.resolve",
+          "lineNumber": 170
+        },
+        {
+          "caller": "_discover_files",
+          "callee": "path.is_file",
+          "lineNumber": 170
+        },
+        {
+          "caller": "_is_xcluded",
+          "callee": "any",
+          "lineNumber": 174
+        },
+        {
+          "caller": "_is_xcluded",
+          "callee": "path.match",
+          "lineNumber": 174
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "source.read_text",
+          "lineNumber": 183
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "normalize_selector",
+          "lineNumber": 186
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "text.strip",
+          "lineNumber": 191
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "_persist_output",
+          "lineNumber": 193
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "TranslationResult",
+          "lineNumber": 201
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "source.stat",
+          "lineNumber": 214
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "logger.warning",
+          "lineNumber": 218
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "detect_format",
+          "lineNumber": 220
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "_translate_html",
+          "lineNumber": 222
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "_select_chunk_size",
+          "lineNumber": 223
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "_select_chunk_size",
+          "lineNumber": 225
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "chunk_text",
+          "lineNumber": 226
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "_apply_engine",
+          "lineNumber": 228
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "\"\".join",
+          "lineNumber": 229
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "len",
+          "lineNumber": 230
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "_persist_output",
+          "lineNumber": 232
+        },
+        {
+          "caller": "_translate_file",
+          "callee": "TranslationResult",
+          "lineNumber": 240
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "HTMLExtractMergeTool",
+          "lineNumber": 265
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "tool.extract",
+          "lineNumber": 266
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "BeautifulSoup",
+          "lineNumber": 268
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "list",
+          "lineNumber": 270
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "getattr",
+          "lineNumber": 271
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "_select_chunk_size",
+          "lineNumber": 276
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "str",
+          "lineNumber": 282
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "len",
+          "lineNumber": 283
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "chunks.append",
+          "lineNumber": 285
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "current_chunk.append",
+          "lineNumber": 289
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "chunks.append",
+          "lineNumber": 292
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "BeautifulSoup",
+          "lineNumber": 296
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "chunk_soup.body.append",
+          "lineNumber": 298
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "copy.copy",
+          "lineNumber": 298
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "chunk_htmls.append",
+          "lineNumber": 299
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "str",
+          "lineNumber": 299
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "_apply_engine",
+          "lineNumber": 301
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "BeautifulSoup",
+          "lineNumber": 305
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "getattr",
+          "lineNumber": 309
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "getattr",
+          "lineNumber": 312
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "translated_elements.extend",
+          "lineNumber": 313
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "BeautifulSoup",
+          "lineNumber": 315
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "final_comp_soup.body.append",
+          "lineNumber": 317
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "copy.copy",
+          "lineNumber": 317
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "str",
+          "lineNumber": 318
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "tool.merge",
+          "lineNumber": 320
+        },
+        {
+          "caller": "_translate_html",
+          "callee": "len",
+          "lineNumber": 321
+        },
+        {
+          "caller": "_cached_translate_call",
+          "callee": "print",
+          "lineNumber": 339
+        },
+        {
+          "caller": "_cached_translate_call",
+          "callee": "getattr",
+          "lineNumber": 342
+        },
+        {
+          "caller": "_cached_translate_call",
+          "callee": "RuntimeError",
+          "lineNumber": 344
+        },
+        {
+          "caller": "_cached_translate_call",
+          "callee": "EngineRequest",
+          "lineNumber": 346
+        },
+        {
+          "caller": "_cached_translate_call",
+          "callee": "json.loads",
+          "lineNumber": 351
+        },
+        {
+          "caller": "_cached_translate_call",
+          "callee": "json.loads",
+          "lineNumber": 352
+        },
+        {
+          "caller": "_cached_translate_call",
+          "callee": "engine.translate",
+          "lineNumber": 356
+        },
+        {
+          "caller": "_cached_translate_call",
+          "callee": "json.dumps",
+          "lineNumber": 357
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "dict",
+          "lineNumber": 367
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "dict",
+          "lineNumber": 368
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "list",
+          "lineNumber": 370
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "len",
+          "lineNumber": 371
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "enumerate",
+          "lineNumber": 375
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "json.dumps",
+          "lineNumber": 376
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "json.dumps",
+          "lineNumber": 377
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "getattr",
+          "lineNumber": 379
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "getattr",
+          "lineNumber": 379
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "isinstance",
+          "lineNumber": 381
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "getattr",
+          "lineNumber": 384
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "getattr",
+          "lineNumber": 387
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "_cached_translate_call",
+          "lineNumber": 389
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "json.loads",
+          "lineNumber": 401
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "results.append",
+          "lineNumber": 403
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "EngineResult",
+          "lineNumber": 403
+        },
+        {
+          "caller": "_apply_engine",
+          "callee": "hasattr",
+          "lineNumber": 405
+        },
+        {
+          "caller": "_build_request",
+          "callee": "EngineRequest",
+          "lineNumber": 421
+        },
+        {
+          "caller": "_select_chunk_size",
+          "callee": "engine.chunk_size_for",
+          "lineNumber": 441
+        },
+        {
+          "caller": "_select_chunk_size",
+          "callee": "max",
+          "lineNumber": 443
+        },
+        {
+          "caller": "_select_chunk_size",
+          "callee": "engine.chunk_size_for",
+          "lineNumber": 444
+        },
+        {
+          "caller": "_select_chunk_size",
+          "callee": "max",
+          "lineNumber": 445
+        },
+        {
+          "caller": "_persist_output",
+          "callee": "base.mkdir",
+          "lineNumber": 460
+        },
+        {
+          "caller": "_persist_output",
+          "callee": "destination.write_text",
+          "lineNumber": 463
+        },
+        {
+          "caller": "_persist_output",
+          "callee": "destination.with_suffix",
+          "lineNumber": 465
+        },
+        {
+          "caller": "_persist_output",
+          "callee": "vocab_path.write_text",
+          "lineNumber": 466
+        },
+        {
+          "caller": "_persist_output",
+          "callee": "json.dumps",
+          "lineNumber": 466
+        }
+      ],
+      "metrics": {
+        "importCount": 4,
+        "exportCount": 14,
+        "functionCount": 11,
+        "classCount": 3
+      }
+    },
+    {
+      "path": "src/abersetz/tasks.py",
+      "language": "python",
+      "fileCategory": "code",
+      "totalLines": 51,
+      "nonEmptyLines": 42,
+      "functions": [
+        {
+          "name": "translate_task",
+          "startLine": 16,
+          "endLine": 22,
+          "params": [
+            "path",
+            "options",
+            "client"
+          ]
+        },
+        {
+          "name": "translate_flow",
+          "startLine": 26,
+          "endLine": 51,
+          "params": [
+            "path",
+            "to_lang",
+            "engine",
+            "options"
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "name": "translate_task",
+          "line": 15,
+          "isDefault": false
+        },
+        {
+          "name": "translate_flow",
+          "line": 25,
+          "isDefault": false
+        }
+      ],
+      "callGraph": [
+        {
+          "caller": "translate_task",
+          "callee": "translate_path",
+          "lineNumber": 22
+        },
+        {
+          "caller": "translate_flow",
+          "callee": "dict",
+          "lineNumber": 33
+        },
+        {
+          "caller": "translate_flow",
+          "callee": "TranslatorOptions",
+          "lineNumber": 38
+        },
+        {
+          "caller": "translate_flow",
+          "callee": "translate_task",
+          "lineNumber": 39
+        },
+        {
+          "caller": "translate_flow",
+          "callee": "str",
+          "lineNumber": 42
+        },
+        {
+          "caller": "translate_flow",
+          "callee": "str",
+          "lineNumber": 43
+        }
+      ],
+      "metrics": {
+        "importCount": 1,
+        "exportCount": 2,
+        "functionCount": 2,
+        "classCount": 0
+      }
+    }
+  ]
+}

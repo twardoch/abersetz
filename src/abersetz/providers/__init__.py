@@ -5,8 +5,8 @@ from __future__ import annotations
 from .base import Engine, EngineBase, EngineError, EngineRequest, EngineResult
 from .deep_translator import DeepTranslatorEngine
 from .gguf import LocalGgufEngine
-from .hysf import HysfEngine
 from .llm import LlmEngine
+from .lmstudio import LmstudioEngine
 from .mlx import LocalMlxEngine
 from .translators import TranslatorsEngine
 
@@ -18,7 +18,7 @@ __all__ = [
     "EngineResult",
     "DeepTranslatorEngine",
     "LocalGgufEngine",
-    "HysfEngine",
+    "LmstudioEngine",
     "LlmEngine",
     "LocalMlxEngine",
     "TranslatorsEngine",

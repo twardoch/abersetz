@@ -18,8 +18,8 @@ from platformdirs import user_config_dir
 from .engine_catalog import (
     DEEP_TRANSLATOR_FREE_PROVIDERS,
     FREE_TRANSLATOR_PROVIDERS,
-    HYSF_DEFAULT_MODEL,
-    HYSF_DEFAULT_TEMPERATURE,
+    ULLM_DEFAULT_MODEL,
+    ULLM_DEFAULT_TEMPERATURE,
     normalize_selector,
 )
 
@@ -201,14 +201,12 @@ DEFAULT_CONFIG_DICT: dict[str, Any] = {
                 "providers": list(DEEP_TRANSLATOR_FREE_PROVIDERS),
             },
         },
-        "hysf": {
-            "name": "hysf",
+        "lmstudio": {
+            "name": "lmstudio",
             "chunk_size": 2400,
-            "credential": {"name": "siliconflow"},
             "options": {
-                "model": HYSF_DEFAULT_MODEL,
-                "base_url": "https://api.siliconflow.com/v1",
-                "temperature": HYSF_DEFAULT_TEMPERATURE,
+                "base_url": "localhost:1234",
+                "model": "local-model",
             },
         },
         "ullm": {
@@ -219,8 +217,8 @@ DEFAULT_CONFIG_DICT: dict[str, Any] = {
                 "profiles": {
                     "default": {
                         "base_url": "https://api.siliconflow.com/v1",
-                        "model": HYSF_DEFAULT_MODEL,
-                        "temperature": HYSF_DEFAULT_TEMPERATURE,
+                        "model": ULLM_DEFAULT_MODEL,
+                        "temperature": ULLM_DEFAULT_TEMPERATURE,
                         "max_input_tokens": 32000,
                         "prolog": {},
                     }

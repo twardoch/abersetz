@@ -299,3 +299,5 @@ x86/
 external/
 dist/
 src/abersetz/__about__.py
+abersetz_chunk_translations/
+

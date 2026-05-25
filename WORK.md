@@ -4,10 +4,87 @@ this_file: WORK.md
 # Work Log
 
 ## 2026-05-25
+### Config Alignment and Import Silencing
+- Cleaned and aligned the user's config file at `/Users/adam/Library/Application Support/abersetz/config.toml` by removing the defunct `my_memory` provider from deep-translator and ensuring the `libre` and `linguee` providers are correctly configured.
+- Implemented robust stdout/stderr silencing during heavy import stages in `src/abersetz/cli.py` to suppress import-time console prints and warnings (such as `redis not available` or `CACHE_KWARGS` prints from global package copies).
+- Formatted and sorted all modified import blocks to ensure 100% compliance with `ruff check` and `ruff format`.
+- Verified that all 205 unit and integration tests continue to pass successfully.
+
+### Obsolete Files Cleanup, LMStudio, and MLX Caching Bugfixes
+- Deleted the obsolete empty `abersetz_chunk_translations` folder in the project root and gitignored it to keep the repository clean.
+- Fixed duplicate client configuration conflict in `LmstudioEngine` by catching and handling the ValueError from `configure_default_client` gracefully.
+- Exposed a string `self._model_name` property on GGUF, MLX, and LMStudio adapters.
+- Safely extracted string model name in `pipeline.py` to prevent caching full model weight objects which caused SQLite blob capacity limits and indexing issues.
+- Fixed an `IndexError` loguru formatting bug in `twat_cache/engines/diskcache.py` by removing string formatting from `logger.exception`.
+- Successfully executed the benchmark for `mthy/1.8b-mlx` on both `poem.en.md` and `fontlab-7-tldr.en.md`, updating `benchmark_results.json` and generating full translation files.
+- Verified test suite passes completely with zero errors and clean formatting checks: **205 passed, 8 skipped**.
+
+### CLI Enhancements, Entrypoint Routing, Subcommand Documentation, and n_threads Option
+- Registered `abersetz = "abersetz.__main__:main"` as script entrypoint in `pyproject.toml` so that both package execution (`python -m abersetz`) and binary runner (`uvx abersetz`) resolve to `__main__.py` consistently.
+- Added detailed docstrings and return type annotations to all CLI subcommands (`config`, `config show`, `config path`, `lang`) to ensure python-fire outputs clean `--help` documentation.
+- Added support for the local GGUF CPU threads parameter `n_threads` to `AbersetzCLI.tr` subcommand, pipeline options, engine creation factory, and passed it to the `Llama` constructor.
+- Added `discover` subcommand to `AbersetzCLI` to perform local model directory scans.
+- Added support for passing custom local inference parameters (`n_gpu_layers`, `n_ctx`, `max_tokens`) as CLI flags and options on `tr` and propagating them dynamically to local GGUF/MLX engines.
+- Exposed uppercase option aliases for `tr` (`Overwrite`, `Temperature`, `Vocabulary`) and `validate` (`Selectors`, `Text`) to avoid single-letter option collisions under python-fire (letting `-O`, `-T`, `-V`, and `-S` map cleanly alongside lowercase parameters).
+- Updated `__main__.py` to import from `cli_fast` to speed up module-level CLI version/help checks.
+- Fixed python-fire help program name display by specifying `name="abersetz"` and `name="abtr"` inside the `fire.Fire()` calls.
+- Added unit tests in `tests/test_cli.py` and `tests/test_engines.py` verifying `n_threads`, option overrides, case overrides, and the discover command.
+- Formatted and cleaned up code to pass 100% clean ruff check/format.
+- Verified all 205 tests pass successfully.
+
+### Implemented Local Model Discovery and Hunyuan-MT2 Local Support (Issues #109 & #110)
+- Implemented `LocalModelFinder` in `src/abersetz/providers/llm/local_discovery.py` to recursively scan standard model directories across HuggingFace, Ollama, LM Studio, Pinokio, and GPT4All.
+- Supported extensionless Ollama blobs (under `blobs/` directory) and folder-based CoreML `.mlpackage` packages.
+- Added local situation resolution logic to `resolve_and_download_model` in `src/abersetz/providers/mlx.py`.
+- Fixed MLX local model resolution to return the parent directory containing the model weights (instead of the weights file path itself) for compatibility with `mlx_lm.load`.
+- Explicitly blocked legacy Hunyuan-MT1.x models.
+- Updated `./examples/benchmark.py` to resolve provider name keywords dynamically to active engine configurations, accept comma-separated list of engines/providers, and non-destructively merge results in `benchmark_results.json`.
+- Added unit tests in `tests/test_local_discovery.py` covering model scanning, MLX directory resolution, GGUF file resolution, and obsolete model rejection.
+- Cleaned up import statement sorting and non-top-level import warnings (E402/F823) in engines, pipeline, and discovery modules to achieve 100% clean ruff check/format.
+- Verified and passed all 200 unit tests successfully under `uv run pytest`.
+
+### Removed MyMemory and Blocked Discontinued Hunyuan-MT-7B Model (Issue #107)
+- Removed the `my_memory` provider from deep-translator free providers list in `src/abersetz/engine_catalog.py` and `src/abersetz/providers/deep_translator.py` as it enforces a restrictive 500-character limit causing translation failures.
+- Added a validation check in `_build_llm_engine` inside `src/abersetz/engines.py` to raise a descriptive `EngineError` if the user attempts to load the discontinued `tencent/Hunyuan-MT-7B` SiliconFlow model.
+- Refactored `test_deep_translator_engine_resolves_languages` in `tests/test_engines.py` to use a mocked translator class, making it fully independent of network and standard translator instances.
+- Added `test_build_llm_engine_with_discontinued_model_raises_engine_error` in `tests/test_engines.py` to test blocking the discontinued model.
+- Removed `my_memory` from default auto-discovered targets in `examples/benchmark.py` and references in tests.
+- Reassured the user that `hy_v3` instantiation/RoPE scaling warnings during MLX loads, and `llama_context` sequence capacity/Metal BF16 kernel skip warnings during local GGUF loads, are benign diagnostics that can be safely ignored.
+- Verified codebase quality and successfully ran all tests: `191 passed, 8 skipped in 8.56s`.
+
+### Improved Language Code Resolution with Langcodes
+- Updated `DeepTranslatorEngine._resolve_lang` in `src/abersetz/providers/deep_translator.py` to use `langcodes` (specifically `langcodes.find` and `langcodes.closest_supported_match`) to resolve generic language codes and names (e.g. `pl` or `polish` to `pl-PL`) against provider-supported lists.
+- Avoids custom matching bugs and is fully generic without hardcoding language dictionaries.
+- Updated `tests/test_engines.py` language resolution assertions to support either `en-GB` or `en-US` for resolved English queries.
+
+### Added Destination Existing Check and Skipping to Benchmark
+- Updated `examples/benchmark.py` to check if a destination file already exists before translating.
+- Added a `--force` flag to force translating even if the destination file exists.
+- Updated the CLI start log, docstrings, console print messages, and final Rich summary table output to format skipped translations with a "Skipped" status.
+- Updated `examples/README.md` to document the new `--force` flag.
+- Added robust unit testing to `tests/test_examples.py` (`test_runner_run_when_destination_exists_and_not_force_then_skips` and `test_runner_run_when_destination_exists_and_force_then_translates`), bringing total test suite to 190 tests, all passing.
+
+### Completed Issue #106 Verification and Testing
+- Updated all unit, integration, and CLI tests to remove remaining references to `hysf` / `hy` (which were deleted after Hunyuan was discontinued by SiliconFlow) and replaced them with `lmstudio` / `lms`.
+- Updated engine validation sort priority in `src/abersetz/validation.py` to sort `lms` correctly (before `ll`).
+- Resolved lint errors: fixed exception chaining in `LmstudioEngine` (B904) and fixed unused loop variables in `DeepTranslatorEngine._resolve_lang` (B007).
+- Rerun the verification toolchain (autoflake, pyupgrade, ruff check/format) and confirmed clean check results.
+- Verified that all 188 tests pass successfully.
+- Verified that the `benchmark.py` dry-run executes successfully across all 13 translation engines including the new local `lms` adapter.
+
 ### Fixed PyPI Publishing Flow
 - Updated `publish.sh` to clean the `dist/` directory before building the test/dev packages and before building the final release package.
 - This prevents PyPI from rejecting uploads due to the presence of local development version identifiers (with a `+` suffix, e.g. `1.0.23.dev1+gc17a1f7d3.d20260525`) in the `dist/` folder.
 - Verified that all 187 tests pass successfully.
+
+### Relied on Published Abersetz in Benchmark Example
+- Updated `examples/benchmark.py` to require the published `abersetz` package via its `uv` script shebang dependencies block instead of manually adjusting `sys.path`.
+- Verified that all 187 tests pass successfully.
+
+### Fixed Deep-Translator Engine Language Code Mapping
+- Implemented `_resolve_lang` in `DeepTranslatorEngine` to resolve standard 2-letter language codes to their region-specific equivalents for providers with stricter language requirements (such as MyMemory).
+- Verified that `dt/my_memory` now correctly maps `en` -> `en-GB` and `pl` -> `pl-PL`, preventing `LanguageNotSupportedException` errors during translation.
+- Added unit tests in `tests/test_engines.py` to cover code mapping resolution, achieving 188 passing tests.
 
 ### Fully Rewrote Examples Directory and Implemented Translation Benchmark
 - Fully rewrote the `examples/` directory, keeping `examples/data/` while deleting legacy example scripts.

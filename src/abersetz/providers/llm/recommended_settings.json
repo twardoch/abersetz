@@ -1,0 +1,44 @@
+{
+  "openai": {
+    "temperature": 0.3,
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "chunk_size": 4000
+  },
+  "siliconflow": {
+    "temperature": 0.3,
+    "max_input_tokens": 32000,
+    "max_output_tokens": 4096,
+    "chunk_size": 2400
+  },
+  "groq": {
+    "temperature": 0.2,
+    "max_input_tokens": 8000,
+    "max_output_tokens": 4096,
+    "chunk_size": 2000
+  },
+  "openrouter": {
+    "temperature": 0.3,
+    "max_input_tokens": 128000,
+    "max_output_tokens": 4096,
+    "chunk_size": 4000
+  },
+  "deepseek": {
+    "temperature": 0.2,
+    "max_input_tokens": 64000,
+    "max_output_tokens": 4096,
+    "chunk_size": 3000
+  },
+  "gemini": {
+    "temperature": 0.3,
+    "max_input_tokens": 1000000,
+    "max_output_tokens": 8192,
+    "chunk_size": 8000
+  },
+  "default": {
+    "temperature": 0.3,
+    "max_input_tokens": 8000,
+    "max_output_tokens": 2048,
+    "chunk_size": 2000
+  }
+}

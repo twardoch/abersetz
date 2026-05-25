@@ -458,7 +458,7 @@ def test_collect_engine_entries_string_branches(
                 options={"provider": "deepl"},
             ),
             "ullm": EngineConfig(name="ullm", options={"profiles": "default"}),
-            "hysf": EngineConfig(name="hysf"),
+            "lmstudio": EngineConfig(name="lmstudio"),
         },
     )
 
@@ -473,7 +473,7 @@ def test_collect_engine_entries_string_branches(
     assert entries["tr/bing"].configured is True
     assert entries["dt/deepl"].configured is True
     assert entries["ll/default"].configured is True
-    assert entries["hy"].configured is True
+    assert entries["lms"].configured is True
 
 
 def test_collect_engine_entries_includes_local_engines(
@@ -803,3 +803,92 @@ def test_cli_abtr_main_invokes_fire_with_tr(monkeypatch: pytest.MonkeyPatch) -> 
     assert callable(bound)
     assert getattr(bound, "__self__", None).__class__ is AbersetzCLI
     assert getattr(bound, "__func__", None) is AbersetzCLI.tr
+
+
+def test_cli_translate_accepts_case_overrides(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    captured: dict[str, TranslatorOptions] = {}
+
+    def fake_translate_path(path: str | Path, options: TranslatorOptions):
+        captured["options"] = options
+        return []
+
+    monkeypatch.setattr("abersetz.cli.translate_path", fake_translate_path)
+
+    cli = AbersetzCLI()
+    cli.tr(
+        to_lang="pl",
+        path=tmp_path,
+        Overwrite=True,
+        Temperature=0.7,
+        Vocabulary='{"foo": "bar"}',
+        n_gpu_layers=10,
+        n_ctx=2048,
+        max_tokens=512,
+        n_threads=4,
+    )
+
+    opts = captured["options"]
+    assert opts.to_lang == "pl"
+    assert opts.write_over is True
+    assert opts.temperature == 0.7
+    assert opts.initial_voc == {"foo": "bar"}
+    assert opts.n_gpu_layers == 10
+    assert opts.n_ctx == 2048
+    assert opts.max_tokens == 512
+    assert opts.n_threads == 4
+
+
+def test_cli_validate_accepts_case_overrides(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: dict[str, Any] = {}
+
+    def fake_validate_engines(
+        cfg, selectors, target_lang, source_lang, sample_text, include_defaults
+    ):
+        captured["selectors"] = selectors
+        captured["target_lang"] = target_lang
+        captured["source_lang"] = source_lang
+        captured["sample_text"] = sample_text
+        captured["include_defaults"] = include_defaults
+        return []
+
+    monkeypatch.setattr("abersetz.cli.validate_engines", fake_validate_engines)
+
+    from typing import Any
+
+    cli = AbersetzCLI()
+    cli.validate(
+        Selectors="tr/google,dt/bing",
+        target_lang="pl",
+        source_lang="en",
+        Text="Test validation string",
+        include_defaults=False,
+    )
+
+    assert captured["selectors"] == ("tr/google", "dt/bing")
+    assert captured["target_lang"] == "pl"
+    assert captured["source_lang"] == "en"
+    assert captured["sample_text"] == "Test validation string"
+    assert captured["include_defaults"] is False
+
+
+def test_cli_discover_subcommand(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: dict[str, Any] = {}
+
+    class FakeLocalModelFinder:
+        def scan(self, format=None, min_size_mb=100.0):
+            captured["format"] = format
+            captured["min_size_mb"] = min_size_mb
+
+    monkeypatch.setattr(
+        "abersetz.providers.llm.local_discovery.LocalModelFinder", FakeLocalModelFinder
+    )
+
+    from typing import Any
+
+    cli = AbersetzCLI()
+    cli.discover(format="gguf", min_size_mb=200.0)
+
+    assert captured["format"] == "gguf"
+    assert captured["min_size_mb"] == 200.0

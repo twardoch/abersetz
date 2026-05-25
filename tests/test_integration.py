@@ -67,10 +67,10 @@ def test_deep_translator_google_real() -> None:
     not os.getenv("SILICONFLOW_API_KEY"),
     reason="Requires SILICONFLOW_API_KEY environment variable",
 )
-def test_hysf_engine_real() -> None:
+def test_ullm_engine_real() -> None:
     """Test Siliconflow translation engine (requires API key)."""
     config = load_config()
-    engine = create_engine("hysf", config)
+    engine = create_engine("ullm/default", config)
 
     request = EngineRequest(
         text="Thank you",

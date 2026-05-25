@@ -1,0 +1,543 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/abersetz/abersetz.py",
+      "type": "file",
+      "name": "abersetz.py",
+      "filePath": "src/abersetz/abersetz.py",
+      "summary": "Thin public API module that re-exports the translation pipeline entry points for library consumers.",
+      "tags": ["entry-point", "barrel", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/chunking.py",
+      "type": "file",
+      "name": "chunking.py",
+      "filePath": "src/abersetz/chunking.py",
+      "summary": "Splits source text into translation-sized chunks, detecting HTML vs plain text and using semantic splitting with a length-based fallback.",
+      "tags": ["utility", "chunking", "text-processing", "serialization"],
+      "complexity": "moderate",
+      "languageNotes": "Uses an enum (TextFormat) plus a semantic TextSplitter with a manual range-based fallback."
+    },
+    {
+      "id": "file:src/abersetz/pipeline.py",
+      "type": "file",
+      "name": "pipeline.py",
+      "filePath": "src/abersetz/pipeline.py",
+      "summary": "Core translation orchestration: discovers input files, merges options with config defaults, chunks text (incl. HTML extract/merge), invokes the selected engine with caching, and persists translated output plus vocabulary.",
+      "tags": ["service", "orchestration", "api-handler", "data-model"],
+      "complexity": "complex",
+      "languageNotes": "Combines frozen dataclass option/result types, an LRU-cached engine call, and BeautifulSoup-based HTML splitting."
+    },
+    {
+      "id": "file:src/abersetz/tasks.py",
+      "type": "file",
+      "name": "tasks.py",
+      "filePath": "src/abersetz/tasks.py",
+      "summary": "Higher-level convenience wrappers around translate_path that build TranslatorOptions and return simplified result mappings.",
+      "tags": ["service", "wrapper", "api"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/chunking.py:TextFormat",
+      "type": "class",
+      "name": "TextFormat",
+      "filePath": "src/abersetz/chunking.py",
+      "lineRange": [15, 21],
+      "summary": "Enum distinguishing plaintext, Markdown, and HTML so the chunker can pick an appropriate splitting strategy.",
+      "tags": ["type-definition", "enum", "chunking"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/chunking.py:chunk_text",
+      "type": "function",
+      "name": "chunk_text",
+      "filePath": "src/abersetz/chunking.py",
+      "lineRange": [54, 62],
+      "summary": "Public entry that returns a list of text chunks sized to max_size for a given format, delegating to the semantic chunker.",
+      "tags": ["utility", "chunking", "entry-point"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/chunking.py:_semantic_chunks",
+      "type": "function",
+      "name": "_semantic_chunks",
+      "filePath": "src/abersetz/chunking.py",
+      "lineRange": [40, 51],
+      "summary": "Splits text into semantically coherent chunks using a TextSplitter, falling back to fixed-size slicing when unavailable.",
+      "tags": ["utility", "chunking", "fallback"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/pipeline.py:TranslatorOptions",
+      "type": "class",
+      "name": "TranslatorOptions",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [35, 58],
+      "summary": "Configuration dataclass capturing all translation parameters: engine selection, languages, chunk sizes, output handling, vocabulary, and model runtime options.",
+      "tags": ["data-model", "config", "type-definition"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/abersetz/pipeline.py:TranslationResult",
+      "type": "class",
+      "name": "TranslationResult",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [62, 75],
+      "summary": "Result dataclass describing a translated file: source/destination paths, chunk count, vocabulary, format, engine, and language pair.",
+      "tags": ["data-model", "type-definition"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/pipeline.py:PipelineError",
+      "type": "class",
+      "name": "PipelineError",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [78, 81],
+      "summary": "Exception raised for pipeline-level failures such as missing paths or empty file selections.",
+      "tags": ["error-handling", "type-definition"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:translate_path",
+      "type": "function",
+      "name": "translate_path",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [84, 140],
+      "summary": "Top-level driver that resolves the input path, loads config, discovers files, instantiates the chosen engine, and translates each file into a list of TranslationResult.",
+      "tags": ["entry-point", "orchestration", "api-handler"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_merge_defaults",
+      "type": "function",
+      "name": "_merge_defaults",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [143, 159],
+      "summary": "Fills unspecified TranslatorOptions fields from configured defaults and normalizes the engine selector.",
+      "tags": ["utility", "config", "validation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_discover_files",
+      "type": "function",
+      "name": "_discover_files",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [162, 170],
+      "summary": "Resolves include glob patterns against the root directory, filtering out excluded paths, and returns a sorted file list.",
+      "tags": ["utility", "filesystem", "discovery"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_translate_file",
+      "type": "function",
+      "name": "_translate_file",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [177, 250],
+      "summary": "Translates a single file end to end: detects format, routes HTML separately, chunks the text, applies the engine, and persists the translated output.",
+      "tags": ["orchestration", "text-processing", "api-handler"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_translate_html",
+      "type": "function",
+      "name": "_translate_html",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [253, 321],
+      "summary": "Handles HTML translation by extracting body elements with BeautifulSoup, grouping them into size-bounded chunks, translating, and merging the result back.",
+      "tags": ["text-processing", "html", "chunking"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_cached_translate_call",
+      "type": "function",
+      "name": "_cached_translate_call",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [328, 357],
+      "summary": "LRU-cached wrapper that builds an EngineRequest and invokes the engine's translate method, keyed on text and translation parameters.",
+      "tags": ["utility", "caching", "serialization"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_apply_engine",
+      "type": "function",
+      "name": "_apply_engine",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [360, 408],
+      "summary": "Iterates chunks through the translation engine, threading vocabulary and prolog context between calls and collecting EngineResult objects.",
+      "tags": ["orchestration", "text-processing", "service"],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_build_request",
+      "type": "function",
+      "name": "_build_request",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [411, 430],
+      "summary": "Constructs an EngineRequest for a single chunk with index/total metadata, format, language, and vocabulary context.",
+      "tags": ["utility", "factory", "serialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_select_chunk_size",
+      "type": "function",
+      "name": "_select_chunk_size",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [433, 445],
+      "summary": "Determines the chunk size for a format by combining engine-derived sizing with user-provided overrides.",
+      "tags": ["utility", "config", "chunking"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_persist_output",
+      "type": "function",
+      "name": "_persist_output",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [448, 467],
+      "summary": "Writes translated content to the destination path (creating directories as needed) and optionally saves the accumulated vocabulary as JSON.",
+      "tags": ["utility", "filesystem", "serialization"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/tasks.py:translate_flow",
+      "type": "function",
+      "name": "translate_flow",
+      "filePath": "src/abersetz/tasks.py",
+      "lineRange": [26, 51],
+      "summary": "Convenience flow that builds TranslatorOptions from simple arguments, runs translate_task, and returns simplified source/destination mappings.",
+      "tags": ["service", "wrapper", "api"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/abersetz/abersetz.py",
+      "target": "file:src/abersetz/pipeline.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "file:src/abersetz/chunking.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "file:src/abersetz/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "file:src/abersetz/engine_catalog.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "file:src/abersetz/engines.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/tasks.py",
+      "target": "file:src/abersetz/pipeline.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/chunking.py",
+      "target": "class:src/abersetz/chunking.py:TextFormat",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/chunking.py",
+      "target": "function:src/abersetz/chunking.py:chunk_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/chunking.py",
+      "target": "function:src/abersetz/chunking.py:_semantic_chunks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/chunking.py",
+      "target": "class:src/abersetz/chunking.py:TextFormat",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/chunking.py",
+      "target": "function:src/abersetz/chunking.py:chunk_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/chunking.py:chunk_text",
+      "target": "function:src/abersetz/chunking.py:_semantic_chunks",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "class:src/abersetz/pipeline.py:TranslatorOptions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "class:src/abersetz/pipeline.py:TranslationResult",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "class:src/abersetz/pipeline.py:PipelineError",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:translate_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_merge_defaults",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_discover_files",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_translate_file",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_translate_html",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_cached_translate_call",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_apply_engine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_build_request",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_select_chunk_size",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_persist_output",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "class:src/abersetz/pipeline.py:TranslatorOptions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "class:src/abersetz/pipeline.py:TranslationResult",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "class:src/abersetz/pipeline.py:PipelineError",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:translate_path",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:translate_path",
+      "target": "function:src/abersetz/pipeline.py:_merge_defaults",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:translate_path",
+      "target": "function:src/abersetz/pipeline.py:_discover_files",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:translate_path",
+      "target": "function:src/abersetz/pipeline.py:_translate_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:translate_path",
+      "target": "function:src/abersetz/config.py:load_config",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:translate_path",
+      "target": "function:src/abersetz/engine_catalog.py:normalize_selector",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:translate_path",
+      "target": "function:src/abersetz/engines.py:create_engine",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_discover_files",
+      "target": "function:src/abersetz/pipeline.py:_is_xcluded",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_translate_file",
+      "target": "function:src/abersetz/chunking.py:detect_format",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_translate_file",
+      "target": "function:src/abersetz/chunking.py:chunk_text",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_translate_file",
+      "target": "function:src/abersetz/pipeline.py:_translate_html",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_translate_file",
+      "target": "function:src/abersetz/pipeline.py:_apply_engine",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_translate_file",
+      "target": "function:src/abersetz/pipeline.py:_persist_output",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_translate_file",
+      "target": "function:src/abersetz/pipeline.py:_select_chunk_size",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_translate_html",
+      "target": "function:src/abersetz/pipeline.py:_apply_engine",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_apply_engine",
+      "target": "function:src/abersetz/pipeline.py:_cached_translate_call",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/tasks.py:translate_flow",
+      "target": "function:src/abersetz/tasks.py:translate_task",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/tasks.py:translate_task",
+      "target": "function:src/abersetz/pipeline.py:translate_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/tasks.py",
+      "target": "function:src/abersetz/tasks.py:translate_flow",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ]
+}

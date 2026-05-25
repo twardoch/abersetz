@@ -21,9 +21,9 @@ from .engine_catalog import (
     COMMUNITY_TRANSLATOR_PROVIDERS,
     DEEP_TRANSLATOR_FREE_PROVIDERS,
     FREE_TRANSLATOR_PROVIDERS,
-    HYSF_DEFAULT_MODEL,
-    HYSF_DEFAULT_TEMPERATURE,
     PAID_TRANSLATOR_PROVIDERS,
+    ULLM_DEFAULT_MODEL,
+    ULLM_DEFAULT_TEMPERATURE,
     collect_deep_translator_providers,
     collect_translator_providers,
     normalize_selector,
@@ -211,12 +211,7 @@ class SetupWizard:
                 if name in ["openai", "anthropic"]:
                     provider.engine_names.append(str(normalize_selector("ullm/default")))
                 if name == "siliconflow":
-                    provider.engine_names.extend(
-                        [
-                            str(normalize_selector("hysf")),
-                            str(normalize_selector("ullm/default")),
-                        ]
-                    )
+                    provider.engine_names.append(str(normalize_selector("ullm/default")))
                 if base_url and "openai" in base_url:
                     # OpenAI-compatible endpoints
                     provider.engine_names.append(str(normalize_selector(f"ullm/{name}")))
@@ -427,18 +422,17 @@ class SetupWizard:
             p.name == "siliconflow" and p.is_available for p in self.discovered_providers
         )
 
-        if siliconflow_available:
-            engines["hysf"] = EngineConfig(
-                name="hysf",
-                chunk_size=2400,
-                credential=Credential(name="siliconflow"),
-                options={
-                    "base_url": "https://api.siliconflow.com/v1",
-                    "model": HYSF_DEFAULT_MODEL,
-                    "temperature": HYSF_DEFAULT_TEMPERATURE,
-                },
-            )
+        # Always configure lmstudio by default so it's ready for local use
+        engines["lmstudio"] = EngineConfig(
+            name="lmstudio",
+            chunk_size=2400,
+            options={
+                "base_url": "localhost:1234",
+                "model": "local-model",
+            },
+        )
 
+        if siliconflow_available:
             engines["ullm"] = EngineConfig(
                 name="ullm",
                 chunk_size=2400,
@@ -447,8 +441,8 @@ class SetupWizard:
                     "profiles": {
                         "default": {
                             "base_url": "https://api.siliconflow.com/v1",
-                            "model": HYSF_DEFAULT_MODEL,
-                            "temperature": HYSF_DEFAULT_TEMPERATURE,
+                            "model": ULLM_DEFAULT_MODEL,
+                            "temperature": ULLM_DEFAULT_TEMPERATURE,
                             "max_input_tokens": 32000,
                             "prolog": {},
                         }
@@ -494,15 +488,13 @@ def _select_default_engine(
 ) -> str | None:
     """Choose the default engine based on configured priorities.
 
-    We prefer DeepL if you have it. If not, Google Translate via `translators`. If not that, Hunyuan. If none of those, we just pick the first thing that works."""
+    We prefer DeepL if you have it. If not, Google Translate via `translators`. If not that, SiliconFlow/ULLM. If none of those, we just pick the first thing that works."""
     if "deep-translator" in engines and any(
         provider.name == "deepl" and provider.is_available for provider in providers
     ):
         return "deep-translator/deepl"
     if "translators" in engines:
         return "tr/google"
-    if "hysf" in engines:
-        return "hysf"
     if "ullm" in engines:
         return "ullm/default"
     if engines:

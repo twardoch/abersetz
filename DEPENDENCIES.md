@@ -25,8 +25,9 @@ this_file: DEPENDENCIES.md
 - **tenacity** (>=8.4): Retry logic with exponential backoff. Handles API failures and rate limits.
 
 ### Optional Local Engines
-- **mlx-lm**: Enables local MLX inference for HY-MT and TranslateGemma (`mthy/mlx`, `gemma/mlx`).
-- **llama-cpp-python**: Enables local GGUF inference for HY-MT and TranslateGemma (`mthy/gguf`, `gemma/gguf`).
+- **mlx-lm**: Enables local MLX inference for HY-MT and TranslateGemma (`mthy/mlx`, `gemma/mlx`). Optional dependency, conditional for macOS only.
+- **llama-cpp-python**: Enables local GGUF inference for HY-MT and TranslateGemma (`mthy/gguf`, `gemma/gguf`). Optional dependency, conditional for macOS only.
+- **lmstudio**: Official LMStudio Python SDK. Enables local inference using LMStudio models via the `lms` / `lmstudio` engine.
 - **huggingface-hub**: Enables automatic downloading and resolution of local models from Hugging Face.
 
 

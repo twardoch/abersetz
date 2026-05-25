@@ -1,0 +1,166 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1779717387379,
+  "projectRoot": "/Users/adam/Developer/vcs3/github.twardoch/pub/abersetz",
+  "techStack": {
+    "languages": [
+      {
+        "name": "Python",
+        "version": "3.12",
+        "confidence": "high",
+        "markers": [
+          "pyproject.toml"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "pytest",
+        "version": null,
+        "category": "testing"
+      }
+    ],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": "pytest",
+    "lintCommand": "ruff check",
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs",
+      "examples",
+      "src",
+      "tests"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "abersetz_chunk_translations": {
+      "path": "abersetz_chunk_translations",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1779717387374,
+      "keyFiles": []
+    },
+    "dist": {
+      "path": "dist",
+      "purpose": "Distribution/build output",
+      "fileCount": 4,
+      "lastAccessed": 1779717387375,
+      "keyFiles": [
+        "abersetz-1.0.24-py3-none-any.whl",
+        "abersetz-1.0.24.tar.gz",
+        "abersetz-1.0.25.dev0+gd766e3368.d20260525-py3-none-any.whl",
+        "abersetz-1.0.25.dev0+gd766e3368.d20260525.tar.gz"
+      ]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 6,
+      "lastAccessed": 1779717387375,
+      "keyFiles": [
+        "_config.yml",
+        "api.md",
+        "cli.md",
+        "configuration.md",
+        "index.md"
+      ]
+    },
+    "examples": {
+      "path": "examples",
+      "purpose": "Example code",
+      "fileCount": 5,
+      "lastAccessed": 1779717387376,
+      "keyFiles": [
+        "README.md",
+        "benchmark.py",
+        "benchmark_results.json",
+        "benchmark_results.md"
+      ]
+    },
+    "external": {
+      "path": "external",
+      "purpose": null,
+      "fileCount": 15,
+      "lastAccessed": 1779717387376,
+      "keyFiles": [
+        "302-py-httpx.md",
+        "303-py-aiohttp.md",
+        "cerebrate-file.txt",
+        "deep-translator.txt",
+        "dump_models.py"
+      ]
+    },
+    "issues": {
+      "path": "issues",
+      "purpose": null,
+      "fileCount": 9,
+      "lastAccessed": 1779717387376,
+      "keyFiles": [
+        "102-review.md",
+        "103.txt",
+        "105.txt",
+        "106.md",
+        "107.md"
+      ]
+    },
+    "scratch": {
+      "path": "scratch",
+      "purpose": null,
+      "fileCount": 3,
+      "lastAccessed": 1779717387376,
+      "keyFiles": [
+        "test_cache_debug.py",
+        "test_gguf.py",
+        "test_temp.txt"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 1,
+      "lastAccessed": 1779717387377,
+      "keyFiles": []
+    },
+    "tests": {
+      "path": "tests",
+      "purpose": "Test files",
+      "fileCount": 17,
+      "lastAccessed": 1779717387377,
+      "keyFiles": [
+        "conftest.py",
+        "test_chunking.py",
+        "test_cli.py",
+        "test_config.py",
+        "test_engine_catalog.py"
+      ]
+    },
+    "examples/data": {
+      "path": "examples/data",
+      "purpose": "Data files",
+      "fileCount": 1,
+      "lastAccessed": 1779717387378,
+      "keyFiles": []
+    }
+  },
+  "hotPaths": [],
+  "userDirectives": []
+}

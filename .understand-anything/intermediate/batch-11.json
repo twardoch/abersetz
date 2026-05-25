@@ -1,0 +1,330 @@
+{
+  "nodes": [
+    {
+      "id": "file:.cursor/rules/codegraph.mdc",
+      "type": "file",
+      "name": "codegraph.mdc",
+      "filePath": ".cursor/rules/codegraph.mdc",
+      "summary": "Cursor editor rule documenting when and how to use the CodeGraph MCP tools for code intelligence in this repository.",
+      "tags": ["documentation", "configuration", "tooling"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.understand-anything/.understandignore",
+      "type": "file",
+      "name": ".understandignore",
+      "filePath": ".understand-anything/.understandignore",
+      "summary": "Ignore-pattern manifest excluding build artifacts, caches, and vendored files from the understand-anything codebase analysis.",
+      "tags": ["configuration", "tooling", "ignore-rules"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:examples/benchmark.py",
+      "type": "file",
+      "name": "benchmark.py",
+      "filePath": "examples/benchmark.py",
+      "summary": "Runnable benchmark harness that resolves engine/provider selectors, translates sample documents through abersetz, and reports timing and output statistics in a rich table.",
+      "tags": ["benchmark", "example", "cli", "entry-point"],
+      "complexity": "complex",
+      "languageNotes": "Uses fire for CLI dispatch and unittest.mock.patch to swap in dummy engines for deterministic timing."
+    },
+    {
+      "id": "function:examples/benchmark.py:get_engine_descriptor",
+      "type": "function",
+      "name": "get_engine_descriptor",
+      "filePath": "examples/benchmark.py",
+      "lineRange": [49, 87],
+      "summary": "Resolves an engine selector against the configuration to build a sanitized human-readable descriptor of provider, model, and profile.",
+      "tags": ["utility", "config", "resolution"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:examples/benchmark.py:resolve_provider_to_engines",
+      "type": "function",
+      "name": "resolve_provider_to_engines",
+      "filePath": "examples/benchmark.py",
+      "lineRange": [90, 115],
+      "summary": "Expands a provider name into the list of matching configured engine selectors.",
+      "tags": ["utility", "config", "resolution"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:examples/benchmark.py:BenchmarkRunner",
+      "type": "class",
+      "name": "BenchmarkRunner",
+      "filePath": "examples/benchmark.py",
+      "lineRange": [118, 415],
+      "summary": "Orchestrates the full benchmark run: selecting engines, translating sample files, capturing timings, and rendering and persisting a results summary.",
+      "tags": ["benchmark", "orchestration", "service"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/abersetz/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "src/abersetz/__init__.py",
+      "summary": "Package root that lazily exposes the public API (translate_path, TranslatorOptions, etc.) via module __getattr__ and resolves the package version.",
+      "tags": ["entry-point", "barrel", "package-init"],
+      "complexity": "simple",
+      "languageNotes": "Uses PEP 562 module-level __getattr__ for lazy imports to keep import time low."
+    },
+    {
+      "id": "function:src/abersetz/__init__.py:__getattr__",
+      "type": "function",
+      "name": "__getattr__",
+      "filePath": "src/abersetz/__init__.py",
+      "lineRange": [29, 52],
+      "summary": "Module-level lazy attribute resolver that imports public symbols on first access and raises AttributeError otherwise.",
+      "tags": ["lazy-import", "package-init", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/__main__.py",
+      "type": "file",
+      "name": "__main__.py",
+      "filePath": "src/abersetz/__main__.py",
+      "summary": "Module execution entry point that delegates to the fast CLI main when the package is run with python -m abersetz.",
+      "tags": ["entry-point", "cli"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/cli_fast.py",
+      "type": "file",
+      "name": "cli_fast.py",
+      "filePath": "src/abersetz/cli_fast.py",
+      "summary": "Lightweight CLI front-end that short-circuits --version without importing the heavy CLI module, otherwise delegating to the full Fire-based CLI.",
+      "tags": ["entry-point", "cli", "performance"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/cli_fast.py:handle_version",
+      "type": "function",
+      "name": "handle_version",
+      "filePath": "src/abersetz/cli_fast.py",
+      "lineRange": [10, 24],
+      "summary": "Detects a --version flag, prints the package version via importlib.metadata, and exits without loading the full CLI.",
+      "tags": ["cli", "version", "utility"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/cli_fast.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "src/abersetz/cli_fast.py",
+      "lineRange": [27, 37],
+      "summary": "CLI entry function that handles the version fast path then defers to the full CLI main.",
+      "tags": ["entry-point", "cli"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/anthropic.py",
+      "type": "file",
+      "name": "anthropic.py",
+      "filePath": "src/abersetz/providers/llm/api/anthropic.py",
+      "summary": "Provider descriptor module declaring Anthropic API base URL, API key env var, and known Claude model identifiers.",
+      "tags": ["provider", "data-model", "llm", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/deepseek.py",
+      "type": "file",
+      "name": "deepseek.py",
+      "filePath": "src/abersetz/providers/llm/api/deepseek.py",
+      "summary": "Provider descriptor module declaring DeepSeek API endpoint, key env var, and known model identifiers.",
+      "tags": ["provider", "data-model", "llm", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/gemini.py",
+      "type": "file",
+      "name": "gemini.py",
+      "filePath": "src/abersetz/providers/llm/api/gemini.py",
+      "summary": "Provider descriptor module declaring Google Gemini's OpenAI-compatible endpoint, key env var, and known model identifiers.",
+      "tags": ["provider", "data-model", "llm", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/groq.py",
+      "type": "file",
+      "name": "groq.py",
+      "filePath": "src/abersetz/providers/llm/api/groq.py",
+      "summary": "Provider descriptor module declaring Groq API endpoint, key env var, and known model identifiers.",
+      "tags": ["provider", "data-model", "llm", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/lmstudio.py",
+      "type": "file",
+      "name": "lmstudio.py",
+      "filePath": "src/abersetz/providers/llm/api/lmstudio.py",
+      "summary": "Provider descriptor module declaring the local LM Studio OpenAI-compatible endpoint and key settings.",
+      "tags": ["provider", "data-model", "llm", "local"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/openai.py",
+      "type": "file",
+      "name": "openai.py",
+      "filePath": "src/abersetz/providers/llm/api/openai.py",
+      "summary": "Provider descriptor module declaring OpenAI API base URL, key env var, and known GPT model identifiers.",
+      "tags": ["provider", "data-model", "llm", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/openrouter.py",
+      "type": "file",
+      "name": "openrouter.py",
+      "filePath": "src/abersetz/providers/llm/api/openrouter.py",
+      "summary": "Provider descriptor module declaring OpenRouter aggregation endpoint, key env var, and known model identifiers.",
+      "tags": ["provider", "data-model", "llm", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/siliconflow.py",
+      "type": "file",
+      "name": "siliconflow.py",
+      "filePath": "src/abersetz/providers/llm/api/siliconflow.py",
+      "summary": "Provider descriptor module declaring SiliconFlow API endpoint, key env var, and known model identifiers.",
+      "tags": ["provider", "data-model", "llm", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/together.py",
+      "type": "file",
+      "name": "together.py",
+      "filePath": "src/abersetz/providers/llm/api/together.py",
+      "summary": "Provider descriptor module declaring Together AI API endpoint, key env var, and known model identifiers.",
+      "tags": ["provider", "data-model", "llm", "configuration"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/local_discovery.py",
+      "type": "file",
+      "name": "local_discovery.py",
+      "filePath": "src/abersetz/providers/llm/local_discovery.py",
+      "summary": "Discovers locally installed GGUF/MLX models across LM Studio and other app directories, returning structured LocalModel records.",
+      "tags": ["provider", "discovery", "local", "filesystem"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/abersetz/providers/llm/local_discovery.py:LocalModel",
+      "type": "class",
+      "name": "LocalModel",
+      "filePath": "src/abersetz/providers/llm/local_discovery.py",
+      "lineRange": [12, 19],
+      "summary": "Dataclass describing a discovered local model with path, name, app, format, and size.",
+      "tags": ["data-model", "dataclass"],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/providers/llm/local_discovery.py:LocalModelFinder",
+      "type": "class",
+      "name": "LocalModelFinder",
+      "filePath": "src/abersetz/providers/llm/local_discovery.py",
+      "lineRange": [22, 196],
+      "summary": "Scans known local model directories (resolving LM Studio's pointer file) to enumerate GGUF/MLX models with size metadata.",
+      "tags": ["discovery", "filesystem", "service"],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:src/abersetz/providers/llm/recommended_settings.json",
+      "type": "config",
+      "name": "recommended_settings.json",
+      "filePath": "src/abersetz/providers/llm/recommended_settings.json",
+      "summary": "Per-provider recommended default settings (model, parameters) for OpenAI, SiliconFlow, Groq, OpenRouter, DeepSeek, Gemini, plus a default fallback.",
+      "tags": ["configuration", "llm", "defaults"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/conftest.py",
+      "type": "file",
+      "name": "conftest.py",
+      "filePath": "tests/conftest.py",
+      "summary": "Pytest fixtures and autouse setup: mocks the bcache decorator with a hashable-args cache, isolates the config dir to tmp_path, and clears caches between tests.",
+      "tags": ["test", "fixtures", "pytest"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_chunking.py",
+      "type": "file",
+      "name": "test_chunking.py",
+      "filePath": "tests/test_chunking.py",
+      "summary": "Unit tests for text chunking and format detection, including round-trip preservation and a fallback path when the semantic splitter is unavailable.",
+      "tags": ["test", "chunking", "unit-test"],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_cli.py",
+      "type": "file",
+      "name": "test_cli.py",
+      "filePath": "tests/test_cli.py",
+      "summary": "Extensive CLI test suite covering argument wiring, option building, engine/validation entry collection, config commands, and Fire invocation.",
+      "tags": ["test", "cli", "unit-test"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_config.py",
+      "type": "file",
+      "name": "test_config.py",
+      "filePath": "tests/test_config.py",
+      "summary": "Tests for configuration loading, defaults, and persistence behavior.",
+      "tags": ["test", "config", "unit-test"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_engine_catalog.py",
+      "type": "file",
+      "name": "test_engine_catalog.py",
+      "filePath": "tests/test_engine_catalog.py",
+      "summary": "Tests for the engine catalog that enumerates and resolves available translation engines.",
+      "tags": ["test", "engine", "unit-test"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_engines.py",
+      "type": "file",
+      "name": "test_engines.py",
+      "filePath": "tests/test_engines.py",
+      "summary": "Large test suite exercising translation engine creation, selection normalization, and provider behavior.",
+      "tags": ["test", "engine", "unit-test"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_examples.py",
+      "type": "file",
+      "name": "test_examples.py",
+      "filePath": "tests/test_examples.py",
+      "summary": "Functional tests validating that the bundled example scripts (including the benchmark) run end-to-end.",
+      "tags": ["test", "integration", "examples"],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_htmladapt_twat.py",
+      "type": "file",
+      "name": "test_htmladapt_twat.py",
+      "filePath": "tests/test_htmladapt_twat.py",
+      "summary": "Tests for HTML adaptation handling used during translation of markup content.",
+      "tags": ["test", "html", "unit-test"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {"source": "file:examples/benchmark.py", "target": "function:examples/benchmark.py:get_engine_descriptor", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:examples/benchmark.py", "target": "function:examples/benchmark.py:resolve_provider_to_engines", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:examples/benchmark.py", "target": "class:examples/benchmark.py:BenchmarkRunner", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:examples/benchmark.py", "target": "function:examples/benchmark.py:get_engine_descriptor", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:examples/benchmark.py", "target": "function:examples/benchmark.py:resolve_provider_to_engines", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:examples/benchmark.py", "target": "class:examples/benchmark.py:BenchmarkRunner", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:src/abersetz/__init__.py", "target": "function:src/abersetz/__init__.py:__getattr__", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/abersetz/cli_fast.py", "target": "function:src/abersetz/cli_fast.py:handle_version", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/abersetz/cli_fast.py", "target": "function:src/abersetz/cli_fast.py:main", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/abersetz/cli_fast.py", "target": "function:src/abersetz/cli_fast.py:handle_version", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:src/abersetz/cli_fast.py", "target": "function:src/abersetz/cli_fast.py:main", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:src/abersetz/__main__.py", "target": "file:src/abersetz/cli_fast.py", "type": "imports", "direction": "forward", "weight": 0.7},
+    {"source": "file:src/abersetz/providers/llm/local_discovery.py", "target": "class:src/abersetz/providers/llm/local_discovery.py:LocalModel", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/abersetz/providers/llm/local_discovery.py", "target": "class:src/abersetz/providers/llm/local_discovery.py:LocalModelFinder", "type": "contains", "direction": "forward", "weight": 1.0},
+    {"source": "file:src/abersetz/providers/llm/local_discovery.py", "target": "class:src/abersetz/providers/llm/local_discovery.py:LocalModel", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "file:src/abersetz/providers/llm/local_discovery.py", "target": "class:src/abersetz/providers/llm/local_discovery.py:LocalModelFinder", "type": "exports", "direction": "forward", "weight": 0.8},
+    {"source": "config:src/abersetz/providers/llm/recommended_settings.json", "target": "file:src/abersetz/providers/llm/local_discovery.py", "type": "configures", "direction": "forward", "weight": 0.6}
+  ]
+}

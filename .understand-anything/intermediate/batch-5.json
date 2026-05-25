@@ -1,0 +1,104 @@
+{
+  "nodes": [
+    {
+      "id": "pipeline:.github/workflows/push.yml",
+      "type": "pipeline",
+      "name": "push.yml",
+      "filePath": ".github/workflows/push.yml",
+      "summary": "GitHub Actions CI workflow triggered on pushes/PRs to main: runs Ruff lint and format checks, the pytest suite across Python 3.10-3.12, and builds distribution artifacts.",
+      "tags": ["ci-cd", "infrastructure", "deployment", "build-system", "test"],
+      "complexity": "moderate",
+      "languageNotes": "Three sequential jobs (quality -> test -> build) chained via needs; the test job uses a matrix over Python versions and uv for dependency management."
+    },
+    {
+      "id": "pipeline:.github/workflows/release.yml",
+      "type": "pipeline",
+      "name": "release.yml",
+      "filePath": ".github/workflows/release.yml",
+      "summary": "GitHub Actions release workflow triggered on version tags (v*): builds distributions, verifies wheel/sdist presence, publishes to PyPI via trusted publishing, and creates a GitHub Release.",
+      "tags": ["ci-cd", "deployment", "infrastructure", "release"],
+      "complexity": "simple",
+      "languageNotes": "Uses OIDC id-token permission with a pypi environment for trusted publishing and softprops/action-gh-release for release notes."
+    },
+    {
+      "id": "step:.github/workflows/push.yml:quality",
+      "type": "pipeline",
+      "name": "quality",
+      "filePath": ".github/workflows/push.yml",
+      "summary": "Code Quality job that runs Ruff lint (check) and Ruff format-check against the repository.",
+      "tags": ["ci-cd", "linting", "validation"],
+      "complexity": "simple"
+    },
+    {
+      "id": "step:.github/workflows/push.yml:test",
+      "type": "pipeline",
+      "name": "test",
+      "filePath": ".github/workflows/push.yml",
+      "summary": "Run Tests job that installs the package with test extras and executes pytest with coverage across a Python 3.10/3.11/3.12 matrix.",
+      "tags": ["ci-cd", "test", "coverage"],
+      "complexity": "simple"
+    },
+    {
+      "id": "step:.github/workflows/push.yml:build",
+      "type": "pipeline",
+      "name": "build",
+      "filePath": ".github/workflows/push.yml",
+      "summary": "Build Distribution job that builds sdist and wheel artifacts via python -m build and uploads them.",
+      "tags": ["ci-cd", "build-system", "deployment"],
+      "complexity": "simple"
+    },
+    {
+      "id": "step:.github/workflows/release.yml:release",
+      "type": "pipeline",
+      "name": "release",
+      "filePath": ".github/workflows/release.yml",
+      "summary": "Release to PyPI job that builds, verifies, publishes distributions to PyPI, and creates a GitHub Release.",
+      "tags": ["ci-cd", "deployment", "release"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "pipeline:.github/workflows/push.yml",
+      "target": "step:.github/workflows/push.yml:quality",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "pipeline:.github/workflows/push.yml",
+      "target": "step:.github/workflows/push.yml:test",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "pipeline:.github/workflows/push.yml",
+      "target": "step:.github/workflows/push.yml:build",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "pipeline:.github/workflows/release.yml",
+      "target": "step:.github/workflows/release.yml:release",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "pipeline:.github/workflows/push.yml",
+      "target": "config:pyproject.toml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "pipeline:.github/workflows/release.yml",
+      "target": "config:pyproject.toml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ]
+}

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 from ..config import EngineConfig
@@ -22,6 +23,7 @@ class LocalGgufEngine(EngineBase):
         temperature: float,
         n_gpu_layers: int,
         n_ctx: int,
+        n_threads: int | None = None,
     ) -> None:
         super().__init__(config.name, config.chunk_size, config.html_chunk_size)
         self._family = family
@@ -29,6 +31,7 @@ class LocalGgufEngine(EngineBase):
         self._temperature = temperature
 
         resolved_path = resolve_and_download_model(model_path, "gguf")
+        self._model_name = Path(resolved_path).name
         try:
             from llama_cpp import Llama
         except Exception as exc:  # pragma: no cover
@@ -37,6 +40,7 @@ class LocalGgufEngine(EngineBase):
             model_path=resolved_path,
             n_gpu_layers=n_gpu_layers,
             n_ctx=n_ctx,
+            n_threads=n_threads,
             verbose=False,
         )
 

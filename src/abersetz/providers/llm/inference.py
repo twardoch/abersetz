@@ -1,5 +1,4 @@
-# this_file: src/abersetz/providers/llm.py
-
+# this_file: src/abersetz/providers/llm/inference.py
 from __future__ import annotations
 
 import json
@@ -9,8 +8,8 @@ from typing import Any
 
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from ..config import EngineConfig
-from .base import EngineBase, EngineRequest, EngineResult
+from ...config import EngineConfig
+from ..base import EngineBase, EngineRequest, EngineResult
 
 
 class LlmEngine(EngineBase):

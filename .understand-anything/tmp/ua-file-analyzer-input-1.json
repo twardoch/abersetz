@@ -1,0 +1,21 @@
+{
+  "projectRoot": "/Users/adam/Developer/vcs3/github.twardoch/pub/abersetz",
+  "batchFiles": [
+    {"path": "src/abersetz/cli.py", "language": "python", "sizeLines": 653, "fileCategory": "code"},
+    {"path": "src/abersetz/config.py", "language": "python", "sizeLines": 356, "fileCategory": "code"},
+    {"path": "src/abersetz/engine_catalog.py", "language": "python", "sizeLines": 184, "fileCategory": "code"},
+    {"path": "src/abersetz/engines.py", "language": "python", "sizeLines": 247, "fileCategory": "code"},
+    {"path": "src/abersetz/openai_lite.py", "language": "python", "sizeLines": 135, "fileCategory": "code"},
+    {"path": "src/abersetz/setup.py", "language": "python", "sizeLines": 530, "fileCategory": "code"},
+    {"path": "src/abersetz/validation.py", "language": "python", "sizeLines": 177, "fileCategory": "code"}
+  ],
+  "batchImportData": {
+    "src/abersetz/cli.py": ["src/abersetz/config.py", "src/abersetz/engine_catalog.py"],
+    "src/abersetz/config.py": ["src/abersetz/engine_catalog.py"],
+    "src/abersetz/engine_catalog.py": [],
+    "src/abersetz/engines.py": ["src/abersetz/config.py", "src/abersetz/engine_catalog.py", "src/abersetz/openai_lite.py", "src/abersetz/providers/__init__.py", "src/abersetz/providers/mlx.py"],
+    "src/abersetz/openai_lite.py": [],
+    "src/abersetz/setup.py": ["src/abersetz/config.py", "src/abersetz/engine_catalog.py", "src/abersetz/validation.py"],
+    "src/abersetz/validation.py": ["src/abersetz/config.py", "src/abersetz/engine_catalog.py", "src/abersetz/engines.py"]
+  }
+}

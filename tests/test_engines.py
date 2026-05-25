@@ -116,12 +116,34 @@ def test_translators_engine_handles_html_requests(monkeypatch: pytest.MonkeyPatc
     assert captured["text"] == "<p>Hello</p>"
 
 
-def test_hysf_engine_uses_fixed_prompt(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_lmstudio_engine_invokes_sdk(monkeypatch: pytest.MonkeyPatch) -> None:
     cfg = config_module.load_config()
-    monkeypatch.setenv("SILICONFLOW_API_KEY", "env-key")
-    payload = "cześć"
-    client = DummyClient(payload)
-    engine = create_engine("hysf", cfg, client=client)
+
+    class MockLmsModel:
+        def __init__(self, name: str):
+            self.name = name
+            self.prompt = ""
+
+        def respond(self, prompt: str, **kwargs: object) -> str:
+            self.prompt = prompt
+            return "lms-translated"
+
+    class MockLms:
+        def __init__(self) -> None:
+            self.configured_url = ""
+            self.model = None
+
+        def configure_default_client(self, url: str) -> None:
+            self.configured_url = url
+
+        def llm(self, name: str) -> MockLmsModel:
+            self.model = MockLmsModel(name)
+            return self.model
+
+    mock_lms = MockLms()
+    monkeypatch.setitem(sys.modules, "lmstudio", mock_lms)
+
+    engine = create_engine("lms", cfg)
 
     request = EngineRequest(
         text="hi",
@@ -134,16 +156,15 @@ def test_hysf_engine_uses_fixed_prompt(monkeypatch: pytest.MonkeyPatch) -> None:
         total_chunks=1,
     )
     result = engine.translate(request)
-    assert result.text == "cześć"
-    # HYSF should not mutate vocabulary and should keep existing entries only
-    assert result.voc == {"existing": "value"}
-    assert client.calls  # ensure API invoked
-    call = client.calls[0]
+    assert result.text == "lms-translated"
+    assert mock_lms.configured_url == "localhost:1234"
+    assert mock_lms.model is not None
+    assert mock_lms.model.name == "local-model"
     expected_language = get_language("pl").language_name("en")
-    expected_message = f"Translate the following segment into {expected_language}, without additional explanation.\n\nhi"
-    assert call["model"] == "tencent/Hunyuan-MT-7B"
-    assert call["temperature"] == 0.9
-    assert call["messages"] == [{"role": "user", "content": expected_message}]
+    assert (
+        mock_lms.model.prompt
+        == f"Translate the following segment into {expected_language}, without additional explanation.\n\nhi"
+    )
 
 
 def test_engine_base_chunk_size_prefers_html_then_plain() -> None:
@@ -281,6 +302,35 @@ def test_deep_translator_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch
         DeepTranslatorEngine.PROVIDERS = original_providers
 
 
+def test_deep_translator_engine_resolves_languages(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test that DeepTranslatorEngine resolves language codes using closest matching."""
+    from abersetz.providers import DeepTranslatorEngine
+
+    class DummyTranslator:
+        _languages = {
+            "english": "en-GB",
+            "english us": "en-US",
+            "polish": "pl-PL",
+            "french": "fr-FR",
+        }
+
+        def __init__(self, source, target):
+            pass
+
+    # Force reload providers
+    providers = dict(DeepTranslatorEngine._get_providers())
+    providers["dummy"] = DummyTranslator
+    monkeypatch.setattr(DeepTranslatorEngine, "PROVIDERS", providers)
+
+    cfg = config_module.load_config()
+    engine = DeepTranslatorEngine("dummy", cfg.engines["deep-translator"])
+
+    assert engine._resolve_lang("en") in {"en-GB", "en-US"}
+    assert engine._resolve_lang("pl") == "pl-PL"
+    assert engine._resolve_lang("english") in {"en-GB", "en-US"}
+    assert engine._resolve_lang("xyz") == "xyz"
+
+
 def test_deep_translator_engine_rejects_unknown_provider(monkeypatch: pytest.MonkeyPatch) -> None:
     cfg = config_module.load_config()
 
@@ -299,6 +349,16 @@ def test_build_llm_engine_without_model_raises_engine_error() -> None:
         create_engine("ullm/default", cfg)
 
 
+def test_build_llm_engine_with_discontinued_model_raises_engine_error() -> None:
+    cfg = config_module.load_config()
+    engine_cfg = cfg.engines["ullm"]
+    profile = engine_cfg.options["profiles"]["default"]
+    profile["model"] = "tencent/Hunyuan-MT-7B"
+
+    with pytest.raises(EngineError, match="discontinued"):
+        create_engine("ullm/default", cfg)
+
+
 def test_build_llm_engine_without_credential_raises_engine_error(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -313,20 +373,14 @@ def test_build_llm_engine_without_credential_raises_engine_error(
         create_engine("ullm/default", cfg)
 
 
-def test_build_hysf_engine_without_credential_raises(monkeypatch: pytest.MonkeyPatch) -> None:
-    cfg = config_module.AbersetzConfig(
-        credentials={},
-        engines={},
-    )
-    engine_cfg = config_module.EngineConfig(
-        name="hysf",
-        credential=config_module.Credential(name="siliconflow"),
-        options={},
-    )
-    monkeypatch.delenv("SILICONFLOW_API_KEY", raising=False)
-
-    with pytest.raises(EngineError, match="Missing credential for engine hysf"):
-        engines_module._build_hysf_engine("hysf", cfg, engine_cfg, client=None)
+def test_lmstudio_engine_without_package_raises_engine_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Force import error for lmstudio
+    monkeypatch.setitem(sys.modules, "lmstudio", None)
+    cfg = config_module.load_config()
+    with pytest.raises(EngineError, match="lmstudio SDK is required"):
+        create_engine("lms", cfg)
 
 
 def test_select_profile_defaults_to_default_variant() -> None:
@@ -529,6 +583,37 @@ def test_local_gemma_gguf_engine_uses_structured_messages(
     assert messages[0]["content"][0]["target_lang_code"] == "fr"
 
 
+def test_local_gemma_gguf_engine_propagates_n_threads(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    model_path = tmp_path / "model.gguf"
+    model_path.write_text("stub", encoding="utf-8")
+    cfg = config_module.AbersetzConfig(
+        defaults=config_module.Defaults(engine="gemma/gguf"),
+        engines={
+            "gemma": config_module.EngineConfig(
+                name="gemma",
+                options={"backend": "gguf", "model_path": str(model_path)},
+            )
+        },
+    )
+    captured: dict[str, object] = {}
+
+    class FakeLlama:
+        def __init__(self, **kwargs: object) -> None:
+            captured["init"] = kwargs
+
+        def create_chat_completion(self, **kwargs: object) -> dict[str, object]:
+            return {"choices": [{"message": {"content": "result"}}]}
+
+    monkeypatch.setitem(sys.modules, "llama_cpp", SimpleNamespace(Llama=FakeLlama))
+
+    create_engine("gemma/gguf", cfg, n_threads=8, n_gpu_layers=12, n_ctx=1024)
+    assert captured["init"].get("n_threads") == 8
+    assert captured["init"].get("n_gpu_layers") == 12
+    assert captured["init"].get("n_ctx") == 1024
+
+
 def test_local_mthy_mlx_engine_hymt2_prompt_with_terminology(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
@@ -646,3 +731,33 @@ def test_resolve_and_download_model_triggers_huggingface_download(
         assert captured_repo == "p0we7/Hy-MT2-1.8B-oQ8-fp16"
     finally:
         KNOWN_MAPPING["p0we7/Hy-MT2-1.8B-oQ8-fp16"]["lmstudio_path"] = original_path
+
+
+def test_create_engine_override_parameters(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    model_dir = tmp_path / "mthy-mlx"
+    model_dir.mkdir()
+    cfg = config_module.AbersetzConfig(
+        defaults=config_module.Defaults(engine="mthy"),
+        engines={
+            "mthy": config_module.EngineConfig(
+                name="mthy",
+                options={"backend": "mlx", "model_path": str(model_dir), "max_tokens": 100},
+            )
+        },
+    )
+
+    loaded_args = []
+
+    def fake_load(path, *args, **kwargs):
+        loaded_args.append(path)
+        return object(), SimpleNamespace(chat_template="template")
+
+    def fake_generate(*args, **kwargs):
+        return "translated"
+
+    fake_module = SimpleNamespace(load=fake_load, generate=fake_generate)
+    monkeypatch.setitem(sys.modules, "mlx_lm", fake_module)
+
+    # Create engine overriding max_tokens to 200
+    engine = create_engine("mthy", cfg, max_tokens=200)
+    assert engine._max_tokens == 200

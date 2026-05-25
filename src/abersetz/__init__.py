@@ -20,6 +20,7 @@ from typing import TYPE_CHECKING, Any
 # Only import types for static analysis
 if TYPE_CHECKING:
     from .pipeline import PipelineError, TranslationResult, TranslatorOptions, translate_path
+    from .tasks import translate_flow, translate_task
 
 # Lazy loading implementation
 _LAZY_IMPORTS: dict[str, Any] = {}
@@ -40,6 +41,14 @@ def __getattr__(name: str) -> Any:
         _LAZY_IMPORTS["translate_path"] = pipeline.translate_path
         return _LAZY_IMPORTS[name]
 
+    # Lazy load tasks module components
+    if name in ("translate_task", "translate_flow"):
+        from . import tasks
+
+        _LAZY_IMPORTS["translate_task"] = tasks.translate_task
+        _LAZY_IMPORTS["translate_flow"] = tasks.translate_flow
+        return _LAZY_IMPORTS[name]
+
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
@@ -55,4 +64,6 @@ __all__ = [
     "TranslatorOptions",
     "__version__",
     "translate_path",
+    "translate_task",
+    "translate_flow",
 ]

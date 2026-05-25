@@ -1,0 +1,868 @@
+{
+  "scriptCompleted": true,
+  "filesAnalyzed": 6,
+  "filesSkipped": [],
+  "results": [
+    {
+      "path": "docs/_config.yml",
+      "language": "yaml",
+      "fileCategory": "config",
+      "totalLines": 77,
+      "nonEmptyLines": 65,
+      "sections": [
+        {
+          "heading": "title",
+          "level": 1,
+          "line": 4
+        },
+        {
+          "heading": "description",
+          "level": 1,
+          "line": 5
+        },
+        {
+          "heading": "baseurl",
+          "level": 1,
+          "line": 6
+        },
+        {
+          "heading": "url",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "remote_theme",
+          "level": 1,
+          "line": 10
+        },
+        {
+          "heading": "color_scheme",
+          "level": 1,
+          "line": 11
+        },
+        {
+          "heading": "search_enabled",
+          "level": 1,
+          "line": 14
+        },
+        {
+          "heading": "search",
+          "level": 1,
+          "line": 15
+        },
+        {
+          "heading": "nav_enabled",
+          "level": 1,
+          "line": 25
+        },
+        {
+          "heading": "nav_sort",
+          "level": 1,
+          "line": 26
+        },
+        {
+          "heading": "footer_content",
+          "level": 1,
+          "line": 29
+        },
+        {
+          "heading": "last_edit_timestamp",
+          "level": 1,
+          "line": 30
+        },
+        {
+          "heading": "last_edit_time_format",
+          "level": 1,
+          "line": 31
+        },
+        {
+          "heading": "back_to_top",
+          "level": 1,
+          "line": 34
+        },
+        {
+          "heading": "back_to_top_text",
+          "level": 1,
+          "line": 35
+        },
+        {
+          "heading": "aux_links",
+          "level": 1,
+          "line": 38
+        },
+        {
+          "heading": "collections",
+          "level": 1,
+          "line": 45
+        },
+        {
+          "heading": "just_the_docs",
+          "level": 1,
+          "line": 50
+        },
+        {
+          "heading": "plugins",
+          "level": 1,
+          "line": 58
+        },
+        {
+          "heading": "markdown",
+          "level": 1,
+          "line": 63
+        },
+        {
+          "heading": "kramdown",
+          "level": 1,
+          "line": 64
+        },
+        {
+          "heading": "xclude",
+          "level": 1,
+          "line": 70
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 22
+      }
+    },
+    {
+      "path": "docs/api.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 442,
+      "nonEmptyLines": 340,
+      "sections": [
+        {
+          "heading": "Python API Reference",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "Table of contents",
+          "level": 2,
+          "line": 10
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 18
+        },
+        {
+          "heading": "Main Functions",
+          "level": 2,
+          "line": 22
+        },
+        {
+          "heading": "translate_path",
+          "level": 3,
+          "line": 24
+        },
+        {
+          "heading": "Core Classes",
+          "level": 2,
+          "line": 48
+        },
+        {
+          "heading": "TranslatorOptions",
+          "level": 3,
+          "line": 50
+        },
+        {
+          "heading": "TranslationResult",
+          "level": 3,
+          "line": 91
+        },
+        {
+          "heading": "PipelineError",
+          "level": 3,
+          "line": 114
+        },
+        {
+          "heading": "Configuration Management",
+          "level": 2,
+          "line": 127
+        },
+        {
+          "heading": "Loading Configuration",
+          "level": 3,
+          "line": 129
+        },
+        {
+          "heading": "Saving Configuration",
+          "level": 3,
+          "line": 139
+        },
+        {
+          "heading": "Custom Engine Configuration",
+          "level": 3,
+          "line": 155
+        },
+        {
+          "heading": "Engine Management",
+          "level": 2,
+          "line": 171
+        },
+        {
+          "heading": "Creating Engines",
+          "level": 3,
+          "line": 173
+        },
+        {
+          "heading": "Using Engines Directly",
+          "level": 3,
+          "line": 183
+        },
+        {
+          "heading": "Text Processing",
+          "level": 2,
+          "line": 203
+        },
+        {
+          "heading": "Format Detection",
+          "level": 3,
+          "line": 205
+        },
+        {
+          "heading": "Text Chunking",
+          "level": 3,
+          "line": 215
+        },
+        {
+          "heading": "Complete Examples",
+          "level": 2,
+          "line": 227
+        },
+        {
+          "heading": "Simple Translation",
+          "level": 3,
+          "line": 229
+        },
+        {
+          "heading": "Batch Processing",
+          "level": 3,
+          "line": 248
+        },
+        {
+          "heading": "Custom Workflow",
+          "level": 3,
+          "line": 277
+        },
+        {
+          "heading": "Error Handling",
+          "level": 3,
+          "line": 324
+        },
+        {
+          "heading": "Async Translation",
+          "level": 3,
+          "line": 361
+        },
+        {
+          "heading": "Advanced Topics",
+          "level": 2,
+          "line": 387
+        },
+        {
+          "heading": "Custom Engines",
+          "level": 3,
+          "line": 389
+        },
+        {
+          "heading": "Vocabulary Management",
+          "level": 3,
+          "line": 410
+        },
+        {
+          "heading": "See Also",
+          "level": 2,
+          "line": 438
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 29
+      }
+    },
+    {
+      "path": "docs/cli.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 368,
+      "nonEmptyLines": 251,
+      "sections": [
+        {
+          "heading": "CLI Reference",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "Table of contents",
+          "level": 2,
+          "line": 10
+        },
+        {
+          "heading": "Overview",
+          "level": 2,
+          "line": 18
+        },
+        {
+          "heading": "Main Commands",
+          "level": 2,
+          "line": 25
+        },
+        {
+          "heading": "abersetz tr",
+          "level": 3,
+          "line": 27
+        },
+        {
+          "heading": "Arguments",
+          "level": 4,
+          "line": 35
+        },
+        {
+          "heading": "Options",
+          "level": 4,
+          "line": 39
+        },
+        {
+          "heading": "abersetz config",
+          "level": 3,
+          "line": 57
+        },
+        {
+          "heading": "Subcommands",
+          "level": 4,
+          "line": 65
+        },
+        {
+          "heading": "abersetz version",
+          "level": 3,
+          "line": 70
+        },
+        {
+          "heading": "abersetz engines",
+          "level": 3,
+          "line": 78
+        },
+        {
+          "heading": "abersetz setup",
+          "level": 3,
+          "line": 89
+        },
+        {
+          "heading": "abersetz validate",
+          "level": 3,
+          "line": 101
+        },
+        {
+          "heading": "Shorthand Command",
+          "level": 2,
+          "line": 126
+        },
+        {
+          "heading": "abtr",
+          "level": 3,
+          "line": 128
+        },
+        {
+          "heading": "Usage Examples",
+          "level": 2,
+          "line": 138
+        },
+        {
+          "heading": "Basic Translation",
+          "level": 3,
+          "line": 140
+        },
+        {
+          "heading": "Directory Translation",
+          "level": 3,
+          "line": 154
+        },
+        {
+          "heading": "Engine Selection",
+          "level": 3,
+          "line": 171
+        },
+        {
+          "heading": "Validate Engines",
+          "level": 3,
+          "line": 192
+        },
+        {
+          "heading": "Advanced Options",
+          "level": 3,
+          "line": 200
+        },
+        {
+          "heading": "Language Codes",
+          "level": 2,
+          "line": 230
+        },
+        {
+          "heading": "Pattern Matching",
+          "level": 2,
+          "line": 251
+        },
+        {
+          "heading": "Environment Variables",
+          "level": 2,
+          "line": 261
+        },
+        {
+          "heading": "Output Format",
+          "level": 2,
+          "line": 277
+        },
+        {
+          "heading": "Error Handling",
+          "level": 2,
+          "line": 292
+        },
+        {
+          "heading": "Missing API key",
+          "level": 3,
+          "line": 296
+        },
+        {
+          "heading": "No files matched",
+          "level": 3,
+          "line": 308
+        },
+        {
+          "heading": "Network error",
+          "level": 3,
+          "line": 320
+        },
+        {
+          "heading": "Tips and Tricks",
+          "level": 2,
+          "line": 328
+        },
+        {
+          "heading": "Batch translation",
+          "level": 3,
+          "line": 330
+        },
+        {
+          "heading": "Parallel processing",
+          "level": 3,
+          "line": 340
+        },
+        {
+          "heading": "Progress tracking",
+          "level": 3,
+          "line": 348
+        },
+        {
+          "heading": "Testing configuration",
+          "level": 3,
+          "line": 356
+        },
+        {
+          "heading": "See Also",
+          "level": 2,
+          "line": 364
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 35
+      }
+    },
+    {
+      "path": "docs/configuration.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 435,
+      "nonEmptyLines": 303,
+      "sections": [
+        {
+          "heading": "Configuration",
+          "level": 1,
+          "line": 1
+        },
+        {
+          "heading": "Configuration Location",
+          "level": 2,
+          "line": 5
+        },
+        {
+          "heading": "Configuration Structure",
+          "level": 2,
+          "line": 18
+        },
+        {
+          "heading": "Complete Example",
+          "level": 3,
+          "line": 20
+        },
+        {
+          "heading": "Configuration Sections",
+          "level": 2,
+          "line": 62
+        },
+        {
+          "heading": "defaults",
+          "level": 3,
+          "line": 64
+        },
+        {
+          "heading": "credentials",
+          "level": 3,
+          "line": 77
+        },
+        {
+          "heading": "engines",
+          "level": 3,
+          "line": 89
+        },
+        {
+          "heading": "Setting Up Credentials",
+          "level": 2,
+          "line": 104
+        },
+        {
+          "heading": "Environment Variables (Recommended)",
+          "level": 3,
+          "line": 106
+        },
+        {
+          "heading": "Direct Values (Not Recommended)",
+          "level": 3,
+          "line": 124
+        },
+        {
+          "heading": "Engine Configuration",
+          "level": 2,
+          "line": 133
+        },
+        {
+          "heading": "LLM Engine (ullm)",
+          "level": 3,
+          "line": 135
+        },
+        {
+          "heading": "Custom Endpoints",
+          "level": 3,
+          "line": 167
+        },
+        {
+          "heading": "Managing Configuration",
+          "level": 2,
+          "line": 181
+        },
+        {
+          "heading": "View Current Config",
+          "level": 3,
+          "line": 183
+        },
+        {
+          "heading": "Edit Configuration",
+          "level": 3,
+          "line": 195
+        },
+        {
+          "heading": "Reset Configuration",
+          "level": 3,
+          "line": 209
+        },
+        {
+          "heading": "Backup Configuration",
+          "level": 3,
+          "line": 217
+        },
+        {
+          "heading": "Python Configuration API",
+          "level": 2,
+          "line": 224
+        },
+        {
+          "heading": "Load Configuration",
+          "level": 3,
+          "line": 226
+        },
+        {
+          "heading": "Modify Configuration",
+          "level": 3,
+          "line": 236
+        },
+        {
+          "heading": "Add Custom Engine",
+          "level": 3,
+          "line": 255
+        },
+        {
+          "heading": "Environment Variables",
+          "level": 2,
+          "line": 276
+        },
+        {
+          "heading": "Abersetz-specific",
+          "level": 3,
+          "line": 278
+        },
+        {
+          "heading": "API Keys",
+          "level": 3,
+          "line": 288
+        },
+        {
+          "heading": "Configuration Templates",
+          "level": 2,
+          "line": 315
+        },
+        {
+          "heading": "Minimal Config",
+          "level": 3,
+          "line": 317
+        },
+        {
+          "heading": "Multi-engine Config",
+          "level": 3,
+          "line": 325
+        },
+        {
+          "heading": "Enterprise Config",
+          "level": 3,
+          "line": 358
+        },
+        {
+          "heading": "Security Best Practices",
+          "level": 2,
+          "line": 383
+        },
+        {
+          "heading": "Troubleshooting",
+          "level": 2,
+          "line": 398
+        },
+        {
+          "heading": "Config not loading",
+          "level": 3,
+          "line": 400
+        },
+        {
+          "heading": "API key not found",
+          "level": 3,
+          "line": 409
+        },
+        {
+          "heading": "Permission denied",
+          "level": 3,
+          "line": 417
+        },
+        {
+          "heading": "Validation Selector Tips",
+          "level": 2,
+          "line": 425
+        },
+        {
+          "heading": "See Also",
+          "level": 2,
+          "line": 431
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 37
+      }
+    },
+    {
+      "path": "docs/index.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 150,
+      "nonEmptyLines": 113,
+      "sections": [
+        {
+          "heading": "abersetz",
+          "level": 1,
+          "line": 9
+        },
+        {
+          "heading": "Why abersetz?",
+          "level": 2,
+          "line": 20
+        },
+        {
+          "heading": "Features",
+          "level": 2,
+          "line": 28
+        },
+        {
+          "heading": "Getting Started",
+          "level": 2,
+          "line": 56
+        },
+        {
+          "heading": "Installation",
+          "level": 3,
+          "line": 58
+        },
+        {
+          "heading": "Quick Start",
+          "level": 3,
+          "line": 64
+        },
+        {
+          "heading": "Configuration",
+          "level": 3,
+          "line": 83
+        },
+        {
+          "heading": "Example Usage",
+          "level": 2,
+          "line": 92
+        },
+        {
+          "heading": "CLI Examples",
+          "level": 3,
+          "line": 94
+        },
+        {
+          "heading": "Python API",
+          "level": 3,
+          "line": 114
+        },
+        {
+          "heading": "Documentation",
+          "level": 2,
+          "line": 139
+        },
+        {
+          "heading": "License",
+          "level": 2,
+          "line": 148
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 12
+      }
+    },
+    {
+      "path": "docs/installation.md",
+      "language": "markdown",
+      "fileCategory": "docs",
+      "totalLines": 180,
+      "nonEmptyLines": 122,
+      "sections": [
+        {
+          "heading": "Installation",
+          "level": 1,
+          "line": 7
+        },
+        {
+          "heading": "Table of contents",
+          "level": 2,
+          "line": 10
+        },
+        {
+          "heading": "Requirements",
+          "level": 2,
+          "line": 18
+        },
+        {
+          "heading": "Installing with pip",
+          "level": 2,
+          "line": 23
+        },
+        {
+          "heading": "Installing with uv",
+          "level": 2,
+          "line": 31
+        },
+        {
+          "heading": "Installing from source",
+          "level": 2,
+          "line": 39
+        },
+        {
+          "heading": "Verifying installation",
+          "level": 2,
+          "line": 49
+        },
+        {
+          "heading": "Dependencies",
+          "level": 2,
+          "line": 65
+        },
+        {
+          "heading": "Core dependencies",
+          "level": 3,
+          "line": 69
+        },
+        {
+          "heading": "Utility dependencies",
+          "level": 3,
+          "line": 75
+        },
+        {
+          "heading": "Optional: Setting up API keys",
+          "level": 2,
+          "line": 82
+        },
+        {
+          "heading": "Shell completion (optional)",
+          "level": 2,
+          "line": 103
+        },
+        {
+          "heading": "Docker installation (alternative)",
+          "level": 2,
+          "line": 118
+        },
+        {
+          "heading": "Troubleshooting",
+          "level": 2,
+          "line": 139
+        },
+        {
+          "heading": "Command not found",
+          "level": 3,
+          "line": 141
+        },
+        {
+          "heading": "Permission denied",
+          "level": 3,
+          "line": 155
+        },
+        {
+          "heading": "SSL certificate errors",
+          "level": 3,
+          "line": 164
+        },
+        {
+          "heading": "Next steps",
+          "level": 2,
+          "line": 176
+        }
+      ],
+      "metrics": {
+        "importCount": 0,
+        "exportCount": 0,
+        "functionCount": 0,
+        "classCount": 0,
+        "sectionCount": 18
+      }
+    }
+  ]
+}

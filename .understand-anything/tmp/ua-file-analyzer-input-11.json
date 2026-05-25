@@ -1,0 +1,33 @@
+{
+  "projectRoot": "/Users/adam/Developer/vcs3/github.twardoch/pub/abersetz",
+  "batchFiles": [
+    {"path": ".cursor/rules/codegraph.mdc", "language": "mdc", "sizeLines": 39, "fileCategory": "code"},
+    {"path": ".understand-anything/.understandignore", "language": "unknown", "sizeLines": 326, "fileCategory": "code"},
+    {"path": "examples/benchmark.py", "language": "python", "sizeLines": 423, "fileCategory": "code"},
+    {"path": "src/abersetz/__init__.py", "language": "python", "sizeLines": 69, "fileCategory": "code"},
+    {"path": "src/abersetz/__main__.py", "language": "python", "sizeLines": 9, "fileCategory": "code"},
+    {"path": "src/abersetz/cli_fast.py", "language": "python", "sizeLines": 41, "fileCategory": "code"},
+    {"path": "src/abersetz/providers/llm/api/anthropic.py", "language": "python", "sizeLines": 11, "fileCategory": "code"},
+    {"path": "src/abersetz/providers/llm/api/deepseek.py", "language": "python", "sizeLines": 10, "fileCategory": "code"},
+    {"path": "src/abersetz/providers/llm/api/gemini.py", "language": "python", "sizeLines": 12, "fileCategory": "code"},
+    {"path": "src/abersetz/providers/llm/api/groq.py", "language": "python", "sizeLines": 13, "fileCategory": "code"},
+    {"path": "src/abersetz/providers/llm/api/lmstudio.py", "language": "python", "sizeLines": 9, "fileCategory": "code"},
+    {"path": "src/abersetz/providers/llm/api/openai.py", "language": "python", "sizeLines": 12, "fileCategory": "code"},
+    {"path": "src/abersetz/providers/llm/api/openrouter.py", "language": "python", "sizeLines": 12, "fileCategory": "code"},
+    {"path": "src/abersetz/providers/llm/api/siliconflow.py", "language": "python", "sizeLines": 13, "fileCategory": "code"},
+    {"path": "src/abersetz/providers/llm/api/together.py", "language": "python", "sizeLines": 11, "fileCategory": "code"},
+    {"path": "src/abersetz/providers/llm/local_discovery.py", "language": "python", "sizeLines": 200, "fileCategory": "code"},
+    {"path": "src/abersetz/providers/llm/recommended_settings.json", "language": "json", "sizeLines": 44, "fileCategory": "config"},
+    {"path": "tests/conftest.py", "language": "python", "sizeLines": 71, "fileCategory": "code"},
+    {"path": "tests/test_chunking.py", "language": "python", "sizeLines": 47, "fileCategory": "code"},
+    {"path": "tests/test_cli.py", "language": "python", "sizeLines": 894, "fileCategory": "code"},
+    {"path": "tests/test_config.py", "language": "python", "sizeLines": 259, "fileCategory": "code"},
+    {"path": "tests/test_engine_catalog.py", "language": "python", "sizeLines": 101, "fileCategory": "code"},
+    {"path": "tests/test_engines.py", "language": "python", "sizeLines": 763, "fileCategory": "code"},
+    {"path": "tests/test_examples.py", "language": "python", "sizeLines": 568, "fileCategory": "code"},
+    {"path": "tests/test_htmladapt_twat.py", "language": "python", "sizeLines": 155, "fileCategory": "code"}
+  ],
+  "batchImportData": {
+    "src/abersetz/__main__.py": ["src/abersetz/cli_fast.py"]
+  }
+}

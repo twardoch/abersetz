@@ -25,6 +25,10 @@ dependencies = [
     "tomli>=2.0; python_version < \"3.11\"",
     "language-data>=1.4.0",
     "huggingface-hub>=1.16.1",
+    "htmladapt",
+    "twat",
+    "twat-cache",
+    "twat-task",
 ]
 
 [[project.authors]]
@@ -39,8 +43,24 @@ Documentation = "https://github.com/twardoch/abersetz#readme"
 Issues = "https://github.com/twardoch/abersetz/issues"
 Source = "https://github.com/twardoch/abersetz"
 
+[project.optional-dependencies]
+mlx = [
+    "mlx-lm>=0.20.0; sys_platform == 'darwin'",
+]
+gguf = [
+    "llama-cpp-python>=0.3.0; sys_platform == 'darwin'",
+]
+lms = [
+    "lmstudio>=1.3.0",
+]
+all = [
+    "mlx-lm>=0.20.0; sys_platform == 'darwin'",
+    "llama-cpp-python>=0.3.0; sys_platform == 'darwin'",
+    "lmstudio>=1.3.0",
+]
+
 [project.scripts]
-abersetz = "abersetz.cli_fast:main"
+abersetz = "abersetz.__main__:main"
 abtr = "abersetz.cli:abtr_main"
 
 [dependency-groups]
@@ -88,6 +108,12 @@ extra-dependencies = [
 [tool.uv]
 default-groups = ["dev"]
 python-preference = "managed"
+
+[tool.uv.sources]
+htmladapt = { path = "external/htmladapt", editable = true }
+twat = { path = "external/twat", editable = true }
+twat-cache = { path = "external/twat/plugins/repos/twat_cache", editable = true }
+twat-task = { path = "external/twat/plugins/repos/twat_task", editable = true }
 
 [tool.ruff]
 line-length = 100

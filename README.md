@@ -17,7 +17,7 @@ Abersetz speaks to several translation backends through a unified interface:
 | `tr/google`, `tr/bing`, … | `translators` package — scrapes web translation endpoints |
 | `dt/google`, `dt/deepl`, `dt/microsoft`, … | `deep-translator` — more stable, official APIs |
 | `ullm/<profile>` | Any OpenAI-compatible LLM endpoint (OpenAI, Anthropic, SiliconFlow, local Ollama) |
-| `hysf` | Tencent Hunyuan via SiliconFlow API |
+| `lms` | LMStudio local models via the official `lmstudio` SDK |
 | `mthy/mlx`, `mthy/gguf` | Tencent Hunyuan-MT running locally (Apple Silicon or CPU via llama.cpp) |
 | `gemma/mlx`, `gemma/gguf` | Google TranslateGemma running locally |
 

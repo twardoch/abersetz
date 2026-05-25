@@ -6,6 +6,7 @@ The user-facing CLI. This translates terminal commands into pipeline options, fo
 from __future__ import annotations
 
 import json
+import os
 import sys
 from collections.abc import Iterable, Sequence
 from pathlib import Path
@@ -13,11 +14,15 @@ from pathlib import Path
 import fire  # type: ignore
 import tomli_w
 from loguru import logger
-from rich.console import Console
-from rich.table import Table
 
-from .config import config_path, load_config
-from .engine_catalog import (
+logger.remove()
+logger.add(sys.stderr, level="WARNING", enqueue=False)
+
+from rich.console import Console  # noqa: E402
+from rich.table import Table  # noqa: E402
+
+from .config import config_path, load_config  # noqa: E402
+from .engine_catalog import (  # noqa: E402
     DEEP_TRANSLATOR_PAID_PROVIDERS,
     PAID_TRANSLATOR_PROVIDERS,
     EngineEntry,
@@ -25,9 +30,24 @@ from .engine_catalog import (
     collect_translator_providers,
     normalize_selector,
 )
-from .pipeline import PipelineError, TranslationResult, TranslatorOptions, translate_path
-from .setup import setup_command
-from .validation import ValidationResult, validate_engines
+
+with open(os.devnull, "w") as devnull:
+    old_stdout = sys.stdout
+    old_stderr = sys.stderr
+    sys.stdout = devnull
+    sys.stderr = devnull
+    try:
+        from .pipeline import (  # noqa: E402
+            PipelineError,
+            TranslationResult,
+            TranslatorOptions,
+            translate_path,
+        )
+        from .setup import setup_command  # noqa: E402
+        from .validation import ValidationResult, validate_engines  # noqa: E402
+    finally:
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
 
 console = Console()
 
@@ -190,14 +210,14 @@ def _collect_engine_entries(
             )
         )
 
-    # hysf engine
-    if "hysf" in cfg.engines:
+    # lmstudio engine
+    if "lmstudio" in cfg.engines:
         entries.append(
             EngineEntry(
-                selector=str(normalize_selector("hysf")),
+                selector=str(normalize_selector("lmstudio")),
                 configured=True,
-                requires_api_key=True,
-                notes="siliconflow",
+                requires_api_key=False,
+                notes="local",
             )
         )
 
@@ -256,12 +276,24 @@ class ConfigCommands:
     Subcommands under `abersetz config` to show the current setup or print the config file path."""
 
     def show(self) -> str:
+        """Show current configuration as TOML.
+
+        Reads the configuration from disk (or default settings) and prints the serialization.
+
+        Returns:
+            str: The configuration formatted as TOML.
+        """
         cfg = load_config()
         data = cfg.to_dict()
         toml_output = tomli_w.dumps(data)
         return toml_output
 
     def path(self) -> str:
+        """Print the absolute path to the configuration file.
+
+        Returns:
+            str: The path to the config file on the local filesystem.
+        """
         path = str(config_path())
         return path
 
@@ -294,6 +326,11 @@ def _build_options_from_cli(
     dry_run: bool,
     prolog: str | None,
     voc: str | None,
+    temperature: float | None = None,
+    n_gpu_layers: int | None = None,
+    n_ctx: int | None = None,
+    max_tokens: int | None = None,
+    n_threads: int | None = None,
 ) -> TranslatorOptions:
     # Validate language codes
     validated_from_lang = _validate_language_code(from_lang, "--from-lang")
@@ -321,6 +358,11 @@ def _build_options_from_cli(
         dry_run=dry_run,
         prolog=_load_json_data(prolog),
         initial_voc=_load_json_data(voc),
+        temperature=temperature,
+        n_gpu_layers=n_gpu_layers,
+        n_ctx=n_ctx,
+        max_tokens=max_tokens,
+        n_threads=n_threads,
     )
 
 
@@ -361,7 +403,8 @@ class AbersetzCLI:
         engine: str | None = None,
         from_lang: str | None = None,
         recurse: bool = True,
-        write_over: bool = False,
+        write_over: bool | None = None,
+        Overwrite: bool = False,
         output: str | Path | None = None,
         save_voc: bool = False,
         chunk_size: int | None = None,
@@ -371,8 +414,48 @@ class AbersetzCLI:
         dry_run: bool = False,
         prolog: str | None = None,
         voc: str | None = None,
+        Vocabulary: str | None = None,
+        temperature: float | None = None,
+        Temperature: float | None = None,
+        n_gpu_layers: int | None = None,
+        n_ctx: int | None = None,
+        max_tokens: int | None = None,
+        n_threads: int | None = None,
         verbose: bool = False,
     ) -> None:
+        """Translate documents or folders.
+
+        Args:
+            to_lang: Target language code (e.g. 'pl' or 'es'). Maps to short option -t.
+            path: Path to target file or folder.
+            engine: Translation engine/provider selector (e.g. 'tr/google', 'lms').
+            from_lang: Source language code (defaults to 'auto').
+            recurse: Recursively search directories if path is folder.
+            write_over: Backward compatible lowercase overwrite option.
+            Overwrite: Overwrite existing translation files. Maps to uppercase -O (avoids clash with output -o).
+            output: Directory to write output files to. Maps to lowercase -o.
+            save_voc: Save extracted terminology vocabulary file.
+            chunk_size: Split size for text chunks.
+            html_chunk_size: Split size for HTML chunk structure.
+            include: Comma-separated glob patterns to include (e.g. '*.md').
+            xclude: Comma-separated glob patterns to exclude.
+            dry_run: Simulate translation without calling backend APIs.
+            prolog: JSON string or path containing static prolog/system instructions.
+            voc: Backward compatible lowercase vocabulary option.
+            Vocabulary: JSON vocabulary file/string for terminology lookup. Maps to uppercase -V (avoids clash with verbose -v).
+            temperature: Backward compatible lowercase temperature option.
+            Temperature: Inference temperature for LLM-based translation. Maps to uppercase -T (avoids clash with target language -t).
+            n_gpu_layers: GPU layers to offload (specific to local GGUF/llama.cpp engines).
+            n_ctx: Context size / length (specific to local GGUF/llama.cpp engines).
+            max_tokens: Maximum tokens to generate (specific to local MLX/GGUF engines).
+            n_threads: Number of CPU threads to use (specific to local GGUF/llama.cpp engines).
+            verbose: Enable debug log outputs.
+        """
+        # Handle case-based overrides and fallbacks
+        actual_overwrite = Overwrite or (write_over is True)
+        actual_voc = Vocabulary if Vocabulary is not None else voc
+        actual_temperature = Temperature if Temperature is not None else temperature
+
         _configure_logging(verbose)
         opts = _build_options_from_cli(
             to_lang=to_lang,
@@ -380,7 +463,7 @@ class AbersetzCLI:
             engine=engine,
             from_lang=from_lang,
             recurse=recurse,
-            write_over=write_over,
+            write_over=actual_overwrite,
             output=output,
             save_voc=save_voc,
             chunk_size=chunk_size,
@@ -389,7 +472,12 @@ class AbersetzCLI:
             xclude=xclude,
             dry_run=dry_run,
             prolog=prolog,
-            voc=voc,
+            voc=actual_voc,
+            temperature=actual_temperature,
+            n_gpu_layers=n_gpu_layers,
+            n_ctx=n_ctx,
+            max_tokens=max_tokens,
+            n_threads=n_threads,
         )
         try:
             results = translate_path(path, opts)
@@ -413,9 +501,21 @@ class AbersetzCLI:
             print(result.destination)
 
     def config(self) -> ConfigCommands:
+        """Access configuration helper subcommands.
+
+        Returns:
+            ConfigCommands: Group of subcommands under `abersetz config` (show, path).
+        """
         return ConfigCommands()
 
     def lang(self) -> list[str]:
+        """List popular and all supported CLDR language codes.
+
+        Prints popular language codes along with a list of all CLDR languages, and returns them as a list of strings.
+
+        Returns:
+            list[str]: The list of formatted language codes and names.
+        """
         from langcodes import get
 
         popular: list[str] = []
@@ -473,34 +573,69 @@ class AbersetzCLI:
         self,
         *,
         selectors: str | Sequence[str] | None = None,
+        Selectors: str | Sequence[str] | None = None,
         target_lang: str = "es",
         source_lang: str = "auto",
-        sample_text: str = "Hello, world!",
+        sample_text: str | None = None,
+        Text: str = "Hello, world!",
         include_defaults: bool = True,
     ) -> list[ValidationResult]:
         """Validate configured engines by translating a short phrase.
 
-        Fires a test string ("Hello, world!") through the selected engines to measure latency and verify they actually work."""
+        Fires a test string ("Hello, world!") through the selected engines to measure latency and verify they actually work.
 
+        Args:
+            selectors: Backward compatible lowercase selectors option.
+            Selectors: Comma-separated list or sequence of engine selectors to test. Maps to uppercase -S (avoids clash with source_lang -s).
+            target_lang: Target language code to translate into. Maps to lowercase -t.
+            source_lang: Source language code to translate from. Maps to lowercase -s.
+            sample_text: Backward compatible lowercase sample text option.
+            Text: Text phrase to translate for testing. Maps to uppercase -T (avoids clash with target_lang -t).
+            include_defaults: Include default active engines in verification.
+        """
         cfg = load_config()
-        selector_tuple = _parse_patterns(selectors)
+
+        # Handle case-based overrides and fallbacks
+        actual_selectors = Selectors if Selectors is not None else selectors
+        actual_text = Text if Text != "Hello, world!" else (sample_text or Text)
+
+        selector_tuple = _parse_patterns(actual_selectors)
         results = validate_engines(
             cfg,
             selectors=selector_tuple or None,
             target_lang=target_lang,
             source_lang=source_lang,
-            sample_text=sample_text,
+            sample_text=actual_text,
             include_defaults=include_defaults,
         )
         _render_validation_entries(results)
         return results
+
+    def discover(
+        self,
+        *,
+        format: str | None = None,
+        min_size_mb: float = 100.0,
+    ) -> None:
+        """Scan and discover downloaded local LLM and AI models.
+
+        Checks standard paths for HuggingFace, Ollama, LM Studio, Pinokio, and GPT4All.
+
+        Args:
+            format: Filter by model format extension (e.g. 'gguf', 'safetensors', 'coreml').
+            min_size_mb: Minimum file size in MB to filter out metadata/configs (default: 100).
+        """
+        from .providers.llm.local_discovery import LocalModelFinder
+
+        finder = LocalModelFinder()
+        finder.scan(format=format, min_size_mb=min_size_mb)
 
 
 def main() -> None:
     """Invoke the Fire CLI.
 
     Turns the `AbersetzCLI` class into a command-line application."""
-    fire.Fire(AbersetzCLI())
+    fire.Fire(AbersetzCLI(), name="abersetz")
 
 
 def abtr_main() -> None:
@@ -512,7 +647,7 @@ def abtr_main() -> None:
     cli = AbersetzCLI()
 
     # Use Fire to parse arguments for the tr method specifically
-    fire.Fire(cli.tr)
+    fire.Fire(cli.tr, name="abtr")
 
 
 __all__ = ["AbersetzCLI", "ConfigCommands", "main", "abtr_main"]

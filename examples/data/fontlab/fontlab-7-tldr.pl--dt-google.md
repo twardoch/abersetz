@@ -242,7 +242,7 @@ Precyzyjna edycja węzłów jest niezbędna, ponieważ przesuwanie konturów bez
 - **Zaznaczenie zaznaczenia**: Przeciągnij prostokąt nad obszarem roboczym. Jego zachowaniem reguluje opcja `Preferencje > Edycja > Wybór markizy ignoruje uchwyty podczas wybierania węzłów. Jeśli ta opcja jest włączona, przeciąganie po obu węzłach i uchwytach powoduje zaznaczenie tylko węzłów. Jeśli markiza zawiera tylko uchwyty, zostaną one zaznaczone.
 - **Zaznaczanie lasso**: Przytrzymaj **Alt** podczas przeciągania, aby narysować dowolne lasso, zaznaczając wszystkie zawarte węzły i uchwyty.
 
-> [!WAŻNE] Gdy opcja `Zaznaczanie markizy ignoruje uchwyty` jest aktywna, użycie **Markiza z klawiszem Shift** w celu odznaczenia zawsze spowoduje odznaczenie wszystkich przechwyconych elementów, niezależnie od tego, czy są to węzły, czy uchwyty.
+> [!WAŻNE] Gdy opcja `Wybór markizy ignoruje uchwyty` jest aktywna, użycie **Markiza z klawiszem Shift** w celu odznaczenia zawsze spowoduje odznaczenie wszystkich przechwyconych elementów, niezależnie od tego, czy są to węzły, czy uchwyty.
 
 ---
 

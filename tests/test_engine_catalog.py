@@ -56,8 +56,8 @@ def test_resolve_engine_reference_handles_long_selector() -> None:
 
 
 def test_resolve_engine_reference_handles_base_only_alias() -> None:
-    base, variant = resolve_engine_reference("hy")
-    assert base == "hysf"
+    base, variant = resolve_engine_reference("lms")
+    assert base == "lmstudio"
     assert variant is None
 
 
@@ -95,7 +95,7 @@ def test_collect_deep_translator_providers_include_paid_appends_once() -> None:
     free_only = collect_deep_translator_providers(include_paid=False)
     include_paid = collect_deep_translator_providers(include_paid=True)
 
-    assert free_only == ["google", "libre", "linguee", "my_memory"]
+    assert free_only == ["google", "libre", "linguee"]
     assert include_paid[: len(free_only)] == free_only
     assert include_paid[-3:] == ["deepl", "microsoft", "papago"]
     assert len(include_paid) == len(set(include_paid))

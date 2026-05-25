@@ -182,8 +182,8 @@ abtr pt file.txt --engine translators/bing
 # DeepL
 abtr pt file.txt --engine deep-translator/deepl
 
-# SiliconFlow LLM
-abtr pt file.txt --engine hysf
+# SiliconFlow LLM (via ULLM)
+abtr pt file.txt --engine ullm/default
 
 # Custom LLM profile
 abtr pt file.txt --engine ullm/gpt4

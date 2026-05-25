@@ -58,7 +58,7 @@ def _extract_providers(options: dict[str, object], key: str) -> list[str]:
 
 def _selector_sort_key(selector: str) -> tuple[int, str]:
     base = selector.split("/", 1)[0]
-    order = {"tr": 0, "dt": 1, "hy": 2, "ll": 3}
+    order = {"tr": 0, "dt": 1, "lms": 2, "ll": 3}
     return (order.get(base, 99), selector)
 
 
@@ -84,8 +84,8 @@ def _selectors_from_config(config: AbersetzConfig, include_defaults: bool) -> li
             )
             selectors.add(normalized)
 
-    if config.engines.get("hysf"):
-        selectors.add(normalize_selector("hysf") or "hysf")
+    if config.engines.get("lmstudio"):
+        selectors.add(normalize_selector("lmstudio") or "lmstudio")
 
     ullm_cfg = config.engines.get("ullm")
     if ullm_cfg:

@@ -1,38 +1,70 @@
 ---
 this_file: TASKS.md
 ---
-# Abersetz Evolution Plan (Issue #200)
+# Abersetz Enhancements Plan (Task 108, 109 & 110)
 
 ## Scope (One Sentence)
-Deliver a responsive translation CLI that defaults to short engine selectors, validates every configured engine end-to-end, and ships with polished docs, examples, and tests that make abersetz easy to adopt and extend.
+Extend Abersetz with LM Studio auto-starting, modular LLM provider discovery with wildcard model matching, local model discovery (Issue 109), local situation support for Hunyuan-MT2 (Issue 110), htmladapt-based structured HTML translation, twat-cache and twat-task workflow integrations, and a flexible provider-centric benchmarking tool.
 
 ## Guiding Principles
-- Preserve backward compatibility via aliases while promoting the short selector format (`tr/google`, `dt/deepl`, `ll/default`, etc.).
-- Prefer existing, battle-tested packages (`translators`, `deep-translator`, httpx, rich) over custom reinventions.
-- Ship every change with automated tests, documentation, and runnable examples.
-- Prioritize fast feedback: run targeted pytest suites and smoke the CLI for every phase.
+- Avoid duplicating functionality; leverage local packages in `external/` via path dependencies.
+- Ensure all tests run locally and verify both success and failure/fallback behaviors.
+- Ensure backward compatibility: keep existing selector formats functional.
 
-## Phase 4 – Auto-Configuration & Engine Research Enhancements
-**Goal**: Broaden provider awareness and produce smarter defaults using the research in `external/` and recent API trends.
-- Automate provider metadata extraction from `external/translators.txt`, `external/deep-translator.txt`, and current API research so discovery stays accurate without manual updates.
-- Sync pricing/tier hints into setup output, highlighting free/community tiers and optional paid upgrades.
-- Add structured hints for optional packages the user might need (for example `translators[google]`).
-- [x] Allow users to opt into community/self-hosted engines such as LibreTranslate with a `--include-community` flag.
-- Document every provider addition in `DEPENDENCIES.md` with justification referencing external sources.
+## Detailed Plan
 
-## Phase 5 – Documentation, Examples, and Tests
-**Goal**: Keep abersetz approachable with real-world material and strong guardrails.
-- Update user-facing docs (`README.md`, `CLAUDE.md`, `CHANGELOG.md`, `docs/`) whenever selectors, validation workflows, or setup guidance changes.
-- Expand `WORK.md` logging templates to capture validation runs and outcomes per session.
-- Maintain at least three runnable examples in `examples/`: multi-file translation, validation summary report, and config diff before/after setup.
-- Extend `docs/` (or README) with guidance on picking engines based on cost and availability, drawing on the provider research above.
-- Ensure tests cover selector normalization, CLI output, validation command, setup integration, and documentation link checks.
+### Phase 1: Dependency Integration & LM Studio Auto-Start
+- Update `pyproject.toml` to declare local path sources for `htmladapt`, `twat`, `twat-cache`, and `twat-task`.
+- Synchronize development environment with `uv sync --all-extras`.
+- Modify `src/abersetz/providers/lmstudio.py` to:
+  - Locate `lms` CLI tool.
+  - Query status via `lms server status --json`.
+  - Auto-start using `lms daemon up --json` if down.
+  - Pass custom per-request `temperature` parameter.
 
-## Maintenance Sprint – CLI Option Guardrails *(Completed)*
-**Objective**: Backfill regression coverage for CLI option validation and propagation so user-facing flags behave predictably without introducing new functionality.
+### Phase 2: LLM Provider Registry & Modularization
+- Move logic from `src/abersetz/providers/llm.py` into `src/abersetz/providers/llm/__init__.py`, `inference.py`, and `discovery.py`.
+- Define dedicated provider files under `src/abersetz/providers/llm/api/` for `openai.py`, `siliconflow.py`, `groq.py`, `deepseek.py`, `gemini.py`, `openrouter.py`, `together.py`, `lmstudio.py`, and `anthropic.py`.
+- Implement `fnmatch` wildcard model matching (e.g. `openrouter:*:free`).
+- Add `src/abersetz/providers/llm/recommended_settings.json` to store recommended temperatures, context lengths, and chunk sizes.
+- Expose `temperature` parameter through the CLI `--temperature` option and `TranslatorOptions`.
 
-## Micro Sprint – README + CLI Option Defaults *(Completed)*
-**Objective**: Keep documentation clean and ensure CLI option defaults resolve predictably.
-- Remove assistant preamble/outro from `README.md`.
-- Add `_build_options_from_cli` coverage for include defaults when omitted.
-- Add `_build_options_from_cli` coverage for output dir resolution.
+### Phase 3: htmladapt & Twat Integration
+- Integrate `htmladapt` for HTML mode in `pipeline.py`:
+  - Extract translatable content subset HTML using `HTMLExtractMergeTool.extract`.
+  - Chunk translatable HTML elements at tags within chunk size limits.
+  - Merge structural details back using `HTMLExtractMergeTool.merge`.
+- Decorate chunk translation calls with `twat_cache.decorators.bcache` (disk-based persistent cache) to skip repeat requests.
+- Expose a translation job task/flow using `twat_task` Prefect integration.
+
+### Phase 4: Local Model Discovery (Issue 109)
+- Implement `src/abersetz/providers/llm/local_discovery.py` featuring `LocalModelFinder`.
+- Check paths: HuggingFace hub, Ollama, LMStudio pointer, Pinokio, GPT4All nomic folder.
+- Parse formats: `.gguf`, `.safetensors`, `.bin`, `.pt`, `.pth`, `.onnx` and directory-based CoreML `.mlpackage`.
+- Parse Ollama's custom `sha256-` blobs under the blobs folder.
+- Expose a CLI tool using `fire` to scan/discover models.
+
+### Phase 5: Local Hunyuan-MT2 Model Support (Issue 110)
+- Mapped models: GGUF models (`Hy-MT2-1.8B-2Bit`, `Hy-MT2-1.8B-1.25Bit`, `Hy-MT2-1.8B`, `Hy-MT2-7B`) and MLX models (`1.8B-oQ8-fp16`, `7B-oQ8`, `30B-A3B-MLX-4bit`, `7b-8bit-mlx`).
+- Avoid snapshot downloading if local finder discovers the model directory or gguf file on disk.
+- Explicitly block obsolete Hunyuan-MT1.x models.
+
+### Phase 6: Benchmarking Tool Rewrite
+- Modify `./examples/benchmark.py` to resolve provider name keywords (e.g., `google`, `siliconflow`) into active engine configurations.
+- Allow benchmarking all providers in sequence, separately, or via a comma-separated list of providers.
+- Read existing `benchmark_results.json` and non-destructively update it.
+
+## Verification Plan
+
+### Automated Tests
+- Test LM Studio check and startup logic.
+- Test wildcard matching for model selectors.
+- Test htmladapt extraction, element-based chunking, and merging.
+- Test twat cache hits on repeat translations.
+- Test local model finder scanning and format detection.
+- Test Hy-MT2 local resolution.
+- Run all Hatch tests: `uvx hatch test`.
+
+### Manual Verification
+- Run benchmark dry-run: `uv run examples/benchmark.py --providers google,lms,siliconflow --dry-run`.
+- Verify validation command: `abersetz validate`.

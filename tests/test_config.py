@@ -19,7 +19,8 @@ def test_load_config_yields_defaults(tmp_path: Path) -> None:
     cfg = config_module.load_config()
     assert cfg.defaults.engine == "tr/google"
     assert cfg.defaults.to_lang == "en"
-    assert cfg.engines["hysf"].options["model"] == "tencent/Hunyuan-MT-7B"
+    assert cfg.engines["ullm"].options["profiles"]["default"]["model"] == "Qwen/Qwen2.5-7B-Instruct"
+    assert cfg.engines["lmstudio"].options["model"] == "local-model"
     assert cfg.credentials["siliconflow"].env == "SILICONFLOW_API_KEY"
     assert "providers" in cfg.engines["translators"].options
     assert "providers" in cfg.engines["deep-translator"].options
@@ -37,7 +38,7 @@ def test_save_config_persists_changes(tmp_path: Path) -> None:
 def test_resolve_credential_prefers_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     cfg = config_module.load_config()
     monkeypatch.setenv("SILICONFLOW_API_KEY", "from_env")
-    resolved = config_module.resolve_credential(cfg, cfg.engines["hysf"].credential)
+    resolved = config_module.resolve_credential(cfg, cfg.engines["ullm"].credential)
     assert resolved == "from_env"
     monkeypatch.delenv("SILICONFLOW_API_KEY")
     resolved_direct = config_module.resolve_credential(

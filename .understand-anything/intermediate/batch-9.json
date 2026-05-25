@@ -1,0 +1,63 @@
+{
+  "nodes": [
+    {
+      "id": "document:examples/data/fontlab/fontlab-7-tldr.en.md",
+      "type": "document",
+      "name": "fontlab-7-tldr.en.md",
+      "filePath": "examples/data/fontlab/fontlab-7-tldr.en.md",
+      "summary": "English source fixture: a 20-chapter FontLab 7 overview used as sample input for the translation pipeline's example/benchmark runs.",
+      "tags": ["documentation", "test-fixture", "sample-data", "source"],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:examples/data/fontlab/fontlab-7-tldr.pl--dt-google.md",
+      "type": "document",
+      "name": "fontlab-7-tldr.pl--dt-google.md",
+      "filePath": "examples/data/fontlab/fontlab-7-tldr.pl--dt-google.md",
+      "summary": "Polish translation of the FontLab 7 overview produced via the deep-translator Google engine, kept as an example output fixture.",
+      "tags": ["documentation", "test-fixture", "translation", "deep-translator"],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:examples/data/fontlab/fontlab-7-tldr.pl--mthy-mlx-1.8b-mlx.md",
+      "type": "document",
+      "name": "fontlab-7-tldr.pl--mthy-mlx-1.8b-mlx.md",
+      "filePath": "examples/data/fontlab/fontlab-7-tldr.pl--mthy-mlx-1.8b-mlx.md",
+      "summary": "Polish translation of the FontLab 7 overview produced by the local MLX 1.8b model engine, kept as an example output fixture.",
+      "tags": ["documentation", "test-fixture", "translation", "mlx", "local-model"],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:examples/data/fontlab/fontlab-7-tldr.pl--tr-google.md",
+      "type": "document",
+      "name": "fontlab-7-tldr.pl--tr-google.md",
+      "filePath": "examples/data/fontlab/fontlab-7-tldr.pl--tr-google.md",
+      "summary": "Polish translation of the FontLab 7 overview produced via the translators Google engine, kept as an example output fixture.",
+      "tags": ["documentation", "test-fixture", "translation", "translators"],
+      "complexity": "complex"
+    }
+  ],
+  "edges": [
+    {
+      "source": "document:examples/data/fontlab/fontlab-7-tldr.pl--dt-google.md",
+      "target": "document:examples/data/fontlab/fontlab-7-tldr.en.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:examples/data/fontlab/fontlab-7-tldr.pl--mthy-mlx-1.8b-mlx.md",
+      "target": "document:examples/data/fontlab/fontlab-7-tldr.en.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:examples/data/fontlab/fontlab-7-tldr.pl--tr-google.md",
+      "target": "document:examples/data/fontlab/fontlab-7-tldr.en.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    }
+  ]
+}

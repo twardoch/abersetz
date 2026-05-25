@@ -178,7 +178,7 @@ def test_selectors_from_config_collects_all_engines() -> None:
         engines={
             "translators": EngineConfig(name="translators", options={"providers": ["bing"]}),
             "deep-translator": EngineConfig(name="deep-translator", options={"provider": "deepl"}),
-            "hysf": EngineConfig(name="hysf", options={}),
+            "lmstudio": EngineConfig(name="lmstudio", options={}),
             "ullm": EngineConfig(name="ullm", options={"profiles": "default"}),
         },
     )
@@ -189,7 +189,7 @@ def test_selectors_from_config_collects_all_engines() -> None:
         "tr/bing",
         "tr/google",
         "dt/deepl",
-        "hy",
+        "lms",
         "ll",
     ]
 

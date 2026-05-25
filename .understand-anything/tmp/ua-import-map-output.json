@@ -1,0 +1,166 @@
+{
+  "scriptCompleted": true,
+  "stats": {
+    "filesScanned": 94,
+    "filesWithImports": 18,
+    "totalEdges": 44
+  },
+  "importMap": {
+    ".cursor/rules/codegraph.mdc": [],
+    ".github/workflows/push.yml": [],
+    ".github/workflows/release.yml": [],
+    ".pre-commit-config.yaml": [],
+    ".understand-anything/.understandignore": [],
+    "AGENTS.md": [],
+    "build.sh": [],
+    "CHANGELOG.md": [],
+    "CLAUDE.md": [],
+    "DEPENDENCIES.md": [],
+    "docs/_config.yml": [],
+    "docs/api.md": [],
+    "docs/cli.md": [],
+    "docs/configuration.md": [],
+    "docs/index.md": [],
+    "docs/installation.md": [],
+    "examples/benchmark_results.json": [],
+    "examples/benchmark_results.md": [],
+    "examples/benchmark.py": [],
+    "examples/data/fontlab/fontlab-7-tldr.en.md": [],
+    "examples/data/fontlab/fontlab-7-tldr.pl--dt-google.md": [],
+    "examples/data/fontlab/fontlab-7-tldr.pl--mthy-mlx-1.8b-mlx.md": [],
+    "examples/data/fontlab/fontlab-7-tldr.pl--tr-google.md": [],
+    "examples/data/poem/poem.en.md": [],
+    "examples/data/poem/poem.pl--dt-google.md": [],
+    "examples/data/poem/poem.pl--mthy-gguf-1.8b-gguf.md": [],
+    "examples/data/poem/poem.pl--mthy-mlx-1.8b-mlx.md": [],
+    "examples/data/poem/poem.pl--tr-google.md": [],
+    "examples/README.md": [],
+    "GEMINI.md": [],
+    "IDEA.md": [],
+    "install.sh": [],
+    "LLXPRT.md": [],
+    "package.toml": [],
+    "publish.sh": [],
+    "pyproject.toml": [],
+    "QWEN.md": [],
+    "README.md": [],
+    "SPEC.md": [],
+    "src/abersetz/__init__.py": [],
+    "src/abersetz/__main__.py": [
+      "src/abersetz/cli_fast.py"
+    ],
+    "src/abersetz/abersetz.py": [
+      "src/abersetz/pipeline.py"
+    ],
+    "src/abersetz/chunking.py": [],
+    "src/abersetz/cli_fast.py": [],
+    "src/abersetz/cli.py": [
+      "src/abersetz/config.py",
+      "src/abersetz/engine_catalog.py"
+    ],
+    "src/abersetz/config.py": [
+      "src/abersetz/engine_catalog.py"
+    ],
+    "src/abersetz/engine_catalog.py": [],
+    "src/abersetz/engines.py": [
+      "src/abersetz/config.py",
+      "src/abersetz/engine_catalog.py",
+      "src/abersetz/openai_lite.py",
+      "src/abersetz/providers/__init__.py",
+      "src/abersetz/providers/mlx.py"
+    ],
+    "src/abersetz/openai_lite.py": [],
+    "src/abersetz/pipeline.py": [
+      "src/abersetz/chunking.py",
+      "src/abersetz/config.py",
+      "src/abersetz/engine_catalog.py",
+      "src/abersetz/engines.py"
+    ],
+    "src/abersetz/providers/__init__.py": [
+      "src/abersetz/providers/base.py",
+      "src/abersetz/providers/deep_translator.py",
+      "src/abersetz/providers/gguf.py",
+      "src/abersetz/providers/llm/__init__.py",
+      "src/abersetz/providers/lmstudio.py",
+      "src/abersetz/providers/mlx.py",
+      "src/abersetz/providers/translators.py"
+    ],
+    "src/abersetz/providers/base.py": [
+      "src/abersetz/chunking.py"
+    ],
+    "src/abersetz/providers/deep_translator.py": [
+      "src/abersetz/config.py",
+      "src/abersetz/providers/base.py"
+    ],
+    "src/abersetz/providers/gguf.py": [
+      "src/abersetz/config.py",
+      "src/abersetz/providers/base.py",
+      "src/abersetz/providers/mlx.py"
+    ],
+    "src/abersetz/providers/llm/__init__.py": [
+      "src/abersetz/providers/llm/discovery.py",
+      "src/abersetz/providers/llm/inference.py"
+    ],
+    "src/abersetz/providers/llm/api/anthropic.py": [],
+    "src/abersetz/providers/llm/api/deepseek.py": [],
+    "src/abersetz/providers/llm/api/gemini.py": [],
+    "src/abersetz/providers/llm/api/groq.py": [],
+    "src/abersetz/providers/llm/api/lmstudio.py": [],
+    "src/abersetz/providers/llm/api/openai.py": [],
+    "src/abersetz/providers/llm/api/openrouter.py": [],
+    "src/abersetz/providers/llm/api/siliconflow.py": [],
+    "src/abersetz/providers/llm/api/together.py": [],
+    "src/abersetz/providers/llm/discovery.py": [],
+    "src/abersetz/providers/llm/inference.py": [
+      "src/abersetz/config.py",
+      "src/abersetz/providers/base.py"
+    ],
+    "src/abersetz/providers/llm/local_discovery.py": [],
+    "src/abersetz/providers/llm/recommended_settings.json": [],
+    "src/abersetz/providers/lmstudio.py": [
+      "src/abersetz/config.py",
+      "src/abersetz/providers/base.py"
+    ],
+    "src/abersetz/providers/mlx.py": [
+      "src/abersetz/config.py",
+      "src/abersetz/providers/base.py"
+    ],
+    "src/abersetz/providers/translators.py": [
+      "src/abersetz/config.py",
+      "src/abersetz/providers/base.py"
+    ],
+    "src/abersetz/setup.py": [
+      "src/abersetz/config.py",
+      "src/abersetz/engine_catalog.py",
+      "src/abersetz/validation.py"
+    ],
+    "src/abersetz/tasks.py": [
+      "src/abersetz/pipeline.py"
+    ],
+    "src/abersetz/validation.py": [
+      "src/abersetz/config.py",
+      "src/abersetz/engine_catalog.py",
+      "src/abersetz/engines.py"
+    ],
+    "TASKS.md": [],
+    "TESTING.md": [],
+    "tests/conftest.py": [],
+    "tests/test_chunking.py": [],
+    "tests/test_cli.py": [],
+    "tests/test_config.py": [],
+    "tests/test_engine_catalog.py": [],
+    "tests/test_engines.py": [],
+    "tests/test_examples.py": [],
+    "tests/test_htmladapt_twat.py": [],
+    "tests/test_integration.py": [],
+    "tests/test_local_discovery.py": [],
+    "tests/test_offline.py": [],
+    "tests/test_openai_lite.py": [],
+    "tests/test_package.py": [],
+    "tests/test_pipeline.py": [],
+    "tests/test_setup.py": [],
+    "tests/test_validation.py": [],
+    "TODO.md": [],
+    "WORK.md": []
+  }
+}

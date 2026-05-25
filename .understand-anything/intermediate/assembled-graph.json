@@ -1,0 +1,4673 @@
+{
+  "nodes": [
+    {
+      "id": "file:src/abersetz/cli.py",
+      "type": "file",
+      "name": "cli.py",
+      "filePath": "src/abersetz/cli.py",
+      "summary": "Fire-based command-line interface for abersetz, exposing tr/config/lang/engines/setup/validate/discover subcommands and rendering results via Rich tables.",
+      "tags": [
+        "entry-point",
+        "cli",
+        "command",
+        "rich-output"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Uses python-fire to map a class (AbersetzCLI) and its methods onto CLI subcommands; rich.Table for terminal rendering."
+    },
+    {
+      "id": "function:src/abersetz/cli.py:_collect_engine_entries",
+      "type": "function",
+      "name": "_collect_engine_entries",
+      "filePath": "src/abersetz/cli.py",
+      "lineRange": [
+        130,
+        270
+      ],
+      "summary": "Builds the list of EngineEntry rows for the engines command by walking the config's tr/dt/ullm/local engine families and filtering by family, paid status, and configured-only.",
+      "tags": [
+        "utility",
+        "engine-catalog",
+        "filtering"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/abersetz/cli.py:_build_options_from_cli",
+      "type": "function",
+      "name": "_build_options_from_cli",
+      "filePath": "src/abersetz/cli.py",
+      "lineRange": [
+        312,
+        366
+      ],
+      "summary": "Translates raw CLI arguments into a validated TranslatorOptions object, normalizing the engine selector, validating language codes, and loading prolog/voc JSON references.",
+      "tags": [
+        "utility",
+        "validation",
+        "options-builder"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/cli.py:_render_engine_entries",
+      "type": "function",
+      "name": "_render_engine_entries",
+      "filePath": "src/abersetz/cli.py",
+      "lineRange": [
+        85,
+        105
+      ],
+      "summary": "Renders a Rich table of engine entries showing selector, family, configured status, and API-key requirements.",
+      "tags": [
+        "utility",
+        "rich-output",
+        "rendering"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/cli.py:_render_validation_entries",
+      "type": "function",
+      "name": "_render_validation_entries",
+      "filePath": "src/abersetz/cli.py",
+      "lineRange": [
+        108,
+        127
+      ],
+      "summary": "Renders a Rich table of engine validation results with success status, latency, and sample translations.",
+      "tags": [
+        "utility",
+        "rich-output",
+        "rendering"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/abersetz/cli.py:AbersetzCLI",
+      "type": "class",
+      "name": "AbersetzCLI",
+      "filePath": "src/abersetz/cli.py",
+      "lineRange": [
+        383,
+        631
+      ],
+      "summary": "Root Fire CLI class whose methods (tr, config, lang, engines, setup, validate, discover) define the abersetz command surface.",
+      "tags": [
+        "cli",
+        "command",
+        "entry-point"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/abersetz/cli.py:ConfigCommands",
+      "type": "class",
+      "name": "ConfigCommands",
+      "filePath": "src/abersetz/cli.py",
+      "lineRange": [
+        273,
+        298
+      ],
+      "summary": "Nested Fire subcommand group exposing 'config show' and 'config path' for inspecting the loaded configuration.",
+      "tags": [
+        "cli",
+        "command",
+        "config"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/config.py",
+      "type": "file",
+      "name": "config.py",
+      "filePath": "src/abersetz/config.py",
+      "summary": "Defines the TOML-backed configuration model (defaults, credentials, engines) with load/save helpers and credential resolution from env vars or stored values.",
+      "tags": [
+        "config",
+        "data-model",
+        "serialization",
+        "credentials"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Frozen-style dataclasses with custom __setattr__ for selector normalization; uses tomllib for reads and tomli_w for writes."
+    },
+    {
+      "id": "class:src/abersetz/config.py:AbersetzConfig",
+      "type": "class",
+      "name": "AbersetzConfig",
+      "filePath": "src/abersetz/config.py",
+      "lineRange": [
+        152,
+        179
+      ],
+      "summary": "Top-level configuration dataclass holding defaults, credentials, and engine configs, with to_dict/from_dict round-trip serialization.",
+      "tags": [
+        "data-model",
+        "config",
+        "serialization"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/abersetz/config.py:EngineConfig",
+      "type": "class",
+      "name": "EngineConfig",
+      "filePath": "src/abersetz/config.py",
+      "lineRange": [
+        117,
+        148
+      ],
+      "summary": "Per-engine configuration holding name, chunk sizes, optional credential, and an arbitrary options dict.",
+      "tags": [
+        "data-model",
+        "config",
+        "serialization"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/abersetz/config.py:Credential",
+      "type": "class",
+      "name": "Credential",
+      "filePath": "src/abersetz/config.py",
+      "lineRange": [
+        77,
+        110
+      ],
+      "summary": "Credential descriptor supporting either an environment-variable reference or an inline value, with flexible from_any parsing.",
+      "tags": [
+        "data-model",
+        "credentials",
+        "serialization"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/abersetz/config.py:Defaults",
+      "type": "class",
+      "name": "Defaults",
+      "filePath": "src/abersetz/config.py",
+      "lineRange": [
+        37,
+        73
+      ],
+      "summary": "Default translation settings (engine, languages, chunk sizes) with selector normalization applied on assignment.",
+      "tags": [
+        "data-model",
+        "config",
+        "validation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/config.py:load_config",
+      "type": "function",
+      "name": "load_config",
+      "filePath": "src/abersetz/config.py",
+      "lineRange": [
+        259,
+        296
+      ],
+      "summary": "Loads the TOML config file, creating a default config on first run and recovering by backing up and regenerating when the file is corrupt.",
+      "tags": [
+        "config",
+        "io",
+        "error-handling"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/config.py:resolve_credential",
+      "type": "function",
+      "name": "resolve_credential",
+      "filePath": "src/abersetz/config.py",
+      "lineRange": [
+        307,
+        342
+      ],
+      "summary": "Resolves a credential reference to a concrete secret by looking up named credentials, environment variables, or inline values.",
+      "tags": [
+        "credentials",
+        "resolution",
+        "security"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/abersetz/engine_catalog.py",
+      "type": "file",
+      "name": "engine_catalog.py",
+      "filePath": "src/abersetz/engine_catalog.py",
+      "summary": "Central catalog of engine selectors: normalizes and resolves selector strings (e.g. tr/google, dt/deepl) and enumerates available translator and deep-translator providers.",
+      "tags": [
+        "utility",
+        "engine-catalog",
+        "data-model"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/engine_catalog.py:normalize_selector",
+      "type": "function",
+      "name": "normalize_selector",
+      "filePath": "src/abersetz/engine_catalog.py",
+      "lineRange": [
+        32,
+        52
+      ],
+      "summary": "Canonicalizes an engine selector string into its normalized family/variant form, handling aliases and casing.",
+      "tags": [
+        "utility",
+        "normalization",
+        "parsing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/engine_catalog.py:collect_translator_providers",
+      "type": "function",
+      "name": "collect_translator_providers",
+      "filePath": "src/abersetz/engine_catalog.py",
+      "lineRange": [
+        144,
+        156
+      ],
+      "summary": "Returns the available translators-library providers, optionally including paid ones, filtered against the installed pool.",
+      "tags": [
+        "utility",
+        "engine-catalog",
+        "provider-discovery"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/engine_catalog.py:collect_deep_translator_providers",
+      "type": "function",
+      "name": "collect_deep_translator_providers",
+      "filePath": "src/abersetz/engine_catalog.py",
+      "lineRange": [
+        159,
+        172
+      ],
+      "summary": "Returns the available deep-translator providers, de-duplicated and optionally including paid ones.",
+      "tags": [
+        "utility",
+        "engine-catalog",
+        "provider-discovery"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/abersetz/engines.py",
+      "type": "file",
+      "name": "engines.py",
+      "filePath": "src/abersetz/engines.py",
+      "summary": "Engine factory that instantiates the concrete translation engine (translators, deep_translator, lmstudio, LLM, MLX, GGUF) for a given selector and configuration.",
+      "tags": [
+        "factory",
+        "service",
+        "engine-catalog"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Single create_engine dispatch function branching on selector family; uses a local OpenAI-compatible client shim."
+    },
+    {
+      "id": "function:src/abersetz/engines.py:create_engine",
+      "type": "function",
+      "name": "create_engine",
+      "filePath": "src/abersetz/engines.py",
+      "lineRange": [
+        97,
+        237
+      ],
+      "summary": "Resolves an engine selector and builds the matching engine instance, wiring credentials, model resolution, and runtime options for each provider family.",
+      "tags": [
+        "factory",
+        "dispatch",
+        "engine-catalog"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/abersetz/engines.py:_build_llm_engine",
+      "type": "function",
+      "name": "_build_llm_engine",
+      "filePath": "src/abersetz/engines.py",
+      "lineRange": [
+        44,
+        80
+      ],
+      "summary": "Constructs an LlmEngine from a profile, resolving the API credential, base URL, model, and temperature into an OpenAI-compatible client.",
+      "tags": [
+        "factory",
+        "llm",
+        "credentials"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/abersetz/openai_lite.py",
+      "type": "file",
+      "name": "openai_lite.py",
+      "filePath": "src/abersetz/openai_lite.py",
+      "summary": "Minimal httpx-based OpenAI chat-completions client shim providing just the request/response surface abersetz needs, avoiding the full openai SDK dependency.",
+      "tags": [
+        "service",
+        "http-client",
+        "openai",
+        "type-definition"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Dataclass response models plus a synchronous httpx.Client mirroring the openai SDK's chat.completions.create shape."
+    },
+    {
+      "id": "class:src/abersetz/openai_lite.py:OpenAI",
+      "type": "class",
+      "name": "OpenAI",
+      "filePath": "src/abersetz/openai_lite.py",
+      "lineRange": [
+        99,
+        117
+      ],
+      "summary": "Lightweight OpenAI client entry point exposing a chat.completions interface against a configurable base URL.",
+      "tags": [
+        "service",
+        "http-client",
+        "openai"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/openai_lite.py:ChatCompletions",
+      "type": "class",
+      "name": "ChatCompletions",
+      "filePath": "src/abersetz/openai_lite.py",
+      "lineRange": [
+        40,
+        96
+      ],
+      "summary": "Implements the chat completions create() call, POSTing to the OpenAI-compatible endpoint and parsing the response into typed dataclasses.",
+      "tags": [
+        "service",
+        "http-client",
+        "serialization"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/abersetz/setup.py",
+      "type": "file",
+      "name": "setup.py",
+      "filePath": "src/abersetz/setup.py",
+      "summary": "Interactive setup wizard that discovers available providers from environment variables, tests their endpoints, and generates a working abersetz configuration.",
+      "tags": [
+        "service",
+        "configuration",
+        "provider-discovery",
+        "wizard"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Rich Progress/Table-driven wizard; probes provider endpoints over httpx and writes a generated AbersetzConfig."
+    },
+    {
+      "id": "class:src/abersetz/setup.py:SetupWizard",
+      "type": "class",
+      "name": "SetupWizard",
+      "filePath": "src/abersetz/setup.py",
+      "lineRange": [
+        95,
+        482
+      ],
+      "summary": "Drives the end-to-end setup flow: discover providers, test endpoints, display results, generate config, and validate the result.",
+      "tags": [
+        "service",
+        "wizard",
+        "configuration"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/abersetz/setup.py:DiscoveredProvider",
+      "type": "class",
+      "name": "DiscoveredProvider",
+      "filePath": "src/abersetz/setup.py",
+      "lineRange": [
+        37,
+        49
+      ],
+      "summary": "Data record describing a provider discovered during setup, including availability, model count, engine names, and pricing hints.",
+      "tags": [
+        "data-model",
+        "provider-discovery"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/setup.py:setup_command",
+      "type": "function",
+      "name": "setup_command",
+      "filePath": "src/abersetz/setup.py",
+      "lineRange": [
+        505,
+        530
+      ],
+      "summary": "Entry function invoked by the CLI setup subcommand that constructs and runs the SetupWizard, exiting non-zero on failure.",
+      "tags": [
+        "entry-point",
+        "wizard",
+        "cli"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/abersetz/validation.py",
+      "type": "file",
+      "name": "validation.py",
+      "filePath": "src/abersetz/validation.py",
+      "summary": "Validates configured engines by performing a small live sample translation against each selector and reporting success, latency, and errors.",
+      "tags": [
+        "validation",
+        "engine-catalog",
+        "service"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/validation.py:validate_engines",
+      "type": "function",
+      "name": "validate_engines",
+      "filePath": "src/abersetz/validation.py",
+      "lineRange": [
+        116,
+        174
+      ],
+      "summary": "Runs a sample translation through each selected engine via an injected create_engine factory, timing each call and collecting ValidationResult records.",
+      "tags": [
+        "validation",
+        "engine-catalog",
+        "smoke-test"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/abersetz/validation.py:_selectors_from_config",
+      "type": "function",
+      "name": "_selectors_from_config",
+      "filePath": "src/abersetz/validation.py",
+      "lineRange": [
+        65,
+        100
+      ],
+      "summary": "Derives the set of engine selectors to validate from the config's engine families and provider option lists.",
+      "tags": [
+        "utility",
+        "engine-catalog",
+        "selectors"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/validation.py:_extract_providers",
+      "type": "function",
+      "name": "_extract_providers",
+      "filePath": "src/abersetz/validation.py",
+      "lineRange": [
+        41,
+        56
+      ],
+      "summary": "Extracts and normalizes a sorted list of provider names from an engine options dict, supporting both list and scalar fallback keys.",
+      "tags": [
+        "utility",
+        "parsing",
+        "selectors"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/abersetz/providers/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "src/abersetz/providers/__init__.py",
+      "summary": "Package barrel for the translation providers, re-exporting the base engine types and every concrete engine implementation (deep_translator, gguf, llm, lmstudio, mlx, translators).",
+      "tags": [
+        "entry-point",
+        "barrel",
+        "providers"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Python package __init__ acting as a re-export barrel for the provider engines."
+    },
+    {
+      "id": "file:src/abersetz/providers/base.py",
+      "type": "file",
+      "name": "base.py",
+      "filePath": "src/abersetz/providers/base.py",
+      "summary": "Defines the shared engine contract: the EngineError exception, EngineRequest/EngineResult data structures, the Engine protocol, and the EngineBase class with chunk-size resolution used by all concrete providers.",
+      "tags": [
+        "type-definition",
+        "data-model",
+        "providers",
+        "interface"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Uses a Protocol-style Engine contract plus dataclasses for request/result payloads."
+    },
+    {
+      "id": "file:src/abersetz/providers/deep_translator.py",
+      "type": "file",
+      "name": "deep_translator.py",
+      "filePath": "src/abersetz/providers/deep_translator.py",
+      "summary": "Engine wrapping the deep-translator library, resolving language codes against provider-supported languages with langcodes fallback and translating text with retry.",
+      "tags": [
+        "service",
+        "providers",
+        "translation",
+        "api-handler"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/abersetz/providers/gguf.py",
+      "type": "file",
+      "name": "gguf.py",
+      "filePath": "src/abersetz/providers/gguf.py",
+      "summary": "Local GGUF translation engine that downloads/loads a llama.cpp model and runs chat-completion translation using the shared mthy prompt builder.",
+      "tags": [
+        "service",
+        "providers",
+        "translation",
+        "local-model"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/abersetz/providers/lmstudio.py",
+      "type": "file",
+      "name": "lmstudio.py",
+      "filePath": "src/abersetz/providers/lmstudio.py",
+      "summary": "Engine driving a local LM Studio model, ensuring the lmstudio daemon is running before invoking the loaded model for translation.",
+      "tags": [
+        "service",
+        "providers",
+        "translation",
+        "local-model"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/abersetz/providers/mlx.py",
+      "type": "file",
+      "name": "mlx.py",
+      "filePath": "src/abersetz/providers/mlx.py",
+      "summary": "Apple MLX translation engine plus shared model-resolution helpers: language mapping, mthy prompt construction, local model discovery, and Hugging Face download fallback.",
+      "tags": [
+        "service",
+        "providers",
+        "translation",
+        "local-model",
+        "utility"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Largest provider file; mixes module-level helper functions (reused by the gguf engine) with the LocalMlxEngine class."
+    },
+    {
+      "id": "file:src/abersetz/providers/translators.py",
+      "type": "file",
+      "name": "translators.py",
+      "filePath": "src/abersetz/providers/translators.py",
+      "summary": "Engine wrapping the translators library, dispatching HTML or plain-text translation with retry handling.",
+      "tags": [
+        "service",
+        "providers",
+        "translation",
+        "api-handler"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/providers/base.py:EngineRequest",
+      "type": "class",
+      "name": "EngineRequest",
+      "filePath": "src/abersetz/providers/base.py",
+      "lineRange": [
+        16,
+        26
+      ],
+      "summary": "Data structure carrying a translation request: text, source/target languages, HTML flag, vocabulary, prolog, and chunk indices.",
+      "tags": [
+        "data-model",
+        "type-definition",
+        "providers"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/providers/base.py:Engine",
+      "type": "class",
+      "name": "Engine",
+      "filePath": "src/abersetz/providers/base.py",
+      "lineRange": [
+        37,
+        48
+      ],
+      "summary": "Protocol defining the translation engine interface with translate and chunk_size_for plus name and chunk-size attributes.",
+      "tags": [
+        "interface",
+        "type-definition",
+        "providers"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/providers/base.py:EngineBase",
+      "type": "class",
+      "name": "EngineBase",
+      "filePath": "src/abersetz/providers/base.py",
+      "lineRange": [
+        51,
+        67
+      ],
+      "summary": "Base class for concrete engines providing common initialization and chunk-size resolution shared across providers.",
+      "tags": [
+        "base-class",
+        "providers",
+        "factory"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/providers/deep_translator.py:DeepTranslatorEngine",
+      "type": "class",
+      "name": "DeepTranslatorEngine",
+      "filePath": "src/abersetz/providers/deep_translator.py",
+      "lineRange": [
+        13,
+        140
+      ],
+      "summary": "Engine adapter for the deep-translator library, resolving language codes to provider-supported forms and translating text with retry logic.",
+      "tags": [
+        "service",
+        "translation",
+        "api-handler",
+        "providers"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/abersetz/providers/gguf.py:LocalGgufEngine",
+      "type": "class",
+      "name": "LocalGgufEngine",
+      "filePath": "src/abersetz/providers/gguf.py",
+      "lineRange": [
+        13,
+        80
+      ],
+      "summary": "Loads a local GGUF model via llama.cpp and translates text through chat completion using the mthy prompt.",
+      "tags": [
+        "service",
+        "translation",
+        "local-model",
+        "providers"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/abersetz/providers/lmstudio.py:LmstudioEngine",
+      "type": "class",
+      "name": "LmstudioEngine",
+      "filePath": "src/abersetz/providers/lmstudio.py",
+      "lineRange": [
+        11,
+        116
+      ],
+      "summary": "Manages the LM Studio daemon lifecycle and invokes a loaded model to translate text per target language.",
+      "tags": [
+        "service",
+        "translation",
+        "local-model",
+        "providers"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/providers/mlx.py:find_local_model_path",
+      "type": "function",
+      "name": "find_local_model_path",
+      "filePath": "src/abersetz/providers/mlx.py",
+      "lineRange": [
+        150,
+        195
+      ],
+      "summary": "Discovers a locally cached model directory matching a model identifier across several naming conventions.",
+      "tags": [
+        "utility",
+        "local-model",
+        "discovery"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/providers/mlx.py:resolve_and_download_model",
+      "type": "function",
+      "name": "resolve_and_download_model",
+      "filePath": "src/abersetz/providers/mlx.py",
+      "lineRange": [
+        198,
+        266
+      ],
+      "summary": "Resolves a model name or path to a local directory, applying aliases and falling back to Hugging Face snapshot/file download when not cached.",
+      "tags": [
+        "utility",
+        "local-model",
+        "download"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/abersetz/providers/mlx.py:build_mthy_prompt",
+      "type": "function",
+      "name": "build_mthy_prompt",
+      "filePath": "src/abersetz/providers/mlx.py",
+      "lineRange": [
+        68,
+        76
+      ],
+      "summary": "Builds the mthy translation prompt from source text, target language, and optional vocabulary mapping. Reused by the gguf engine.",
+      "tags": [
+        "utility",
+        "translation",
+        "prompt"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/providers/mlx.py:LocalMlxEngine",
+      "type": "class",
+      "name": "LocalMlxEngine",
+      "filePath": "src/abersetz/providers/mlx.py",
+      "lineRange": [
+        269,
+        343
+      ],
+      "summary": "Apple MLX translation engine that loads a local model and generates translations via chat-templated prompts.",
+      "tags": [
+        "service",
+        "translation",
+        "local-model",
+        "providers"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/abersetz/providers/translators.py:TranslatorsEngine",
+      "type": "class",
+      "name": "TranslatorsEngine",
+      "filePath": "src/abersetz/providers/translators.py",
+      "lineRange": [
+        11,
+        45
+      ],
+      "summary": "Engine adapter for the translators library, dispatching HTML or plain-text translation with retry handling.",
+      "tags": [
+        "service",
+        "translation",
+        "api-handler",
+        "providers"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/abersetz/abersetz.py",
+      "type": "file",
+      "name": "abersetz.py",
+      "filePath": "src/abersetz/abersetz.py",
+      "summary": "Thin public API module that re-exports the translation pipeline entry points for library consumers.",
+      "tags": [
+        "entry-point",
+        "barrel",
+        "api"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/chunking.py",
+      "type": "file",
+      "name": "chunking.py",
+      "filePath": "src/abersetz/chunking.py",
+      "summary": "Splits source text into translation-sized chunks, detecting HTML vs plain text and using semantic splitting with a length-based fallback.",
+      "tags": [
+        "utility",
+        "chunking",
+        "text-processing",
+        "serialization"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Uses an enum (TextFormat) plus a semantic TextSplitter with a manual range-based fallback."
+    },
+    {
+      "id": "file:src/abersetz/pipeline.py",
+      "type": "file",
+      "name": "pipeline.py",
+      "filePath": "src/abersetz/pipeline.py",
+      "summary": "Core translation orchestration: discovers input files, merges options with config defaults, chunks text (incl. HTML extract/merge), invokes the selected engine with caching, and persists translated output plus vocabulary.",
+      "tags": [
+        "service",
+        "orchestration",
+        "api-handler",
+        "data-model"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Combines frozen dataclass option/result types, an LRU-cached engine call, and BeautifulSoup-based HTML splitting."
+    },
+    {
+      "id": "file:src/abersetz/tasks.py",
+      "type": "file",
+      "name": "tasks.py",
+      "filePath": "src/abersetz/tasks.py",
+      "summary": "Higher-level convenience wrappers around translate_path that build TranslatorOptions and return simplified result mappings.",
+      "tags": [
+        "service",
+        "wrapper",
+        "api"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/chunking.py:TextFormat",
+      "type": "class",
+      "name": "TextFormat",
+      "filePath": "src/abersetz/chunking.py",
+      "lineRange": [
+        15,
+        21
+      ],
+      "summary": "Enum distinguishing plaintext, Markdown, and HTML so the chunker can pick an appropriate splitting strategy.",
+      "tags": [
+        "type-definition",
+        "enum",
+        "chunking"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/chunking.py:chunk_text",
+      "type": "function",
+      "name": "chunk_text",
+      "filePath": "src/abersetz/chunking.py",
+      "lineRange": [
+        54,
+        62
+      ],
+      "summary": "Public entry that returns a list of text chunks sized to max_size for a given format, delegating to the semantic chunker.",
+      "tags": [
+        "utility",
+        "chunking",
+        "entry-point"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/chunking.py:_semantic_chunks",
+      "type": "function",
+      "name": "_semantic_chunks",
+      "filePath": "src/abersetz/chunking.py",
+      "lineRange": [
+        40,
+        51
+      ],
+      "summary": "Splits text into semantically coherent chunks using a TextSplitter, falling back to fixed-size slicing when unavailable.",
+      "tags": [
+        "utility",
+        "chunking",
+        "fallback"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/pipeline.py:TranslatorOptions",
+      "type": "class",
+      "name": "TranslatorOptions",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [
+        35,
+        58
+      ],
+      "summary": "Configuration dataclass capturing all translation parameters: engine selection, languages, chunk sizes, output handling, vocabulary, and model runtime options.",
+      "tags": [
+        "data-model",
+        "config",
+        "type-definition"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/abersetz/pipeline.py:TranslationResult",
+      "type": "class",
+      "name": "TranslationResult",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [
+        62,
+        75
+      ],
+      "summary": "Result dataclass describing a translated file: source/destination paths, chunk count, vocabulary, format, engine, and language pair.",
+      "tags": [
+        "data-model",
+        "type-definition"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/pipeline.py:PipelineError",
+      "type": "class",
+      "name": "PipelineError",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [
+        78,
+        81
+      ],
+      "summary": "Exception raised for pipeline-level failures such as missing paths or empty file selections.",
+      "tags": [
+        "error-handling",
+        "type-definition"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:translate_path",
+      "type": "function",
+      "name": "translate_path",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [
+        84,
+        140
+      ],
+      "summary": "Top-level driver that resolves the input path, loads config, discovers files, instantiates the chosen engine, and translates each file into a list of TranslationResult.",
+      "tags": [
+        "entry-point",
+        "orchestration",
+        "api-handler"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_merge_defaults",
+      "type": "function",
+      "name": "_merge_defaults",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [
+        143,
+        159
+      ],
+      "summary": "Fills unspecified TranslatorOptions fields from configured defaults and normalizes the engine selector.",
+      "tags": [
+        "utility",
+        "config",
+        "validation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_discover_files",
+      "type": "function",
+      "name": "_discover_files",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [
+        162,
+        170
+      ],
+      "summary": "Resolves include glob patterns against the root directory, filtering out excluded paths, and returns a sorted file list.",
+      "tags": [
+        "utility",
+        "filesystem",
+        "discovery"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_translate_file",
+      "type": "function",
+      "name": "_translate_file",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [
+        177,
+        250
+      ],
+      "summary": "Translates a single file end to end: detects format, routes HTML separately, chunks the text, applies the engine, and persists the translated output.",
+      "tags": [
+        "orchestration",
+        "text-processing",
+        "api-handler"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_translate_html",
+      "type": "function",
+      "name": "_translate_html",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [
+        253,
+        321
+      ],
+      "summary": "Handles HTML translation by extracting body elements with BeautifulSoup, grouping them into size-bounded chunks, translating, and merging the result back.",
+      "tags": [
+        "text-processing",
+        "html",
+        "chunking"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_cached_translate_call",
+      "type": "function",
+      "name": "_cached_translate_call",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [
+        328,
+        357
+      ],
+      "summary": "LRU-cached wrapper that builds an EngineRequest and invokes the engine's translate method, keyed on text and translation parameters.",
+      "tags": [
+        "utility",
+        "caching",
+        "serialization"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_apply_engine",
+      "type": "function",
+      "name": "_apply_engine",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [
+        360,
+        408
+      ],
+      "summary": "Iterates chunks through the translation engine, threading vocabulary and prolog context between calls and collecting EngineResult objects.",
+      "tags": [
+        "orchestration",
+        "text-processing",
+        "service"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_build_request",
+      "type": "function",
+      "name": "_build_request",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [
+        411,
+        430
+      ],
+      "summary": "Constructs an EngineRequest for a single chunk with index/total metadata, format, language, and vocabulary context.",
+      "tags": [
+        "utility",
+        "factory",
+        "serialization"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_select_chunk_size",
+      "type": "function",
+      "name": "_select_chunk_size",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [
+        433,
+        445
+      ],
+      "summary": "Determines the chunk size for a format by combining engine-derived sizing with user-provided overrides.",
+      "tags": [
+        "utility",
+        "config",
+        "chunking"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_persist_output",
+      "type": "function",
+      "name": "_persist_output",
+      "filePath": "src/abersetz/pipeline.py",
+      "lineRange": [
+        448,
+        467
+      ],
+      "summary": "Writes translated content to the destination path (creating directories as needed) and optionally saves the accumulated vocabulary as JSON.",
+      "tags": [
+        "utility",
+        "filesystem",
+        "serialization"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/tasks.py:translate_flow",
+      "type": "function",
+      "name": "translate_flow",
+      "filePath": "src/abersetz/tasks.py",
+      "lineRange": [
+        26,
+        51
+      ],
+      "summary": "Convenience flow that builds TranslatorOptions from simple arguments, runs translate_task, and returns simplified source/destination mappings.",
+      "tags": [
+        "service",
+        "wrapper",
+        "api"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "src/abersetz/providers/llm/__init__.py",
+      "summary": "Package barrel for the LLM provider, re-exporting endpoint discovery helpers and the LlmEngine inference class as the public surface of the llm subpackage.",
+      "tags": [
+        "entry-point",
+        "barrel",
+        "exports",
+        "llm"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Python package __init__ acting as a re-export barrel."
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/discovery.py",
+      "type": "file",
+      "name": "discovery.py",
+      "filePath": "src/abersetz/providers/llm/discovery.py",
+      "summary": "Discovers OpenAI-compatible LLM endpoints from environment variables and a static catalog, fetches model lists over HTTP, and resolves provider/model selectors including wildcard patterns.",
+      "tags": [
+        "service",
+        "discovery",
+        "llm",
+        "http-client",
+        "validation"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Uses a frozen dataclass Endpoint plus fnmatch for wildcard model selection and httpx for live model fetching."
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/inference.py",
+      "type": "file",
+      "name": "inference.py",
+      "filePath": "src/abersetz/providers/llm/inference.py",
+      "summary": "Implements LlmEngine, an OpenAI chat-completions translation engine that builds prompts, invokes the model, and parses the structured text/vocabulary payload from the response.",
+      "tags": [
+        "service",
+        "llm",
+        "api-handler",
+        "serialization",
+        "engine"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/abersetz/providers/llm/discovery.py:Endpoint",
+      "type": "class",
+      "name": "Endpoint",
+      "filePath": "src/abersetz/providers/llm/discovery.py",
+      "lineRange": [
+        28,
+        32
+      ],
+      "summary": "Dataclass describing an OpenAI-compatible LLM endpoint with its name, base URL, API-key environment variable, and any known models.",
+      "tags": [
+        "data-model",
+        "llm",
+        "config"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/providers/llm/discovery.py:discover_env_endpoints",
+      "type": "function",
+      "name": "discover_env_endpoints",
+      "filePath": "src/abersetz/providers/llm/discovery.py",
+      "lineRange": [
+        60,
+        75
+      ],
+      "summary": "Scans environment variables for provider API-key suffixes and constructs Endpoint instances for each discovered provider.",
+      "tags": [
+        "discovery",
+        "utility",
+        "llm",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/providers/llm/discovery.py:fetch_models",
+      "type": "function",
+      "name": "fetch_models",
+      "filePath": "src/abersetz/providers/llm/discovery.py",
+      "lineRange": [
+        84,
+        121
+      ],
+      "summary": "Queries an endpoint's /models API over HTTP and normalizes the response into a list of model identifier strings.",
+      "tags": [
+        "http-client",
+        "llm",
+        "serialization",
+        "discovery"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/providers/llm/discovery.py:resolve_model",
+      "type": "function",
+      "name": "resolve_model",
+      "filePath": "src/abersetz/providers/llm/discovery.py",
+      "lineRange": [
+        124,
+        162
+      ],
+      "summary": "Resolves a provider/model selector string against discovered endpoints, handling explicit provider prefixes, defaults, and wildcard patterns.",
+      "tags": [
+        "validation",
+        "llm",
+        "discovery",
+        "utility"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/providers/llm/discovery.py:resolve_wildcard_to_model",
+      "type": "function",
+      "name": "resolve_wildcard_to_model",
+      "filePath": "src/abersetz/providers/llm/discovery.py",
+      "lineRange": [
+        165,
+        179
+      ],
+      "summary": "Expands a wildcard model pattern against an endpoint's known and fetched models, returning the first matching model name.",
+      "tags": [
+        "llm",
+        "utility",
+        "discovery"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/providers/llm/discovery.py:load_recommended_settings",
+      "type": "function",
+      "name": "load_recommended_settings",
+      "filePath": "src/abersetz/providers/llm/discovery.py",
+      "lineRange": [
+        182,
+        196
+      ],
+      "summary": "Loads recommended per-provider engine settings from a bundled JSON catalog file.",
+      "tags": [
+        "configuration",
+        "utility",
+        "llm",
+        "serialization"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/providers/llm/inference.py:LlmEngine",
+      "type": "class",
+      "name": "LlmEngine",
+      "filePath": "src/abersetz/providers/llm/inference.py",
+      "lineRange": [
+        15,
+        102
+      ],
+      "summary": "Translation engine backed by an OpenAI-compatible chat-completions client; builds translation prompts with optional vocabulary, invokes the model, and parses the structured text and vocabulary from the response.",
+      "tags": [
+        "service",
+        "engine",
+        "llm",
+        "api-handler",
+        "serialization"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "pipeline:.github/workflows/push.yml",
+      "type": "pipeline",
+      "name": "push.yml",
+      "filePath": ".github/workflows/push.yml",
+      "summary": "GitHub Actions CI workflow triggered on pushes/PRs to main: runs Ruff lint and format checks, the pytest suite across Python 3.10-3.12, and builds distribution artifacts.",
+      "tags": [
+        "ci-cd",
+        "infrastructure",
+        "deployment",
+        "build-system",
+        "test"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Three sequential jobs (quality -> test -> build) chained via needs; the test job uses a matrix over Python versions and uv for dependency management."
+    },
+    {
+      "id": "pipeline:.github/workflows/release.yml",
+      "type": "pipeline",
+      "name": "release.yml",
+      "filePath": ".github/workflows/release.yml",
+      "summary": "GitHub Actions release workflow triggered on version tags (v*): builds distributions, verifies wheel/sdist presence, publishes to PyPI via trusted publishing, and creates a GitHub Release.",
+      "tags": [
+        "ci-cd",
+        "deployment",
+        "infrastructure",
+        "release"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Uses OIDC id-token permission with a pypi environment for trusted publishing and softprops/action-gh-release for release notes."
+    },
+    {
+      "id": "step:.github/workflows/push.yml:quality",
+      "type": "pipeline",
+      "name": "quality",
+      "filePath": ".github/workflows/push.yml",
+      "summary": "Code Quality job that runs Ruff lint (check) and Ruff format-check against the repository.",
+      "tags": [
+        "ci-cd",
+        "linting",
+        "validation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "step:.github/workflows/push.yml:test",
+      "type": "pipeline",
+      "name": "test",
+      "filePath": ".github/workflows/push.yml",
+      "summary": "Run Tests job that installs the package with test extras and executes pytest with coverage across a Python 3.10/3.11/3.12 matrix.",
+      "tags": [
+        "ci-cd",
+        "test",
+        "coverage"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "step:.github/workflows/push.yml:build",
+      "type": "pipeline",
+      "name": "build",
+      "filePath": ".github/workflows/push.yml",
+      "summary": "Build Distribution job that builds sdist and wheel artifacts via python -m build and uploads them.",
+      "tags": [
+        "ci-cd",
+        "build-system",
+        "deployment"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "step:.github/workflows/release.yml:release",
+      "type": "pipeline",
+      "name": "release",
+      "filePath": ".github/workflows/release.yml",
+      "summary": "Release to PyPI job that builds, verifies, publishes distributions to PyPI, and creates a GitHub Release.",
+      "tags": [
+        "ci-cd",
+        "deployment",
+        "release"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:.pre-commit-config.yaml",
+      "type": "config",
+      "name": ".pre-commit-config.yaml",
+      "filePath": ".pre-commit-config.yaml",
+      "summary": "Pre-commit hook configuration wiring ruff linting and formatting into the git commit workflow.",
+      "tags": [
+        "configuration",
+        "pre-commit",
+        "linting",
+        "ci-cd"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:AGENTS.md",
+      "type": "document",
+      "name": "AGENTS.md",
+      "filePath": "AGENTS.md",
+      "summary": "AI-assistant development guidelines covering chain-of-thought reasoning, verification workflow, anti-bloat rules, and project conventions for agents working on abersetz.",
+      "tags": [
+        "documentation",
+        "ai-guidelines",
+        "development",
+        "conventions"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:CHANGELOG.md",
+      "type": "document",
+      "name": "CHANGELOG.md",
+      "filePath": "CHANGELOG.md",
+      "summary": "Accumulative release notes documenting feature additions, fixes, and version history of abersetz.",
+      "tags": [
+        "documentation",
+        "changelog",
+        "release-notes"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:CLAUDE.md",
+      "type": "document",
+      "name": "CLAUDE.md",
+      "filePath": "CLAUDE.md",
+      "summary": "Claude-specific development guidelines, near-identical to AGENTS.md, defining CoT reasoning, verification, and anti-overcomplication rules.",
+      "tags": [
+        "documentation",
+        "ai-guidelines",
+        "development",
+        "conventions"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:DEPENDENCIES.md",
+      "type": "document",
+      "name": "DEPENDENCIES.md",
+      "filePath": "DEPENDENCIES.md",
+      "summary": "Lists the project's package dependencies with rationale for why each was chosen.",
+      "tags": [
+        "documentation",
+        "dependencies",
+        "rationale"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:GEMINI.md",
+      "type": "document",
+      "name": "GEMINI.md",
+      "filePath": "GEMINI.md",
+      "summary": "Gemini-specific development guidelines, near-identical to AGENTS.md/CLAUDE.md, defining AI collaboration conventions.",
+      "tags": [
+        "documentation",
+        "ai-guidelines",
+        "development",
+        "conventions"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:IDEA.md",
+      "type": "document",
+      "name": "IDEA.md",
+      "filePath": "IDEA.md",
+      "summary": "Conceptual notes and original idea sketch describing the motivation and high-level design of abersetz.",
+      "tags": [
+        "documentation",
+        "design",
+        "concept"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:LLXPRT.md",
+      "type": "document",
+      "name": "LLXPRT.md",
+      "filePath": "LLXPRT.md",
+      "summary": "LLxprt-specific development guidelines, near-identical to AGENTS.md, defining AI collaboration conventions.",
+      "tags": [
+        "documentation",
+        "ai-guidelines",
+        "development",
+        "conventions"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:QWEN.md",
+      "type": "document",
+      "name": "QWEN.md",
+      "filePath": "QWEN.md",
+      "summary": "Qwen-specific development guidelines, near-identical to AGENTS.md, defining AI collaboration conventions.",
+      "tags": [
+        "documentation",
+        "ai-guidelines",
+        "development",
+        "conventions"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "Project overview explaining what abersetz does, with usage examples for translating directories of text and Markdown files via AI engines.",
+      "tags": [
+        "documentation",
+        "entry-point",
+        "overview",
+        "usage"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:SPEC.md",
+      "type": "document",
+      "name": "SPEC.md",
+      "filePath": "SPEC.md",
+      "summary": "Technical specification describing the architecture, pipeline stages, and engine interfaces of abersetz.",
+      "tags": [
+        "documentation",
+        "specification",
+        "architecture"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:TASKS.md",
+      "type": "document",
+      "name": "TASKS.md",
+      "filePath": "TASKS.md",
+      "summary": "Detailed future goals and planned work for abersetz with specific implementation specifics.",
+      "tags": [
+        "documentation",
+        "planning",
+        "roadmap"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:TESTING.md",
+      "type": "document",
+      "name": "TESTING.md",
+      "filePath": "TESTING.md",
+      "summary": "Testing strategy and instructions covering unit, integration, and functional example-based tests.",
+      "tags": [
+        "documentation",
+        "testing",
+        "qa"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:TODO.md",
+      "type": "document",
+      "name": "TODO.md",
+      "filePath": "TODO.md",
+      "summary": "Flat itemized checklist representation of the TASKS.md roadmap.",
+      "tags": [
+        "documentation",
+        "planning",
+        "todo"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:WORK.md",
+      "type": "document",
+      "name": "WORK.md",
+      "filePath": "WORK.md",
+      "summary": "Work progress log capturing iteration notes, test results, and next steps across the development of abersetz.",
+      "tags": [
+        "documentation",
+        "progress",
+        "work-log"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:package.toml",
+      "type": "config",
+      "name": "package.toml",
+      "filePath": "package.toml",
+      "summary": "Project scaffolding configuration toggling CLI, logging, Pydantic, Rich, VCS, and GitHub Actions features.",
+      "tags": [
+        "configuration",
+        "scaffolding",
+        "toml"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:pyproject.toml",
+      "type": "config",
+      "name": "pyproject.toml",
+      "filePath": "pyproject.toml",
+      "summary": "Python project manifest defining build system (hatch-vcs), dependencies, CLI entry point, and tool configuration (ruff, pytest, mypy).",
+      "tags": [
+        "configuration",
+        "build-system",
+        "dependencies",
+        "packaging"
+      ],
+      "complexity": "moderate",
+      "languageNotes": "Uses hatch-vcs for git-tag-driven versioning."
+    },
+    {
+      "id": "file:build.sh",
+      "type": "file",
+      "name": "build.sh",
+      "filePath": "build.sh",
+      "summary": "Build script that lints, formats, runs tests, and builds the abersetz package via uv/hatch.",
+      "tags": [
+        "script",
+        "build-system",
+        "automation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:install.sh",
+      "type": "file",
+      "name": "install.sh",
+      "filePath": "install.sh",
+      "summary": "Installation script performing an editable local install of abersetz via uv pip.",
+      "tags": [
+        "script",
+        "install",
+        "automation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:publish.sh",
+      "type": "file",
+      "name": "publish.sh",
+      "filePath": "publish.sh",
+      "summary": "Release script that cleans builds, runs build.sh and install.sh, tags the next version, and publishes the package to PyPI.",
+      "tags": [
+        "script",
+        "deployment",
+        "release",
+        "automation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:docs/_config.yml",
+      "type": "config",
+      "name": "_config.yml",
+      "filePath": "docs/_config.yml",
+      "summary": "Jekyll site configuration for the abersetz GitHub Pages documentation, using the just-the-docs remote theme with search and navigation enabled.",
+      "tags": [
+        "configuration",
+        "documentation",
+        "jekyll",
+        "static-site"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Uses remote_theme (just-the-docs) rather than a vendored theme, keeping the docs repo lean."
+    },
+    {
+      "id": "document:docs/api.md",
+      "type": "document",
+      "name": "api.md",
+      "filePath": "docs/api.md",
+      "summary": "Python API reference documenting the programmatic translation interface, primarily the translate_path entry point and supporting types from the abersetz package.",
+      "tags": [
+        "documentation",
+        "api-reference",
+        "python-api"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/cli.md",
+      "type": "document",
+      "name": "cli.md",
+      "filePath": "docs/cli.md",
+      "summary": "CLI reference describing the abersetz and abtr commands and subcommands (tr, validate, config, engines, version) exposed by the command-line interface.",
+      "tags": [
+        "documentation",
+        "cli-reference",
+        "usage"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/configuration.md",
+      "type": "document",
+      "name": "configuration.md",
+      "filePath": "docs/configuration.md",
+      "summary": "Configuration guide explaining the TOML config file managed by platformdirs, its structure, defaults, and engine settings.",
+      "tags": [
+        "documentation",
+        "configuration",
+        "reference"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:docs/index.md",
+      "type": "document",
+      "name": "index.md",
+      "filePath": "docs/index.md",
+      "summary": "Documentation home page introducing abersetz, its value proposition, and getting-started entry points for the documentation site.",
+      "tags": [
+        "documentation",
+        "entry-point",
+        "overview"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:docs/installation.md",
+      "type": "document",
+      "name": "installation.md",
+      "filePath": "docs/installation.md",
+      "summary": "Installation guide covering requirements (Python 3.10+) and installation via pip or uv package managers.",
+      "tags": [
+        "documentation",
+        "installation",
+        "getting-started"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:examples/README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "examples/README.md",
+      "summary": "Usage guide for the translation engine benchmark suite, documenting how to run examples/benchmark.py with its --engines, --dry-run, --force and related options, and describing the poem and FontLab test documents.",
+      "tags": [
+        "documentation",
+        "benchmark",
+        "examples",
+        "usage-guide"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:examples/benchmark_results.json",
+      "type": "config",
+      "name": "benchmark_results.json",
+      "filePath": "examples/benchmark_results.json",
+      "summary": "Persisted machine-readable benchmark output produced by examples/benchmark.py, recording per-engine translation speed, throughput, and success/failure metrics across the test documents.",
+      "tags": [
+        "benchmark",
+        "data",
+        "metrics",
+        "examples"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:examples/benchmark_results.md",
+      "type": "document",
+      "name": "benchmark_results.md",
+      "filePath": "examples/benchmark_results.md",
+      "summary": "Narrative analysis of the translation engine benchmark, comparing local MLX vs GGUF backends, model sizes, and cataloguing failure modes (API length limits, volume/path errors, network timeouts, LM Studio connectivity).",
+      "tags": [
+        "documentation",
+        "benchmark",
+        "analysis",
+        "examples"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:examples/data/fontlab/fontlab-7-tldr.en.md",
+      "type": "document",
+      "name": "fontlab-7-tldr.en.md",
+      "filePath": "examples/data/fontlab/fontlab-7-tldr.en.md",
+      "summary": "English source fixture: a 20-chapter FontLab 7 overview used as sample input for the translation pipeline's example/benchmark runs.",
+      "tags": [
+        "documentation",
+        "test-fixture",
+        "sample-data",
+        "source"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:examples/data/fontlab/fontlab-7-tldr.pl--dt-google.md",
+      "type": "document",
+      "name": "fontlab-7-tldr.pl--dt-google.md",
+      "filePath": "examples/data/fontlab/fontlab-7-tldr.pl--dt-google.md",
+      "summary": "Polish translation of the FontLab 7 overview produced via the deep-translator Google engine, kept as an example output fixture.",
+      "tags": [
+        "documentation",
+        "test-fixture",
+        "translation",
+        "deep-translator"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:examples/data/fontlab/fontlab-7-tldr.pl--mthy-mlx-1.8b-mlx.md",
+      "type": "document",
+      "name": "fontlab-7-tldr.pl--mthy-mlx-1.8b-mlx.md",
+      "filePath": "examples/data/fontlab/fontlab-7-tldr.pl--mthy-mlx-1.8b-mlx.md",
+      "summary": "Polish translation of the FontLab 7 overview produced by the local MLX 1.8b model engine, kept as an example output fixture.",
+      "tags": [
+        "documentation",
+        "test-fixture",
+        "translation",
+        "mlx",
+        "local-model"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:examples/data/fontlab/fontlab-7-tldr.pl--tr-google.md",
+      "type": "document",
+      "name": "fontlab-7-tldr.pl--tr-google.md",
+      "filePath": "examples/data/fontlab/fontlab-7-tldr.pl--tr-google.md",
+      "summary": "Polish translation of the FontLab 7 overview produced via the translators Google engine, kept as an example output fixture.",
+      "tags": [
+        "documentation",
+        "test-fixture",
+        "translation",
+        "translators"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "document:examples/data/poem/poem.en.md",
+      "type": "document",
+      "name": "poem.en.md",
+      "filePath": "examples/data/poem/poem.en.md",
+      "summary": "English source poem used as the input fixture for translation examples and tests.",
+      "tags": [
+        "documentation",
+        "test-fixture",
+        "sample-data",
+        "source"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:examples/data/poem/poem.pl--dt-google.md",
+      "type": "document",
+      "name": "poem.pl--dt-google.md",
+      "filePath": "examples/data/poem/poem.pl--dt-google.md",
+      "summary": "Polish translation of the sample poem produced via the deep-translator Google engine, kept as an example output fixture.",
+      "tags": [
+        "documentation",
+        "test-fixture",
+        "sample-data",
+        "translation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:examples/data/poem/poem.pl--mthy-gguf-1.8b-gguf.md",
+      "type": "document",
+      "name": "poem.pl--mthy-gguf-1.8b-gguf.md",
+      "filePath": "examples/data/poem/poem.pl--mthy-gguf-1.8b-gguf.md",
+      "summary": "Polish translation of the sample poem produced via the GGUF 1.8B local model engine, kept as an example output fixture.",
+      "tags": [
+        "documentation",
+        "test-fixture",
+        "sample-data",
+        "translation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:examples/data/poem/poem.pl--mthy-mlx-1.8b-mlx.md",
+      "type": "document",
+      "name": "poem.pl--mthy-mlx-1.8b-mlx.md",
+      "filePath": "examples/data/poem/poem.pl--mthy-mlx-1.8b-mlx.md",
+      "summary": "Polish translation of the sample poem produced via the MLX 1.8B local model engine, kept as an example output fixture.",
+      "tags": [
+        "documentation",
+        "test-fixture",
+        "sample-data",
+        "translation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:examples/data/poem/poem.pl--tr-google.md",
+      "type": "document",
+      "name": "poem.pl--tr-google.md",
+      "filePath": "examples/data/poem/poem.pl--tr-google.md",
+      "summary": "Polish translation of the sample poem produced via the translators (tr) Google engine, kept as an example output fixture.",
+      "tags": [
+        "documentation",
+        "test-fixture",
+        "sample-data",
+        "translation"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.cursor/rules/codegraph.mdc",
+      "type": "file",
+      "name": "codegraph.mdc",
+      "filePath": ".cursor/rules/codegraph.mdc",
+      "summary": "Cursor editor rule documenting when and how to use the CodeGraph MCP tools for code intelligence in this repository.",
+      "tags": [
+        "documentation",
+        "configuration",
+        "tooling"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:.understand-anything/.understandignore",
+      "type": "file",
+      "name": ".understandignore",
+      "filePath": ".understand-anything/.understandignore",
+      "summary": "Ignore-pattern manifest excluding build artifacts, caches, and vendored files from the understand-anything codebase analysis.",
+      "tags": [
+        "configuration",
+        "tooling",
+        "ignore-rules"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:examples/benchmark.py",
+      "type": "file",
+      "name": "benchmark.py",
+      "filePath": "examples/benchmark.py",
+      "summary": "Runnable benchmark harness that resolves engine/provider selectors, translates sample documents through abersetz, and reports timing and output statistics in a rich table.",
+      "tags": [
+        "benchmark",
+        "example",
+        "cli",
+        "entry-point"
+      ],
+      "complexity": "complex",
+      "languageNotes": "Uses fire for CLI dispatch and unittest.mock.patch to swap in dummy engines for deterministic timing."
+    },
+    {
+      "id": "function:examples/benchmark.py:get_engine_descriptor",
+      "type": "function",
+      "name": "get_engine_descriptor",
+      "filePath": "examples/benchmark.py",
+      "lineRange": [
+        49,
+        87
+      ],
+      "summary": "Resolves an engine selector against the configuration to build a sanitized human-readable descriptor of provider, model, and profile.",
+      "tags": [
+        "utility",
+        "config",
+        "resolution"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:examples/benchmark.py:resolve_provider_to_engines",
+      "type": "function",
+      "name": "resolve_provider_to_engines",
+      "filePath": "examples/benchmark.py",
+      "lineRange": [
+        90,
+        115
+      ],
+      "summary": "Expands a provider name into the list of matching configured engine selectors.",
+      "tags": [
+        "utility",
+        "config",
+        "resolution"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:examples/benchmark.py:BenchmarkRunner",
+      "type": "class",
+      "name": "BenchmarkRunner",
+      "filePath": "examples/benchmark.py",
+      "lineRange": [
+        118,
+        415
+      ],
+      "summary": "Orchestrates the full benchmark run: selecting engines, translating sample files, capturing timings, and rendering and persisting a results summary.",
+      "tags": [
+        "benchmark",
+        "orchestration",
+        "service"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/abersetz/__init__.py",
+      "type": "file",
+      "name": "__init__.py",
+      "filePath": "src/abersetz/__init__.py",
+      "summary": "Package root that lazily exposes the public API (translate_path, TranslatorOptions, etc.) via module __getattr__ and resolves the package version.",
+      "tags": [
+        "entry-point",
+        "barrel",
+        "package-init"
+      ],
+      "complexity": "simple",
+      "languageNotes": "Uses PEP 562 module-level __getattr__ for lazy imports to keep import time low."
+    },
+    {
+      "id": "function:src/abersetz/__init__.py:__getattr__",
+      "type": "function",
+      "name": "__getattr__",
+      "filePath": "src/abersetz/__init__.py",
+      "lineRange": [
+        29,
+        52
+      ],
+      "summary": "Module-level lazy attribute resolver that imports public symbols on first access and raises AttributeError otherwise.",
+      "tags": [
+        "lazy-import",
+        "package-init",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/__main__.py",
+      "type": "file",
+      "name": "__main__.py",
+      "filePath": "src/abersetz/__main__.py",
+      "summary": "Module execution entry point that delegates to the fast CLI main when the package is run with python -m abersetz.",
+      "tags": [
+        "entry-point",
+        "cli"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/cli_fast.py",
+      "type": "file",
+      "name": "cli_fast.py",
+      "filePath": "src/abersetz/cli_fast.py",
+      "summary": "Lightweight CLI front-end that short-circuits --version without importing the heavy CLI module, otherwise delegating to the full Fire-based CLI.",
+      "tags": [
+        "entry-point",
+        "cli",
+        "performance"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/cli_fast.py:handle_version",
+      "type": "function",
+      "name": "handle_version",
+      "filePath": "src/abersetz/cli_fast.py",
+      "lineRange": [
+        10,
+        24
+      ],
+      "summary": "Detects a --version flag, prints the package version via importlib.metadata, and exits without loading the full CLI.",
+      "tags": [
+        "cli",
+        "version",
+        "utility"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:src/abersetz/cli_fast.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "src/abersetz/cli_fast.py",
+      "lineRange": [
+        27,
+        37
+      ],
+      "summary": "CLI entry function that handles the version fast path then defers to the full CLI main.",
+      "tags": [
+        "entry-point",
+        "cli"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/anthropic.py",
+      "type": "file",
+      "name": "anthropic.py",
+      "filePath": "src/abersetz/providers/llm/api/anthropic.py",
+      "summary": "Provider descriptor module declaring Anthropic API base URL, API key env var, and known Claude model identifiers.",
+      "tags": [
+        "provider",
+        "data-model",
+        "llm",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/deepseek.py",
+      "type": "file",
+      "name": "deepseek.py",
+      "filePath": "src/abersetz/providers/llm/api/deepseek.py",
+      "summary": "Provider descriptor module declaring DeepSeek API endpoint, key env var, and known model identifiers.",
+      "tags": [
+        "provider",
+        "data-model",
+        "llm",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/gemini.py",
+      "type": "file",
+      "name": "gemini.py",
+      "filePath": "src/abersetz/providers/llm/api/gemini.py",
+      "summary": "Provider descriptor module declaring Google Gemini's OpenAI-compatible endpoint, key env var, and known model identifiers.",
+      "tags": [
+        "provider",
+        "data-model",
+        "llm",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/groq.py",
+      "type": "file",
+      "name": "groq.py",
+      "filePath": "src/abersetz/providers/llm/api/groq.py",
+      "summary": "Provider descriptor module declaring Groq API endpoint, key env var, and known model identifiers.",
+      "tags": [
+        "provider",
+        "data-model",
+        "llm",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/lmstudio.py",
+      "type": "file",
+      "name": "lmstudio.py",
+      "filePath": "src/abersetz/providers/llm/api/lmstudio.py",
+      "summary": "Provider descriptor module declaring the local LM Studio OpenAI-compatible endpoint and key settings.",
+      "tags": [
+        "provider",
+        "data-model",
+        "llm",
+        "local"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/openai.py",
+      "type": "file",
+      "name": "openai.py",
+      "filePath": "src/abersetz/providers/llm/api/openai.py",
+      "summary": "Provider descriptor module declaring OpenAI API base URL, key env var, and known GPT model identifiers.",
+      "tags": [
+        "provider",
+        "data-model",
+        "llm",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/openrouter.py",
+      "type": "file",
+      "name": "openrouter.py",
+      "filePath": "src/abersetz/providers/llm/api/openrouter.py",
+      "summary": "Provider descriptor module declaring OpenRouter aggregation endpoint, key env var, and known model identifiers.",
+      "tags": [
+        "provider",
+        "data-model",
+        "llm",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/siliconflow.py",
+      "type": "file",
+      "name": "siliconflow.py",
+      "filePath": "src/abersetz/providers/llm/api/siliconflow.py",
+      "summary": "Provider descriptor module declaring SiliconFlow API endpoint, key env var, and known model identifiers.",
+      "tags": [
+        "provider",
+        "data-model",
+        "llm",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/api/together.py",
+      "type": "file",
+      "name": "together.py",
+      "filePath": "src/abersetz/providers/llm/api/together.py",
+      "summary": "Provider descriptor module declaring Together AI API endpoint, key env var, and known model identifiers.",
+      "tags": [
+        "provider",
+        "data-model",
+        "llm",
+        "configuration"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/abersetz/providers/llm/local_discovery.py",
+      "type": "file",
+      "name": "local_discovery.py",
+      "filePath": "src/abersetz/providers/llm/local_discovery.py",
+      "summary": "Discovers locally installed GGUF/MLX models across LM Studio and other app directories, returning structured LocalModel records.",
+      "tags": [
+        "provider",
+        "discovery",
+        "local",
+        "filesystem"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/abersetz/providers/llm/local_discovery.py:LocalModel",
+      "type": "class",
+      "name": "LocalModel",
+      "filePath": "src/abersetz/providers/llm/local_discovery.py",
+      "lineRange": [
+        12,
+        19
+      ],
+      "summary": "Dataclass describing a discovered local model with path, name, app, format, and size.",
+      "tags": [
+        "data-model",
+        "dataclass"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:src/abersetz/providers/llm/local_discovery.py:LocalModelFinder",
+      "type": "class",
+      "name": "LocalModelFinder",
+      "filePath": "src/abersetz/providers/llm/local_discovery.py",
+      "lineRange": [
+        22,
+        196
+      ],
+      "summary": "Scans known local model directories (resolving LM Studio's pointer file) to enumerate GGUF/MLX models with size metadata.",
+      "tags": [
+        "discovery",
+        "filesystem",
+        "service"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "config:src/abersetz/providers/llm/recommended_settings.json",
+      "type": "config",
+      "name": "recommended_settings.json",
+      "filePath": "src/abersetz/providers/llm/recommended_settings.json",
+      "summary": "Per-provider recommended default settings (model, parameters) for OpenAI, SiliconFlow, Groq, OpenRouter, DeepSeek, Gemini, plus a default fallback.",
+      "tags": [
+        "configuration",
+        "llm",
+        "defaults"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/conftest.py",
+      "type": "file",
+      "name": "conftest.py",
+      "filePath": "tests/conftest.py",
+      "summary": "Pytest fixtures and autouse setup: mocks the bcache decorator with a hashable-args cache, isolates the config dir to tmp_path, and clears caches between tests.",
+      "tags": [
+        "test",
+        "fixtures",
+        "pytest"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_chunking.py",
+      "type": "file",
+      "name": "test_chunking.py",
+      "filePath": "tests/test_chunking.py",
+      "summary": "Unit tests for text chunking and format detection, including round-trip preservation and a fallback path when the semantic splitter is unavailable.",
+      "tags": [
+        "test",
+        "chunking",
+        "unit-test"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_cli.py",
+      "type": "file",
+      "name": "test_cli.py",
+      "filePath": "tests/test_cli.py",
+      "summary": "Extensive CLI test suite covering argument wiring, option building, engine/validation entry collection, config commands, and Fire invocation.",
+      "tags": [
+        "test",
+        "cli",
+        "unit-test"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_config.py",
+      "type": "file",
+      "name": "test_config.py",
+      "filePath": "tests/test_config.py",
+      "summary": "Tests for configuration loading, defaults, and persistence behavior.",
+      "tags": [
+        "test",
+        "config",
+        "unit-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_engine_catalog.py",
+      "type": "file",
+      "name": "test_engine_catalog.py",
+      "filePath": "tests/test_engine_catalog.py",
+      "summary": "Tests for the engine catalog that enumerates and resolves available translation engines.",
+      "tags": [
+        "test",
+        "engine",
+        "unit-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_engines.py",
+      "type": "file",
+      "name": "test_engines.py",
+      "filePath": "tests/test_engines.py",
+      "summary": "Large test suite exercising translation engine creation, selection normalization, and provider behavior.",
+      "tags": [
+        "test",
+        "engine",
+        "unit-test"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_examples.py",
+      "type": "file",
+      "name": "test_examples.py",
+      "filePath": "tests/test_examples.py",
+      "summary": "Functional tests validating that the bundled example scripts (including the benchmark) run end-to-end.",
+      "tags": [
+        "test",
+        "integration",
+        "examples"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_htmladapt_twat.py",
+      "type": "file",
+      "name": "test_htmladapt_twat.py",
+      "filePath": "tests/test_htmladapt_twat.py",
+      "summary": "Tests for HTML adaptation handling used during translation of markup content.",
+      "tags": [
+        "test",
+        "html",
+        "unit-test"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_integration.py",
+      "type": "file",
+      "name": "test_integration.py",
+      "filePath": "tests/test_integration.py",
+      "summary": "Integration tests exercising real translation engines (translators, deep-translator, ullm) plus file/HTML/batch translation and network-failure retry behavior.",
+      "tags": [
+        "test",
+        "integration",
+        "translation",
+        "retry"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_local_discovery.py",
+      "type": "file",
+      "name": "test_local_discovery.py",
+      "filePath": "tests/test_local_discovery.py",
+      "summary": "Tests for local model discovery, verifying the model finder scans correctly and resolves local GGUF and MLX situation models.",
+      "tags": [
+        "test",
+        "local-models",
+        "discovery",
+        "mlx"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_offline.py",
+      "type": "file",
+      "name": "test_offline.py",
+      "filePath": "tests/test_offline.py",
+      "summary": "Offline-mode tests confirming dry-run, empty-file handling, imports, and edge-case file processing all work without network access.",
+      "tags": [
+        "test",
+        "offline",
+        "dry-run",
+        "edge-cases"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_openai_lite.py",
+      "type": "file",
+      "name": "test_openai_lite.py",
+      "filePath": "tests/test_openai_lite.py",
+      "summary": "Unit tests for the lightweight OpenAI chat-completions client, validating response parsing and HTTP error handling via dummy client stubs.",
+      "tags": [
+        "test",
+        "openai",
+        "http-client",
+        "mocking"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_package.py",
+      "type": "file",
+      "name": "test_package.py",
+      "filePath": "tests/test_package.py",
+      "summary": "Smoke test verifying package-level dynamic attribute access rejects unknown symbols.",
+      "tags": [
+        "test",
+        "smoke-test",
+        "package"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tests/test_pipeline.py",
+      "type": "file",
+      "name": "test_pipeline.py",
+      "filePath": "tests/test_pipeline.py",
+      "summary": "Comprehensive tests for the translation pipeline's translate_path, covering chunk sizing, HTML handling, mixed formats, write modes, dry-run, and large-file warnings.",
+      "tags": [
+        "test",
+        "pipeline",
+        "translation",
+        "chunking"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_setup.py",
+      "type": "file",
+      "name": "test_setup.py",
+      "filePath": "tests/test_setup.py",
+      "summary": "Extensive tests for the setup wizard: provider discovery, config generation, endpoint testing, validation, default-engine selection, and interactive run flow.",
+      "tags": [
+        "test",
+        "setup",
+        "wizard",
+        "configuration"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tests/test_validation.py",
+      "type": "file",
+      "name": "test_validation.py",
+      "filePath": "tests/test_validation.py",
+      "summary": "Tests for engine validation logic, covering result collection, failure handling, selector limits, empty-translation flagging, and selector extraction from config.",
+      "tags": [
+        "test",
+        "validation",
+        "engines",
+        "selectors"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_openai_lite.py:_DummyResponse",
+      "type": "class",
+      "name": "_DummyResponse",
+      "filePath": "tests/test_openai_lite.py",
+      "lineRange": [
+        14,
+        24
+      ],
+      "summary": "Test double simulating an HTTP response with raise_for_status and json methods.",
+      "tags": [
+        "test",
+        "stub",
+        "mocking"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "class:tests/test_openai_lite.py:_DummyClient",
+      "type": "class",
+      "name": "_DummyClient",
+      "filePath": "tests/test_openai_lite.py",
+      "lineRange": [
+        27,
+        40
+      ],
+      "summary": "Context-manager test double simulating an HTTP client that returns canned post responses.",
+      "tags": [
+        "test",
+        "stub",
+        "mocking",
+        "http-client"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_openai_lite.py:test_chat_completions_create_parses_response",
+      "type": "function",
+      "name": "test_chat_completions_create_parses_response",
+      "filePath": "tests/test_openai_lite.py",
+      "lineRange": [
+        43,
+        96
+      ],
+      "summary": "Verifies the lite OpenAI client correctly parses a successful chat-completions response payload.",
+      "tags": [
+        "test",
+        "openai",
+        "parsing"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_pipeline.py:DummyEngine",
+      "type": "class",
+      "name": "DummyEngine",
+      "filePath": "tests/test_pipeline.py",
+      "lineRange": [
+        18,
+        34
+      ],
+      "summary": "Fake translation engine providing chunk_size_for and translate methods for exercising pipeline logic without real backends.",
+      "tags": [
+        "test",
+        "stub",
+        "engine"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_pipeline.py:test_translate_path_uses_engine_chunk_size_when_defaults_falsy",
+      "type": "function",
+      "name": "test_translate_path_uses_engine_chunk_size_when_defaults_falsy",
+      "filePath": "tests/test_pipeline.py",
+      "lineRange": [
+        115,
+        150
+      ],
+      "summary": "Confirms translate_path falls back to the engine-provided chunk size when default chunk settings are falsy.",
+      "tags": [
+        "test",
+        "pipeline",
+        "chunking"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_pipeline.py:test_translate_path_html_uses_engine_chunk_hint",
+      "type": "function",
+      "name": "test_translate_path_html_uses_engine_chunk_hint",
+      "filePath": "tests/test_pipeline.py",
+      "lineRange": [
+        189,
+        229
+      ],
+      "summary": "Verifies HTML translation through translate_path respects the engine's chunk-size hint.",
+      "tags": [
+        "test",
+        "pipeline",
+        "html",
+        "chunking"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_local_discovery.py:test_local_model_finder_scans_correctly",
+      "type": "function",
+      "name": "test_local_model_finder_scans_correctly",
+      "filePath": "tests/test_local_discovery.py",
+      "lineRange": [
+        12,
+        74
+      ],
+      "summary": "Verifies the local model finder scans directories and identifies available local models correctly.",
+      "tags": [
+        "test",
+        "local-models",
+        "discovery"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_local_discovery.py:test_resolve_local_situation_model",
+      "type": "function",
+      "name": "test_resolve_local_situation_model",
+      "filePath": "tests/test_local_discovery.py",
+      "lineRange": [
+        77,
+        139
+      ],
+      "summary": "Tests resolution of a local GGUF situation model from discovered candidates.",
+      "tags": [
+        "test",
+        "local-models",
+        "gguf"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_local_discovery.py:test_resolve_local_mlx_situation_model",
+      "type": "function",
+      "name": "test_resolve_local_mlx_situation_model",
+      "filePath": "tests/test_local_discovery.py",
+      "lineRange": [
+        153,
+        209
+      ],
+      "summary": "Tests resolution of a local MLX situation model from discovered candidates.",
+      "tags": [
+        "test",
+        "local-models",
+        "mlx"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:tests/test_setup.py:_StubProgress",
+      "type": "class",
+      "name": "_StubProgress",
+      "filePath": "tests/test_setup.py",
+      "lineRange": [
+        27,
+        38
+      ],
+      "summary": "Context-manager stub replacing the rich Progress display during setup wizard tests.",
+      "tags": [
+        "test",
+        "stub",
+        "rich"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_setup.py:test_generate_config_builds_engines",
+      "type": "function",
+      "name": "test_generate_config_builds_engines",
+      "filePath": "tests/test_setup.py",
+      "lineRange": [
+        120,
+        153
+      ],
+      "summary": "Verifies setup config generation builds the expected engine entries from discovered providers.",
+      "tags": [
+        "test",
+        "setup",
+        "config-generation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_setup.py:test_setup_wizard_run_interactive_success",
+      "type": "function",
+      "name": "test_setup_wizard_run_interactive_success",
+      "filePath": "tests/test_setup.py",
+      "lineRange": [
+        663,
+        721
+      ],
+      "summary": "End-to-end test of the interactive setup wizard run producing a successful configuration.",
+      "tags": [
+        "test",
+        "setup",
+        "wizard",
+        "interactive"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:tests/test_setup.py:test_test_single_endpoint_uses_anthropic_headers",
+      "type": "function",
+      "name": "test_test_single_endpoint_uses_anthropic_headers",
+      "filePath": "tests/test_setup.py",
+      "lineRange": [
+        518,
+        553
+      ],
+      "summary": "Confirms single-endpoint testing sends Anthropic-specific headers for Anthropic providers.",
+      "tags": [
+        "test",
+        "setup",
+        "endpoint",
+        "anthropic"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:tests/test_validation.py:_StubEngine",
+      "type": "class",
+      "name": "_StubEngine",
+      "filePath": "tests/test_validation.py",
+      "lineRange": [
+        16,
+        35
+      ],
+      "summary": "Fake engine implementing translate and chunk_size_for for validation-logic tests.",
+      "tags": [
+        "test",
+        "stub",
+        "engine"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:tests/test_validation.py:_build_config",
+      "type": "function",
+      "name": "_build_config",
+      "filePath": "tests/test_validation.py",
+      "lineRange": [
+        38,
+        58
+      ],
+      "summary": "Helper constructing a sample config object used across validation tests.",
+      "tags": [
+        "test",
+        "fixture",
+        "config"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_validation.py:test_validate_engines_collects_results",
+      "type": "function",
+      "name": "test_validate_engines_collects_results",
+      "filePath": "tests/test_validation.py",
+      "lineRange": [
+        61,
+        90
+      ],
+      "summary": "Verifies engine validation collects per-selector results into the expected aggregate structure.",
+      "tags": [
+        "test",
+        "validation",
+        "engines"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_integration.py:test_batch_translation_with_voc",
+      "type": "function",
+      "name": "test_batch_translation_with_voc",
+      "filePath": "tests/test_integration.py",
+      "lineRange": [
+        179,
+        212
+      ],
+      "summary": "Integration test for batch translation using a vocabulary file to constrain terminology.",
+      "tags": [
+        "test",
+        "integration",
+        "batch",
+        "vocabulary"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_integration.py:test_retry_on_network_failure",
+      "type": "function",
+      "name": "test_retry_on_network_failure",
+      "filePath": "tests/test_integration.py",
+      "lineRange": [
+        216,
+        254
+      ],
+      "summary": "Integration test verifying the pipeline retries translation on simulated network failures.",
+      "tags": [
+        "test",
+        "integration",
+        "retry",
+        "network"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/engine_catalog.py:resolve_engine_reference",
+      "type": "function",
+      "name": "resolve_engine_reference",
+      "filePath": "src/abersetz/engine_catalog.py",
+      "summary": "No summary available",
+      "tags": [
+        "untagged"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/config.py:save_config",
+      "type": "function",
+      "name": "save_config",
+      "filePath": "src/abersetz/config.py",
+      "summary": "No summary available",
+      "tags": [
+        "untagged"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/pipeline.py:_is_xcluded",
+      "type": "function",
+      "name": "_is_xcluded",
+      "filePath": "src/abersetz/pipeline.py",
+      "summary": "No summary available",
+      "tags": [
+        "untagged"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/chunking.py:detect_format",
+      "type": "function",
+      "name": "detect_format",
+      "filePath": "src/abersetz/chunking.py",
+      "summary": "No summary available",
+      "tags": [
+        "untagged"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/abersetz/tasks.py:translate_task",
+      "type": "function",
+      "name": "translate_task",
+      "filePath": "src/abersetz/tasks.py",
+      "summary": "No summary available",
+      "tags": [
+        "untagged"
+      ],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:src/abersetz/cli.py",
+      "target": "file:src/abersetz/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/cli.py",
+      "target": "file:src/abersetz/engine_catalog.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/config.py",
+      "target": "file:src/abersetz/engine_catalog.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/engines.py",
+      "target": "file:src/abersetz/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/engines.py",
+      "target": "file:src/abersetz/engine_catalog.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/engines.py",
+      "target": "file:src/abersetz/openai_lite.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/engines.py",
+      "target": "file:src/abersetz/providers/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/engines.py",
+      "target": "file:src/abersetz/providers/mlx.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/setup.py",
+      "target": "file:src/abersetz/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/setup.py",
+      "target": "file:src/abersetz/engine_catalog.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/setup.py",
+      "target": "file:src/abersetz/validation.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/validation.py",
+      "target": "file:src/abersetz/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/validation.py",
+      "target": "file:src/abersetz/engine_catalog.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/validation.py",
+      "target": "file:src/abersetz/engines.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/cli.py",
+      "target": "function:src/abersetz/cli.py:_collect_engine_entries",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/cli.py",
+      "target": "function:src/abersetz/cli.py:_build_options_from_cli",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/cli.py",
+      "target": "function:src/abersetz/cli.py:_render_engine_entries",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/cli.py",
+      "target": "function:src/abersetz/cli.py:_render_validation_entries",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/cli.py",
+      "target": "class:src/abersetz/cli.py:AbersetzCLI",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/cli.py",
+      "target": "class:src/abersetz/cli.py:ConfigCommands",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/cli.py",
+      "target": "class:src/abersetz/cli.py:AbersetzCLI",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/config.py",
+      "target": "class:src/abersetz/config.py:AbersetzConfig",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/config.py",
+      "target": "class:src/abersetz/config.py:EngineConfig",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/config.py",
+      "target": "class:src/abersetz/config.py:Credential",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/config.py",
+      "target": "class:src/abersetz/config.py:Defaults",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/config.py",
+      "target": "function:src/abersetz/config.py:load_config",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/config.py",
+      "target": "function:src/abersetz/config.py:resolve_credential",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/config.py",
+      "target": "class:src/abersetz/config.py:AbersetzConfig",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/config.py",
+      "target": "function:src/abersetz/config.py:load_config",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/config.py",
+      "target": "function:src/abersetz/config.py:resolve_credential",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/engine_catalog.py",
+      "target": "function:src/abersetz/engine_catalog.py:normalize_selector",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/engine_catalog.py",
+      "target": "function:src/abersetz/engine_catalog.py:collect_translator_providers",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/engine_catalog.py",
+      "target": "function:src/abersetz/engine_catalog.py:collect_deep_translator_providers",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/engine_catalog.py",
+      "target": "function:src/abersetz/engine_catalog.py:normalize_selector",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/engine_catalog.py",
+      "target": "function:src/abersetz/engine_catalog.py:collect_translator_providers",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/engine_catalog.py",
+      "target": "function:src/abersetz/engine_catalog.py:collect_deep_translator_providers",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/engines.py",
+      "target": "function:src/abersetz/engines.py:create_engine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/engines.py",
+      "target": "function:src/abersetz/engines.py:_build_llm_engine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/engines.py",
+      "target": "function:src/abersetz/engines.py:create_engine",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/openai_lite.py",
+      "target": "class:src/abersetz/openai_lite.py:OpenAI",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/openai_lite.py",
+      "target": "class:src/abersetz/openai_lite.py:ChatCompletions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/openai_lite.py",
+      "target": "class:src/abersetz/openai_lite.py:OpenAI",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/setup.py",
+      "target": "class:src/abersetz/setup.py:SetupWizard",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/setup.py",
+      "target": "class:src/abersetz/setup.py:DiscoveredProvider",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/setup.py",
+      "target": "function:src/abersetz/setup.py:setup_command",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/setup.py",
+      "target": "function:src/abersetz/setup.py:setup_command",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/validation.py",
+      "target": "function:src/abersetz/validation.py:validate_engines",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/validation.py",
+      "target": "function:src/abersetz/validation.py:_selectors_from_config",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/validation.py",
+      "target": "function:src/abersetz/validation.py:_extract_providers",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/validation.py",
+      "target": "function:src/abersetz/validation.py:validate_engines",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/cli.py:_collect_engine_entries",
+      "target": "function:src/abersetz/config.py:load_config",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/cli.py:_collect_engine_entries",
+      "target": "function:src/abersetz/engine_catalog.py:normalize_selector",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/cli.py:_collect_engine_entries",
+      "target": "function:src/abersetz/engine_catalog.py:collect_translator_providers",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/cli.py:_collect_engine_entries",
+      "target": "function:src/abersetz/engine_catalog.py:collect_deep_translator_providers",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:src/abersetz/cli.py:AbersetzCLI",
+      "target": "function:src/abersetz/setup.py:setup_command",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:src/abersetz/cli.py:AbersetzCLI",
+      "target": "function:src/abersetz/validation.py:validate_engines",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:src/abersetz/cli.py:AbersetzCLI",
+      "target": "function:src/abersetz/config.py:load_config",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/engines.py:create_engine",
+      "target": "function:src/abersetz/engine_catalog.py:normalize_selector",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/engines.py:create_engine",
+      "target": "function:src/abersetz/config.py:resolve_credential",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/engines.py:_build_llm_engine",
+      "target": "function:src/abersetz/config.py:resolve_credential",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/engines.py:create_engine",
+      "target": "class:src/abersetz/openai_lite.py:OpenAI",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/config.py:resolve_credential",
+      "target": "class:src/abersetz/config.py:Credential",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/config.py:load_config",
+      "target": "class:src/abersetz/config.py:AbersetzConfig",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/validation.py:validate_engines",
+      "target": "function:src/abersetz/config.py:load_config",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/validation.py:validate_engines",
+      "target": "function:src/abersetz/engine_catalog.py:normalize_selector",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/validation.py:_selectors_from_config",
+      "target": "function:src/abersetz/engine_catalog.py:normalize_selector",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:src/abersetz/setup.py:SetupWizard",
+      "target": "function:src/abersetz/validation.py:validate_engines",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:src/abersetz/setup.py:SetupWizard",
+      "target": "function:src/abersetz/engine_catalog.py:collect_translator_providers",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:src/abersetz/setup.py:SetupWizard",
+      "target": "function:src/abersetz/engine_catalog.py:collect_deep_translator_providers",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:src/abersetz/setup.py:SetupWizard",
+      "target": "class:src/abersetz/config.py:AbersetzConfig",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/providers/__init__.py",
+      "target": "file:src/abersetz/providers/base.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/__init__.py",
+      "target": "file:src/abersetz/providers/deep_translator.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/__init__.py",
+      "target": "file:src/abersetz/providers/gguf.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/__init__.py",
+      "target": "file:src/abersetz/providers/llm/__init__.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/__init__.py",
+      "target": "file:src/abersetz/providers/lmstudio.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/__init__.py",
+      "target": "file:src/abersetz/providers/mlx.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/__init__.py",
+      "target": "file:src/abersetz/providers/translators.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/base.py",
+      "target": "file:src/abersetz/chunking.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/deep_translator.py",
+      "target": "file:src/abersetz/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/deep_translator.py",
+      "target": "file:src/abersetz/providers/base.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/gguf.py",
+      "target": "file:src/abersetz/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/gguf.py",
+      "target": "file:src/abersetz/providers/base.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/gguf.py",
+      "target": "file:src/abersetz/providers/mlx.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/lmstudio.py",
+      "target": "file:src/abersetz/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/lmstudio.py",
+      "target": "file:src/abersetz/providers/base.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/mlx.py",
+      "target": "file:src/abersetz/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/mlx.py",
+      "target": "file:src/abersetz/providers/base.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/translators.py",
+      "target": "file:src/abersetz/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/translators.py",
+      "target": "file:src/abersetz/providers/base.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/base.py",
+      "target": "class:src/abersetz/providers/base.py:EngineRequest",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/base.py",
+      "target": "class:src/abersetz/providers/base.py:Engine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/base.py",
+      "target": "class:src/abersetz/providers/base.py:EngineBase",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/base.py",
+      "target": "class:src/abersetz/providers/base.py:EngineRequest",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/providers/base.py",
+      "target": "class:src/abersetz/providers/base.py:Engine",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/providers/base.py",
+      "target": "class:src/abersetz/providers/base.py:EngineBase",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/providers/deep_translator.py",
+      "target": "class:src/abersetz/providers/deep_translator.py:DeepTranslatorEngine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/deep_translator.py",
+      "target": "class:src/abersetz/providers/deep_translator.py:DeepTranslatorEngine",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:src/abersetz/providers/deep_translator.py:DeepTranslatorEngine",
+      "target": "class:src/abersetz/providers/base.py:EngineBase",
+      "type": "inherits",
+      "direction": "forward",
+      "weight": 0.9
+    },
+    {
+      "source": "file:src/abersetz/providers/gguf.py",
+      "target": "class:src/abersetz/providers/gguf.py:LocalGgufEngine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/gguf.py",
+      "target": "class:src/abersetz/providers/gguf.py:LocalGgufEngine",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:src/abersetz/providers/gguf.py:LocalGgufEngine",
+      "target": "class:src/abersetz/providers/base.py:EngineBase",
+      "type": "inherits",
+      "direction": "forward",
+      "weight": 0.9
+    },
+    {
+      "source": "class:src/abersetz/providers/gguf.py:LocalGgufEngine",
+      "target": "function:src/abersetz/providers/mlx.py:build_mthy_prompt",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:src/abersetz/providers/gguf.py:LocalGgufEngine",
+      "target": "function:src/abersetz/providers/mlx.py:resolve_and_download_model",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/providers/lmstudio.py",
+      "target": "class:src/abersetz/providers/lmstudio.py:LmstudioEngine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/lmstudio.py",
+      "target": "class:src/abersetz/providers/lmstudio.py:LmstudioEngine",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:src/abersetz/providers/lmstudio.py:LmstudioEngine",
+      "target": "class:src/abersetz/providers/base.py:EngineBase",
+      "type": "inherits",
+      "direction": "forward",
+      "weight": 0.9
+    },
+    {
+      "source": "file:src/abersetz/providers/mlx.py",
+      "target": "function:src/abersetz/providers/mlx.py:build_mthy_prompt",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/mlx.py",
+      "target": "function:src/abersetz/providers/mlx.py:find_local_model_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/mlx.py",
+      "target": "function:src/abersetz/providers/mlx.py:resolve_and_download_model",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/mlx.py",
+      "target": "class:src/abersetz/providers/mlx.py:LocalMlxEngine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/mlx.py",
+      "target": "function:src/abersetz/providers/mlx.py:build_mthy_prompt",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/providers/mlx.py",
+      "target": "function:src/abersetz/providers/mlx.py:find_local_model_path",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/providers/mlx.py",
+      "target": "function:src/abersetz/providers/mlx.py:resolve_and_download_model",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/providers/mlx.py",
+      "target": "class:src/abersetz/providers/mlx.py:LocalMlxEngine",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:src/abersetz/providers/mlx.py:LocalMlxEngine",
+      "target": "class:src/abersetz/providers/base.py:EngineBase",
+      "type": "inherits",
+      "direction": "forward",
+      "weight": 0.9
+    },
+    {
+      "source": "class:src/abersetz/providers/mlx.py:LocalMlxEngine",
+      "target": "function:src/abersetz/providers/mlx.py:build_mthy_prompt",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:src/abersetz/providers/mlx.py:LocalMlxEngine",
+      "target": "function:src/abersetz/providers/mlx.py:resolve_and_download_model",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/providers/mlx.py:resolve_and_download_model",
+      "target": "function:src/abersetz/providers/mlx.py:find_local_model_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/providers/translators.py",
+      "target": "class:src/abersetz/providers/translators.py:TranslatorsEngine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/translators.py",
+      "target": "class:src/abersetz/providers/translators.py:TranslatorsEngine",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:src/abersetz/providers/translators.py:TranslatorsEngine",
+      "target": "class:src/abersetz/providers/base.py:EngineBase",
+      "type": "inherits",
+      "direction": "forward",
+      "weight": 0.9
+    },
+    {
+      "source": "file:src/abersetz/abersetz.py",
+      "target": "file:src/abersetz/pipeline.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "file:src/abersetz/chunking.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "file:src/abersetz/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "file:src/abersetz/engine_catalog.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "file:src/abersetz/engines.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/tasks.py",
+      "target": "file:src/abersetz/pipeline.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/chunking.py",
+      "target": "class:src/abersetz/chunking.py:TextFormat",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/chunking.py",
+      "target": "function:src/abersetz/chunking.py:chunk_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/chunking.py",
+      "target": "function:src/abersetz/chunking.py:_semantic_chunks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/chunking.py",
+      "target": "class:src/abersetz/chunking.py:TextFormat",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/chunking.py",
+      "target": "function:src/abersetz/chunking.py:chunk_text",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/chunking.py:chunk_text",
+      "target": "function:src/abersetz/chunking.py:_semantic_chunks",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "class:src/abersetz/pipeline.py:TranslatorOptions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "class:src/abersetz/pipeline.py:TranslationResult",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "class:src/abersetz/pipeline.py:PipelineError",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:translate_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_merge_defaults",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_discover_files",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_translate_file",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_translate_html",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_cached_translate_call",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_apply_engine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_build_request",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_select_chunk_size",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:_persist_output",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "class:src/abersetz/pipeline.py:TranslatorOptions",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "class:src/abersetz/pipeline.py:TranslationResult",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "class:src/abersetz/pipeline.py:PipelineError",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/pipeline.py",
+      "target": "function:src/abersetz/pipeline.py:translate_path",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:translate_path",
+      "target": "function:src/abersetz/pipeline.py:_merge_defaults",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:translate_path",
+      "target": "function:src/abersetz/pipeline.py:_discover_files",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:translate_path",
+      "target": "function:src/abersetz/pipeline.py:_translate_file",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:translate_path",
+      "target": "function:src/abersetz/config.py:load_config",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:translate_path",
+      "target": "function:src/abersetz/engine_catalog.py:normalize_selector",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:translate_path",
+      "target": "function:src/abersetz/engines.py:create_engine",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_translate_file",
+      "target": "function:src/abersetz/chunking.py:chunk_text",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_translate_file",
+      "target": "function:src/abersetz/pipeline.py:_translate_html",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_translate_file",
+      "target": "function:src/abersetz/pipeline.py:_apply_engine",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_translate_file",
+      "target": "function:src/abersetz/pipeline.py:_persist_output",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_translate_file",
+      "target": "function:src/abersetz/pipeline.py:_select_chunk_size",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_translate_html",
+      "target": "function:src/abersetz/pipeline.py:_apply_engine",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_apply_engine",
+      "target": "function:src/abersetz/pipeline.py:_cached_translate_call",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/tasks.py",
+      "target": "function:src/abersetz/tasks.py:translate_flow",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/__init__.py",
+      "target": "file:src/abersetz/providers/llm/discovery.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/__init__.py",
+      "target": "file:src/abersetz/providers/llm/inference.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/inference.py",
+      "target": "file:src/abersetz/config.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/inference.py",
+      "target": "file:src/abersetz/providers/base.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/discovery.py",
+      "target": "class:src/abersetz/providers/llm/discovery.py:Endpoint",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/discovery.py",
+      "target": "function:src/abersetz/providers/llm/discovery.py:discover_env_endpoints",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/discovery.py",
+      "target": "function:src/abersetz/providers/llm/discovery.py:fetch_models",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/discovery.py",
+      "target": "function:src/abersetz/providers/llm/discovery.py:resolve_model",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/discovery.py",
+      "target": "function:src/abersetz/providers/llm/discovery.py:resolve_wildcard_to_model",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/discovery.py",
+      "target": "function:src/abersetz/providers/llm/discovery.py:load_recommended_settings",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/discovery.py",
+      "target": "class:src/abersetz/providers/llm/discovery.py:Endpoint",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/discovery.py",
+      "target": "function:src/abersetz/providers/llm/discovery.py:discover_env_endpoints",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/discovery.py",
+      "target": "function:src/abersetz/providers/llm/discovery.py:fetch_models",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/discovery.py",
+      "target": "function:src/abersetz/providers/llm/discovery.py:resolve_model",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/discovery.py",
+      "target": "function:src/abersetz/providers/llm/discovery.py:resolve_wildcard_to_model",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/discovery.py",
+      "target": "function:src/abersetz/providers/llm/discovery.py:load_recommended_settings",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/providers/llm/discovery.py:resolve_model",
+      "target": "function:src/abersetz/providers/llm/discovery.py:resolve_wildcard_to_model",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/abersetz/providers/llm/discovery.py:resolve_wildcard_to_model",
+      "target": "function:src/abersetz/providers/llm/discovery.py:fetch_models",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/inference.py",
+      "target": "class:src/abersetz/providers/llm/inference.py:LlmEngine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/inference.py",
+      "target": "class:src/abersetz/providers/llm/inference.py:LlmEngine",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "class:src/abersetz/providers/llm/inference.py:LlmEngine",
+      "target": "class:src/abersetz/providers/base.py:EngineBase",
+      "type": "inherits",
+      "direction": "forward",
+      "weight": 0.9
+    },
+    {
+      "source": "pipeline:.github/workflows/push.yml",
+      "target": "step:.github/workflows/push.yml:quality",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "pipeline:.github/workflows/push.yml",
+      "target": "step:.github/workflows/push.yml:test",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "pipeline:.github/workflows/push.yml",
+      "target": "step:.github/workflows/push.yml:build",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "pipeline:.github/workflows/release.yml",
+      "target": "step:.github/workflows/release.yml:release",
+      "type": "triggers",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "pipeline:.github/workflows/push.yml",
+      "target": "config:pyproject.toml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "pipeline:.github/workflows/release.yml",
+      "target": "config:pyproject.toml",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "config:pyproject.toml",
+      "target": "document:README.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:README.md",
+      "target": "config:pyproject.toml",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:publish.sh",
+      "target": "file:build.sh",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:publish.sh",
+      "target": "file:install.sh",
+      "type": "depends_on",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:docs/api.md",
+      "target": "file:src/abersetz/pipeline.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/api.md",
+      "target": "file:src/abersetz/__init__.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/cli.md",
+      "target": "file:src/abersetz/cli.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/cli.md",
+      "target": "file:src/abersetz/validation.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/configuration.md",
+      "target": "file:src/abersetz/config.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/configuration.md",
+      "target": "file:src/abersetz/engines.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/index.md",
+      "target": "document:docs/installation.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:docs/index.md",
+      "target": "document:docs/cli.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "config:docs/_config.yml",
+      "target": "document:docs/index.md",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:examples/README.md",
+      "target": "file:examples/benchmark.py",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:examples/README.md",
+      "target": "config:examples/benchmark_results.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:examples/benchmark_results.md",
+      "target": "config:examples/benchmark_results.json",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:examples/data/fontlab/fontlab-7-tldr.pl--dt-google.md",
+      "target": "document:examples/data/fontlab/fontlab-7-tldr.en.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:examples/data/fontlab/fontlab-7-tldr.pl--mthy-mlx-1.8b-mlx.md",
+      "target": "document:examples/data/fontlab/fontlab-7-tldr.en.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:examples/data/fontlab/fontlab-7-tldr.pl--tr-google.md",
+      "target": "document:examples/data/fontlab/fontlab-7-tldr.en.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:examples/data/poem/poem.pl--dt-google.md",
+      "target": "document:examples/data/poem/poem.en.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:examples/data/poem/poem.pl--mthy-gguf-1.8b-gguf.md",
+      "target": "document:examples/data/poem/poem.en.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:examples/data/poem/poem.pl--mthy-mlx-1.8b-mlx.md",
+      "target": "document:examples/data/poem/poem.en.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:examples/data/poem/poem.pl--tr-google.md",
+      "target": "document:examples/data/poem/poem.en.md",
+      "type": "related",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:examples/benchmark.py",
+      "target": "function:examples/benchmark.py:get_engine_descriptor",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:examples/benchmark.py",
+      "target": "function:examples/benchmark.py:resolve_provider_to_engines",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:examples/benchmark.py",
+      "target": "class:examples/benchmark.py:BenchmarkRunner",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:examples/benchmark.py",
+      "target": "function:examples/benchmark.py:get_engine_descriptor",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:examples/benchmark.py",
+      "target": "function:examples/benchmark.py:resolve_provider_to_engines",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:examples/benchmark.py",
+      "target": "class:examples/benchmark.py:BenchmarkRunner",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/__init__.py",
+      "target": "function:src/abersetz/__init__.py:__getattr__",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/cli_fast.py",
+      "target": "function:src/abersetz/cli_fast.py:handle_version",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/cli_fast.py",
+      "target": "function:src/abersetz/cli_fast.py:main",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/cli_fast.py",
+      "target": "function:src/abersetz/cli_fast.py:handle_version",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/cli_fast.py",
+      "target": "function:src/abersetz/cli_fast.py:main",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/__main__.py",
+      "target": "file:src/abersetz/cli_fast.py",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/local_discovery.py",
+      "target": "class:src/abersetz/providers/llm/local_discovery.py:LocalModel",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/local_discovery.py",
+      "target": "class:src/abersetz/providers/llm/local_discovery.py:LocalModelFinder",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/local_discovery.py",
+      "target": "class:src/abersetz/providers/llm/local_discovery.py:LocalModel",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/abersetz/providers/llm/local_discovery.py",
+      "target": "class:src/abersetz/providers/llm/local_discovery.py:LocalModelFinder",
+      "type": "exports",
+      "direction": "forward",
+      "weight": 0.8
+    },
+    {
+      "source": "config:src/abersetz/providers/llm/recommended_settings.json",
+      "target": "file:src/abersetz/providers/llm/local_discovery.py",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:tests/test_openai_lite.py",
+      "target": "class:tests/test_openai_lite.py:_DummyResponse",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_lite.py",
+      "target": "class:tests/test_openai_lite.py:_DummyClient",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_openai_lite.py",
+      "target": "function:tests/test_openai_lite.py:test_chat_completions_create_parses_response",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_pipeline.py",
+      "target": "class:tests/test_pipeline.py:DummyEngine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_pipeline.py",
+      "target": "function:tests/test_pipeline.py:test_translate_path_uses_engine_chunk_size_when_defaults_falsy",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_pipeline.py",
+      "target": "function:tests/test_pipeline.py:test_translate_path_html_uses_engine_chunk_hint",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_local_discovery.py",
+      "target": "function:tests/test_local_discovery.py:test_local_model_finder_scans_correctly",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_local_discovery.py",
+      "target": "function:tests/test_local_discovery.py:test_resolve_local_situation_model",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_local_discovery.py",
+      "target": "function:tests/test_local_discovery.py:test_resolve_local_mlx_situation_model",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_setup.py",
+      "target": "class:tests/test_setup.py:_StubProgress",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_setup.py",
+      "target": "function:tests/test_setup.py:test_generate_config_builds_engines",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_setup.py",
+      "target": "function:tests/test_setup.py:test_setup_wizard_run_interactive_success",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_setup.py",
+      "target": "function:tests/test_setup.py:test_test_single_endpoint_uses_anthropic_headers",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_validation.py",
+      "target": "class:tests/test_validation.py:_StubEngine",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_validation.py",
+      "target": "function:tests/test_validation.py:_build_config",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_validation.py",
+      "target": "function:tests/test_validation.py:test_validate_engines_collects_results",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_integration.py",
+      "target": "function:tests/test_integration.py:test_batch_translation_with_voc",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tests/test_integration.py",
+      "target": "function:tests/test_integration.py:test_retry_on_network_failure",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "function:src/abersetz/engines.py:create_engine",
+      "target": "function:src/abersetz/engine_catalog.py:resolve_engine_reference",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "class:src/abersetz/setup.py:SetupWizard",
+      "target": "function:src/abersetz/config.py:save_config",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_discover_files",
+      "target": "function:src/abersetz/pipeline.py:_is_xcluded",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:src/abersetz/pipeline.py:_translate_file",
+      "target": "function:src/abersetz/chunking.py:detect_format",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:src/abersetz/tasks.py:translate_flow",
+      "target": "function:src/abersetz/tasks.py:translate_task",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "function:src/abersetz/tasks.py:translate_task",
+      "target": "function:src/abersetz/pipeline.py:translate_path",
+      "type": "calls",
+      "direction": "forward",
+      "weight": 0.7
+    }
+  ]
+}

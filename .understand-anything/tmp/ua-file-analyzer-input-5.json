@@ -1,0 +1,11 @@
+{
+  "projectRoot": "/Users/adam/Developer/vcs3/github.twardoch/pub/abersetz",
+  "batchFiles": [
+    {"path": ".github/workflows/push.yml", "language": "yaml", "sizeLines": 111, "fileCategory": "infra"},
+    {"path": ".github/workflows/release.yml", "language": "yaml", "sizeLines": 58, "fileCategory": "infra"}
+  ],
+  "batchImportData": {
+    ".github/workflows/push.yml": [],
+    ".github/workflows/release.yml": []
+  }
+}
