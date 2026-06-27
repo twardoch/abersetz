@@ -1,7 +1,12 @@
 # this_file: src/abersetz/providers/llm/local_discovery.py
 from __future__ import annotations
 
+import json
 import os
+import shutil
+import subprocess
+import tempfile
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -74,6 +79,75 @@ class LocalModelFinder:
         except Exception:
             return 0
 
+    def _format_matches(self, format_name: str, format_filter: str | None) -> bool:
+        """Return whether a discovered model format passes the CLI filter."""
+        if not format_filter:
+            return True
+        return format_name.lower().replace(".", "") == format_filter.lower().replace(".", "")
+
+    def _format_label(self, format_name: str) -> str:
+        """Normalize raw format names for display."""
+        labels = {
+            "gguf": "GGUF",
+            "safetensors": "Safetensors",
+            "pytorch": "PyTorch",
+            "onnx": "ONNX",
+            "coreml": "CoreML",
+        }
+        return labels.get(format_name.lower(), format_name)
+
+    def _discover_lmstudio_cli_models(
+        self, format_filter: str | None, min_size_bytes: int
+    ) -> list[LocalModel]:
+        """Use `lms ls --json` so LM Studio models are grouped like LM Studio reports them."""
+        lms_path = shutil.which("lms")
+        if not lms_path:
+            return []
+
+        try:
+            with tempfile.NamedTemporaryFile(mode="w+", encoding="utf-8") as output:
+                subprocess.run(
+                    [lms_path, "ls", "--json"],
+                    check=True,
+                    stderr=subprocess.PIPE,
+                    stdout=output,
+                    text=True,
+                    timeout=30,
+                )
+                output.seek(0)
+                raw_models = json.load(output)
+        except (OSError, subprocess.SubprocessError, json.JSONDecodeError):
+            return []
+
+        if not isinstance(raw_models, list):
+            return []
+
+        lmstudio_root = self._get_lmstudio_path()
+        models: list[LocalModel] = []
+        for item in raw_models:
+            if not isinstance(item, Mapping):
+                continue
+
+            size = item.get("sizeBytes", 0)
+            model_format = str(item.get("format") or "unknown")
+            relative_path = str(item.get("path") or "")
+            if not isinstance(size, int) or size < min_size_bytes:
+                continue
+            if not self._format_matches(model_format, format_filter):
+                continue
+
+            name = str(item.get("modelKey") or item.get("displayName") or relative_path)
+            models.append(
+                LocalModel(
+                    path=lmstudio_root / relative_path if relative_path else lmstudio_root,
+                    name=name,
+                    app="LMStudio",
+                    format=self._format_label(model_format),
+                    size=size,
+                )
+            )
+        return models
+
     def discover_models(
         self, format_filter: str | None = None, min_size_mb: float = 100.0
     ) -> list[LocalModel]:
@@ -88,6 +162,12 @@ class LocalModelFinder:
         discovered: list[LocalModel] = []
 
         for app_name, app_path in search_paths.items():
+            if app_name == "LMStudio":
+                lmstudio_models = self._discover_lmstudio_cli_models(format_filter, min_size_bytes)
+                if lmstudio_models:
+                    discovered.extend(lmstudio_models)
+                    continue
+
             for root, dirs, files in os.walk(app_path):
                 root_path = Path(root)
 

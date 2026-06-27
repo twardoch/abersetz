@@ -1,4 +1,25 @@
 {
+  "version": "1.0.0",
+  "project": {
+    "name": "abersetz",
+    "languages": [
+      "json",
+      "markdown",
+      "mdc",
+      "python",
+      "shell",
+      "toml",
+      "unknown",
+      "yaml"
+    ],
+    "frameworks": [
+      "pytest",
+      "GitHub Actions"
+    ],
+    "description": "A Python CLI utility that translates entire directories of text and Markdown files using modern AI translation engines, slicing large documents at natural boundaries, translating each chunk, and stitching results back together while preserving the original layout. Supports web-scraping translators, official API services, OpenAI-compatible LLM endpoints, and local models (Hunyuan-MT, TranslateGemma).",
+    "analyzedAt": "2026-05-25T14:17:49.946Z",
+    "gitCommitHash": "d766e3368a04b4671817dd94940161502e55f8d5"
+  },
   "nodes": [
     {
       "id": "file:src/abersetz/cli.py",
@@ -2987,42 +3008,42 @@
       "target": "function:src/abersetz/cli.py:_collect_engine_entries",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/cli.py",
       "target": "function:src/abersetz/cli.py:_build_options_from_cli",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/cli.py",
       "target": "function:src/abersetz/cli.py:_render_engine_entries",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/cli.py",
       "target": "function:src/abersetz/cli.py:_render_validation_entries",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/cli.py",
       "target": "class:src/abersetz/cli.py:AbersetzCLI",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/cli.py",
       "target": "class:src/abersetz/cli.py:ConfigCommands",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/cli.py",
@@ -3036,42 +3057,42 @@
       "target": "class:src/abersetz/config.py:AbersetzConfig",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/config.py",
       "target": "class:src/abersetz/config.py:EngineConfig",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/config.py",
       "target": "class:src/abersetz/config.py:Credential",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/config.py",
       "target": "class:src/abersetz/config.py:Defaults",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/config.py",
       "target": "function:src/abersetz/config.py:load_config",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/config.py",
       "target": "function:src/abersetz/config.py:resolve_credential",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/config.py",
@@ -3099,21 +3120,21 @@
       "target": "function:src/abersetz/engine_catalog.py:normalize_selector",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/engine_catalog.py",
       "target": "function:src/abersetz/engine_catalog.py:collect_translator_providers",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/engine_catalog.py",
       "target": "function:src/abersetz/engine_catalog.py:collect_deep_translator_providers",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/engine_catalog.py",
@@ -3141,14 +3162,14 @@
       "target": "function:src/abersetz/engines.py:create_engine",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/engines.py",
       "target": "function:src/abersetz/engines.py:_build_llm_engine",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/engines.py",
@@ -3162,14 +3183,14 @@
       "target": "class:src/abersetz/openai_lite.py:OpenAI",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/openai_lite.py",
       "target": "class:src/abersetz/openai_lite.py:ChatCompletions",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/openai_lite.py",
@@ -3183,21 +3204,21 @@
       "target": "class:src/abersetz/setup.py:SetupWizard",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/setup.py",
       "target": "class:src/abersetz/setup.py:DiscoveredProvider",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/setup.py",
       "target": "function:src/abersetz/setup.py:setup_command",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/setup.py",
@@ -3211,21 +3232,21 @@
       "target": "function:src/abersetz/validation.py:validate_engines",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/validation.py",
       "target": "function:src/abersetz/validation.py:_selectors_from_config",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/validation.py",
       "target": "function:src/abersetz/validation.py:_extract_providers",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/validation.py",
@@ -3512,21 +3533,21 @@
       "target": "class:src/abersetz/providers/base.py:EngineRequest",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/base.py",
       "target": "class:src/abersetz/providers/base.py:Engine",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/base.py",
       "target": "class:src/abersetz/providers/base.py:EngineBase",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/base.py",
@@ -3554,7 +3575,7 @@
       "target": "class:src/abersetz/providers/deep_translator.py:DeepTranslatorEngine",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/deep_translator.py",
@@ -3575,7 +3596,7 @@
       "target": "class:src/abersetz/providers/gguf.py:LocalGgufEngine",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/gguf.py",
@@ -3610,7 +3631,7 @@
       "target": "class:src/abersetz/providers/lmstudio.py:LmstudioEngine",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/lmstudio.py",
@@ -3631,28 +3652,28 @@
       "target": "function:src/abersetz/providers/mlx.py:build_mthy_prompt",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/mlx.py",
       "target": "function:src/abersetz/providers/mlx.py:find_local_model_path",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/mlx.py",
       "target": "function:src/abersetz/providers/mlx.py:resolve_and_download_model",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/mlx.py",
       "target": "class:src/abersetz/providers/mlx.py:LocalMlxEngine",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/mlx.py",
@@ -3715,7 +3736,7 @@
       "target": "class:src/abersetz/providers/translators.py:TranslatorsEngine",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/translators.py",
@@ -3778,21 +3799,21 @@
       "target": "class:src/abersetz/chunking.py:TextFormat",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/chunking.py",
       "target": "function:src/abersetz/chunking.py:chunk_text",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/chunking.py",
       "target": "function:src/abersetz/chunking.py:_semantic_chunks",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/chunking.py",
@@ -3820,91 +3841,91 @@
       "target": "class:src/abersetz/pipeline.py:TranslatorOptions",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/pipeline.py",
       "target": "class:src/abersetz/pipeline.py:TranslationResult",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/pipeline.py",
       "target": "class:src/abersetz/pipeline.py:PipelineError",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/pipeline.py",
       "target": "function:src/abersetz/pipeline.py:translate_path",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/pipeline.py",
       "target": "function:src/abersetz/pipeline.py:_merge_defaults",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/pipeline.py",
       "target": "function:src/abersetz/pipeline.py:_discover_files",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/pipeline.py",
       "target": "function:src/abersetz/pipeline.py:_translate_file",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/pipeline.py",
       "target": "function:src/abersetz/pipeline.py:_translate_html",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/pipeline.py",
       "target": "function:src/abersetz/pipeline.py:_cached_translate_call",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/pipeline.py",
       "target": "function:src/abersetz/pipeline.py:_apply_engine",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/pipeline.py",
       "target": "function:src/abersetz/pipeline.py:_build_request",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/pipeline.py",
       "target": "function:src/abersetz/pipeline.py:_select_chunk_size",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/pipeline.py",
       "target": "function:src/abersetz/pipeline.py:_persist_output",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/pipeline.py",
@@ -4030,7 +4051,7 @@
       "target": "function:src/abersetz/tasks.py:translate_flow",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/llm/__init__.py",
@@ -4065,42 +4086,42 @@
       "target": "class:src/abersetz/providers/llm/discovery.py:Endpoint",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/llm/discovery.py",
       "target": "function:src/abersetz/providers/llm/discovery.py:discover_env_endpoints",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/llm/discovery.py",
       "target": "function:src/abersetz/providers/llm/discovery.py:fetch_models",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/llm/discovery.py",
       "target": "function:src/abersetz/providers/llm/discovery.py:resolve_model",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/llm/discovery.py",
       "target": "function:src/abersetz/providers/llm/discovery.py:resolve_wildcard_to_model",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/llm/discovery.py",
       "target": "function:src/abersetz/providers/llm/discovery.py:load_recommended_settings",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/llm/discovery.py",
@@ -4163,7 +4184,7 @@
       "target": "class:src/abersetz/providers/llm/inference.py:LlmEngine",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/llm/inference.py",
@@ -4387,21 +4408,21 @@
       "target": "function:examples/benchmark.py:get_engine_descriptor",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:examples/benchmark.py",
       "target": "function:examples/benchmark.py:resolve_provider_to_engines",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:examples/benchmark.py",
       "target": "class:examples/benchmark.py:BenchmarkRunner",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:examples/benchmark.py",
@@ -4429,21 +4450,21 @@
       "target": "function:src/abersetz/__init__.py:__getattr__",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/cli_fast.py",
       "target": "function:src/abersetz/cli_fast.py:handle_version",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/cli_fast.py",
       "target": "function:src/abersetz/cli_fast.py:main",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/cli_fast.py",
@@ -4471,14 +4492,14 @@
       "target": "class:src/abersetz/providers/llm/local_discovery.py:LocalModel",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/llm/local_discovery.py",
       "target": "class:src/abersetz/providers/llm/local_discovery.py:LocalModelFinder",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:src/abersetz/providers/llm/local_discovery.py",
@@ -4506,126 +4527,126 @@
       "target": "class:tests/test_openai_lite.py:_DummyResponse",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_openai_lite.py",
       "target": "class:tests/test_openai_lite.py:_DummyClient",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_openai_lite.py",
       "target": "function:tests/test_openai_lite.py:test_chat_completions_create_parses_response",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_pipeline.py",
       "target": "class:tests/test_pipeline.py:DummyEngine",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_pipeline.py",
       "target": "function:tests/test_pipeline.py:test_translate_path_uses_engine_chunk_size_when_defaults_falsy",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_pipeline.py",
       "target": "function:tests/test_pipeline.py:test_translate_path_html_uses_engine_chunk_hint",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_local_discovery.py",
       "target": "function:tests/test_local_discovery.py:test_local_model_finder_scans_correctly",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_local_discovery.py",
       "target": "function:tests/test_local_discovery.py:test_resolve_local_situation_model",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_local_discovery.py",
       "target": "function:tests/test_local_discovery.py:test_resolve_local_mlx_situation_model",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_setup.py",
       "target": "class:tests/test_setup.py:_StubProgress",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_setup.py",
       "target": "function:tests/test_setup.py:test_generate_config_builds_engines",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_setup.py",
       "target": "function:tests/test_setup.py:test_setup_wizard_run_interactive_success",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_setup.py",
       "target": "function:tests/test_setup.py:test_test_single_endpoint_uses_anthropic_headers",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_validation.py",
       "target": "class:tests/test_validation.py:_StubEngine",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_validation.py",
       "target": "function:tests/test_validation.py:_build_config",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_validation.py",
       "target": "function:tests/test_validation.py:test_validate_engines_collects_results",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_integration.py",
       "target": "function:tests/test_integration.py:test_batch_translation_with_voc",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "file:tests/test_integration.py",
       "target": "function:tests/test_integration.py:test_retry_on_network_failure",
       "type": "contains",
       "direction": "forward",
-      "weight": 1.0
+      "weight": 1
     },
     {
       "source": "function:src/abersetz/engines.py:create_engine",
@@ -4668,6 +4689,286 @@
       "type": "calls",
       "direction": "forward",
       "weight": 0.7
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:cli",
+      "name": "CLI & Entry Points",
+      "description": "Fire-based command-line interface, module entry points, and the top-level abersetz facade that users invoke.",
+      "nodeIds": [
+        "file:src/abersetz/cli.py",
+        "file:src/abersetz/abersetz.py",
+        "file:.cursor/rules/codegraph.mdc",
+        "file:.understand-anything/.understandignore",
+        "file:src/abersetz/__init__.py",
+        "file:src/abersetz/__main__.py",
+        "file:src/abersetz/cli_fast.py"
+      ]
+    },
+    {
+      "id": "layer:pipeline",
+      "name": "Translation Pipeline",
+      "description": "Orchestration of the translation workflow: file traversal, text chunking, task scheduling, and input/output validation.",
+      "nodeIds": [
+        "file:src/abersetz/validation.py",
+        "file:src/abersetz/chunking.py",
+        "file:src/abersetz/pipeline.py",
+        "file:src/abersetz/tasks.py"
+      ]
+    },
+    {
+      "id": "layer:engines",
+      "name": "Engines & Providers",
+      "description": "Translation engine catalog, engine dispatch, and concrete provider backends (deep-translator, gguf, mlx, lmstudio, translators).",
+      "nodeIds": [
+        "file:src/abersetz/engine_catalog.py",
+        "file:src/abersetz/engines.py",
+        "file:src/abersetz/providers/__init__.py",
+        "file:src/abersetz/providers/base.py",
+        "file:src/abersetz/providers/deep_translator.py",
+        "file:src/abersetz/providers/gguf.py",
+        "file:src/abersetz/providers/lmstudio.py",
+        "file:src/abersetz/providers/mlx.py",
+        "file:src/abersetz/providers/translators.py"
+      ]
+    },
+    {
+      "id": "layer:llm-adapters",
+      "name": "LLM Provider Adapters",
+      "description": "LLM-specific discovery, inference, and per-vendor API adapters (anthropic, openai, gemini, groq, deepseek, openrouter, siliconflow, together, lmstudio).",
+      "nodeIds": [
+        "file:src/abersetz/openai_lite.py",
+        "file:src/abersetz/providers/llm/__init__.py",
+        "file:src/abersetz/providers/llm/discovery.py",
+        "file:src/abersetz/providers/llm/inference.py",
+        "file:src/abersetz/providers/llm/api/anthropic.py",
+        "file:src/abersetz/providers/llm/api/deepseek.py",
+        "file:src/abersetz/providers/llm/api/gemini.py",
+        "file:src/abersetz/providers/llm/api/groq.py",
+        "file:src/abersetz/providers/llm/api/lmstudio.py",
+        "file:src/abersetz/providers/llm/api/openai.py",
+        "file:src/abersetz/providers/llm/api/openrouter.py",
+        "file:src/abersetz/providers/llm/api/siliconflow.py",
+        "file:src/abersetz/providers/llm/api/together.py",
+        "file:src/abersetz/providers/llm/local_discovery.py"
+      ]
+    },
+    {
+      "id": "layer:config",
+      "name": "Configuration & Setup",
+      "description": "Runtime configuration, interactive setup, project manifests, build/install/publish scripts, and recommended-settings data.",
+      "nodeIds": [
+        "file:src/abersetz/config.py",
+        "file:src/abersetz/setup.py",
+        "config:.pre-commit-config.yaml",
+        "config:package.toml",
+        "config:pyproject.toml",
+        "file:build.sh",
+        "file:install.sh",
+        "file:publish.sh",
+        "config:docs/_config.yml",
+        "config:src/abersetz/providers/llm/recommended_settings.json"
+      ]
+    },
+    {
+      "id": "layer:test",
+      "name": "Tests",
+      "description": "Pytest-based unit, integration, and CLI test suites covering the abersetz package.",
+      "nodeIds": [
+        "file:tests/conftest.py",
+        "file:tests/test_chunking.py",
+        "file:tests/test_cli.py",
+        "file:tests/test_config.py",
+        "file:tests/test_engine_catalog.py",
+        "file:tests/test_engines.py",
+        "file:tests/test_examples.py",
+        "file:tests/test_htmladapt_twat.py",
+        "file:tests/test_integration.py",
+        "file:tests/test_local_discovery.py",
+        "file:tests/test_offline.py",
+        "file:tests/test_openai_lite.py",
+        "file:tests/test_package.py",
+        "file:tests/test_pipeline.py",
+        "file:tests/test_setup.py",
+        "file:tests/test_validation.py"
+      ]
+    },
+    {
+      "id": "layer:documentation",
+      "name": "Documentation",
+      "description": "Project documentation, agent guides, specs, changelog, and runnable example data.",
+      "nodeIds": [
+        "document:AGENTS.md",
+        "document:CHANGELOG.md",
+        "document:CLAUDE.md",
+        "document:DEPENDENCIES.md",
+        "document:GEMINI.md",
+        "document:IDEA.md",
+        "document:LLXPRT.md",
+        "document:QWEN.md",
+        "document:README.md",
+        "document:SPEC.md",
+        "document:TASKS.md",
+        "document:TESTING.md",
+        "document:TODO.md",
+        "document:WORK.md",
+        "document:docs/api.md",
+        "document:docs/cli.md",
+        "document:docs/configuration.md",
+        "document:docs/index.md",
+        "document:docs/installation.md",
+        "document:examples/README.md",
+        "config:examples/benchmark_results.json",
+        "document:examples/benchmark_results.md",
+        "document:examples/data/fontlab/fontlab-7-tldr.en.md",
+        "document:examples/data/fontlab/fontlab-7-tldr.pl--dt-google.md",
+        "document:examples/data/fontlab/fontlab-7-tldr.pl--mthy-mlx-1.8b-mlx.md",
+        "document:examples/data/fontlab/fontlab-7-tldr.pl--tr-google.md",
+        "document:examples/data/poem/poem.en.md",
+        "document:examples/data/poem/poem.pl--dt-google.md",
+        "document:examples/data/poem/poem.pl--mthy-gguf-1.8b-gguf.md",
+        "document:examples/data/poem/poem.pl--mthy-mlx-1.8b-mlx.md",
+        "document:examples/data/poem/poem.pl--tr-google.md",
+        "file:examples/benchmark.py"
+      ]
+    },
+    {
+      "id": "layer:ci-cd",
+      "name": "CI/CD",
+      "description": "GitHub Actions workflows for push validation and release publishing.",
+      "nodeIds": [
+        "pipeline:.github/workflows/push.yml",
+        "pipeline:.github/workflows/release.yml",
+        "step:.github/workflows/push.yml:quality",
+        "step:.github/workflows/push.yml:test",
+        "step:.github/workflows/push.yml:build",
+        "step:.github/workflows/release.yml:release"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "What abersetz Does",
+      "description": "Start with the README to understand the project's mission: feed it a folder of text or Markdown files and get back a translated folder. It introduces the core idea of a unified interface over many translation engines (web-scraping translators, official APIs, OpenAI-compatible LLMs, and local models) and the directory-in/directory-out workflow. This page is the map for everything the tour visits next.",
+      "nodeIds": [
+        "document:README.md",
+        "document:SPEC.md"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "Command-Line Entry Point",
+      "description": "When you run `python -m abersetz` or the `abersetz` command, execution begins here. `__main__.py` delegates to `cli_fast.py`, a lightweight front-end that short-circuits `--version` without importing heavy dependencies, then hands off to the full CLI. This lazy-loading split keeps startup fast for common invocations.",
+      "nodeIds": [
+        "file:src/abersetz/__main__.py",
+        "file:src/abersetz/cli_fast.py"
+      ],
+      "languageLesson": "Python packages can be made runnable with `python -m <pkg>` by providing a `__main__.py`. Deferring expensive imports until they are actually needed is a common trick to keep CLI startup snappy."
+    },
+    {
+      "order": 3,
+      "title": "The Command Surface",
+      "description": "`cli.py` is the Fire-based command surface that turns Python functions into CLI subcommands: `tr` (translate), `validate`, `config`, `engines`, and `setup`. It parses user options, calls into the pipeline, and renders results as Rich tables. This is the bridge between what the README promises and the code that delivers it.",
+      "nodeIds": [
+        "file:src/abersetz/cli.py",
+        "document:docs/cli.md"
+      ],
+      "languageLesson": "The `fire` library auto-generates a command-line interface from ordinary Python functions and classes, so adding a subcommand is as simple as defining a method."
+    },
+    {
+      "order": 4,
+      "title": "Configuration and Credentials",
+      "description": "`config.py` is the most depended-upon module in the codebase (highest fan-in): nearly every layer reads from the TOML-backed configuration model for defaults, credentials, and per-engine settings. It resolves API keys from environment variables or stored values. Understanding this shared contract clarifies how the CLI options from Step 3 merge with persistent settings.",
+      "nodeIds": [
+        "file:src/abersetz/config.py",
+        "document:docs/configuration.md"
+      ],
+      "languageLesson": "TOML is the preferred Python config format (used by pyproject.toml too). `platformdirs` resolves the correct per-OS location for the user config file so the tool behaves natively on macOS, Linux, and Windows."
+    },
+    {
+      "order": 5,
+      "title": "Interactive Setup Wizard",
+      "description": "Building on the config model from Step 4, `setup.py` is the wizard that discovers available providers from environment variables, tests their endpoints live, and writes a working configuration. It is what a first-time user runs to go from zero to a translatable setup, and it explains how credentials discovered here feed every engine.",
+      "nodeIds": [
+        "file:src/abersetz/setup.py"
+      ]
+    },
+    {
+      "order": 6,
+      "title": "Pipeline Orchestration",
+      "description": "`pipeline.py` is the orchestration core that turns a path into translated output. It discovers input files, merges per-call options with config defaults, chunks each document, invokes the selected engine with caching, and writes results into a language-named subdirectory while carrying vocabulary forward. This is the spine that connects every other layer; `tasks.py` and `abersetz.py` wrap it as the friendly public API.",
+      "nodeIds": [
+        "file:src/abersetz/pipeline.py",
+        "file:src/abersetz/abersetz.py",
+        "document:docs/api.md"
+      ]
+    },
+    {
+      "order": 7,
+      "title": "Splitting Text into Chunks",
+      "description": "Translation engines have length limits, so `chunking.py` slices large documents at natural sentence and paragraph boundaries before they reach an engine. It detects HTML versus plain text and falls back to length-based splitting when the semantic splitter is unavailable. This is the step that lets abersetz handle whole books, not just snippets, while preserving layout on reassembly.",
+      "nodeIds": [
+        "file:src/abersetz/chunking.py"
+      ]
+    },
+    {
+      "order": 8,
+      "title": "Selecting an Engine",
+      "description": "Once text is chunked, the pipeline needs a concrete translator. `engine_catalog.py` normalizes and resolves selector strings like `tr/google` or `dt/deepl` and enumerates available providers, while `engines.py` is the factory that instantiates the right engine object for a given selector and config. Together they implement the unified-interface promise from the README.",
+      "nodeIds": [
+        "file:src/abersetz/engine_catalog.py",
+        "file:src/abersetz/engines.py"
+      ]
+    },
+    {
+      "order": 9,
+      "title": "The Engine Contract and Provider Backends",
+      "description": "`base.py` defines the shared contract every engine honors: the EngineRequest/EngineResult data structures, the Engine protocol, and an EngineBase with chunk-size resolution. The concrete backends each adapt one ecosystem to that contract: deep_translator (official APIs), translators (web scraping), and the local mlx and gguf model engines. Studying base.py first makes every backend read the same way.",
+      "nodeIds": [
+        "file:src/abersetz/providers/base.py",
+        "file:src/abersetz/providers/__init__.py",
+        "file:src/abersetz/providers/deep_translator.py",
+        "file:src/abersetz/providers/mlx.py",
+        "file:src/abersetz/providers/gguf.py"
+      ],
+      "languageLesson": "Python's `typing.Protocol` enables structural (duck) typing: any class with the right methods satisfies the Engine protocol without explicitly inheriting from it, which keeps each provider decoupled."
+    },
+    {
+      "order": 10,
+      "title": "LLM Adapters and Discovery",
+      "description": "The `llm` subpackage handles OpenAI-compatible endpoints. `discovery.py` finds endpoints from environment variables and a static catalog and fetches model lists; `inference.py` implements LlmEngine, which builds XML-wrapped prompts, calls the model, and parses the structured text and vocabulary back out. `openai_lite.py` is a minimal httpx client shim that avoids pulling in the full OpenAI SDK. Per-vendor descriptor modules (anthropic, openai, gemini, and friends) just declare endpoints and known models.",
+      "nodeIds": [
+        "file:src/abersetz/providers/llm/__init__.py",
+        "file:src/abersetz/providers/llm/discovery.py",
+        "file:src/abersetz/providers/llm/inference.py",
+        "file:src/abersetz/openai_lite.py",
+        "config:src/abersetz/providers/llm/recommended_settings.json"
+      ]
+    },
+    {
+      "order": 11,
+      "title": "Validation and Tests",
+      "description": "`validation.py` performs a small live sample translation against each configured engine and reports success, latency, and errors, backing the `abersetz validate` command. The pytest suite mirrors the architecture: `test_pipeline.py` and `test_chunking.py` cover the orchestration core, `test_engines.py` and `test_engine_catalog.py` cover engine selection, and `test_offline.py` keeps the happy path runnable without network access.",
+      "nodeIds": [
+        "file:src/abersetz/validation.py",
+        "file:tests/test_pipeline.py",
+        "file:tests/test_engines.py",
+        "file:tests/conftest.py",
+        "file:tests/test_offline.py"
+      ]
+    },
+    {
+      "order": 12,
+      "title": "Packaging and CI/CD",
+      "description": "The capstone shows how abersetz ships. `pyproject.toml` declares the build system (hatch-vcs), dependencies, and the CLI entry point. The `push.yml` workflow runs Ruff linting and the pytest matrix across Python 3.10-3.12 on every push, and `release.yml` builds and publishes to PyPI on version tags. This closes the loop from the code you just toured to a published package users can install.",
+      "nodeIds": [
+        "config:pyproject.toml",
+        "pipeline:.github/workflows/push.yml",
+        "pipeline:.github/workflows/release.yml"
+      ],
+      "languageLesson": "GitHub Actions workflows use `on` triggers (push, tag) and parallel `jobs`. A matrix build runs the same test job across multiple Python versions; hatch-vcs derives the package version from git tags so releases stay in sync with source control."
     }
   ]
 }

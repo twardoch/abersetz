@@ -37,7 +37,7 @@ def test_cli_translate_wires_arguments(monkeypatch: pytest.MonkeyPatch, tmp_path
     monkeypatch.setattr("abersetz.cli.translate_path", fake_translate_path)
 
     cli = AbersetzCLI()
-    cli.tr(
+    cli.td(
         to_lang="es",
         path=str(tmp_path),
         engine="tr/google",
@@ -66,7 +66,7 @@ def test_cli_translate_accepts_path_output(monkeypatch: pytest.MonkeyPatch, tmp_
 
     cli = AbersetzCLI()
     output_dir = tmp_path / "dest"
-    cli.tr(
+    cli.td(
         to_lang="es",
         path=tmp_path,
         output=output_dir,
@@ -93,7 +93,7 @@ def test_cli_accepts_legacy_engine_selector(
     monkeypatch.setattr("abersetz.cli.translate_path", fake_translate_path)
 
     cli = AbersetzCLI()
-    cli.tr(to_lang="es", path=str(tmp_path), engine="translators/google", dry_run=True)
+    cli.td(to_lang="es", path=str(tmp_path), engine="translators/google", dry_run=True)
 
     opts = captured["options"]
     assert opts.engine == "tr/google"
@@ -115,7 +115,7 @@ def test_cli_translate_reports_pipeline_error(
 
     cli = AbersetzCLI()
     with pytest.raises(PipelineError):
-        cli.tr(to_lang="es", path=str(tmp_path), engine="tr/google")
+        cli.td(to_lang="es", path=str(tmp_path), engine="tr/google")
 
     assert captured == ["[red]failed to translate[/red]"]
 
@@ -601,7 +601,7 @@ def test_cli_verbose_logs_translation_details(
     monkeypatch.setattr("builtins.print", lambda value: printed.append(str(value)))
 
     cli = AbersetzCLI()
-    cli.tr(
+    cli.tf(
         to_lang="pl",
         path=str(sample_source),
         engine="tr/google",
@@ -817,7 +817,7 @@ def test_cli_translate_accepts_case_overrides(
     monkeypatch.setattr("abersetz.cli.translate_path", fake_translate_path)
 
     cli = AbersetzCLI()
-    cli.tr(
+    cli.td(
         to_lang="pl",
         path=tmp_path,
         Overwrite=True,
@@ -871,6 +871,87 @@ def test_cli_validate_accepts_case_overrides(monkeypatch: pytest.MonkeyPatch) ->
     assert captured["source_lang"] == "en"
     assert captured["sample_text"] == "Test validation string"
     assert captured["include_defaults"] is False
+
+
+def test_cli_tr_string_prints_translation(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured: dict[str, object] = {}
+
+    def fake_translate_string(text: str, options: TranslatorOptions):
+        captured["text"] = text
+        captured["options"] = options
+        return "hola"
+
+    printed: list[str] = []
+    monkeypatch.setattr("abersetz.cli.translate_string", fake_translate_string)
+    monkeypatch.setattr("builtins.print", lambda value: printed.append(str(value)))
+
+    cli = AbersetzCLI()
+    cli.tr(to_lang="es", text="hello", engine="tr::google")
+
+    assert captured["text"] == "hello"
+    assert isinstance(captured["options"], TranslatorOptions)
+    assert printed == ["hola"]
+
+
+def test_cli_tr_string_with_job(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    import json as _json
+
+    job_path = tmp_path / "job.json"
+    job_path.write_text(
+        _json.dumps(
+            {"to_lang": "pl", "entries": [{"selector": "tr::google"}, {"selector": "dt::deepl"}]}
+        ),
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "abersetz.cli.translate_string", lambda text, options: f"out-{options.engine}"
+    )
+    printed: list[str] = []
+    monkeypatch.setattr("builtins.print", lambda value: printed.append(str(value)))
+
+    cli = AbersetzCLI()
+    cli.tr(to_lang="pl", text="hi", job=str(job_path))
+
+    assert "tr::google\tout-tr::google" in printed
+    assert "dt::deepl\tout-dt::deepl" in printed
+
+
+def test_cli_ls_renders_catalog(monkeypatch: pytest.MonkeyPatch) -> None:
+    import io
+
+    from rich.console import Console
+
+    from abersetz.listing import CatalogEntry
+
+    monkeypatch.setattr(
+        "abersetz.listing.build_catalog",
+        lambda *a, **k: [CatalogEntry("tr::google", "provider")],
+    )
+    buffer = io.StringIO()
+    monkeypatch.setattr("abersetz.cli.console", Console(file=buffer, force_terminal=True))
+
+    AbersetzCLI().ls("tr")
+    assert "tr::google" in buffer.getvalue()
+
+
+def test_cli_ls_job_output(monkeypatch: pytest.MonkeyPatch) -> None:
+    import json as _json
+
+    from abersetz.listing import CatalogEntry
+
+    monkeypatch.setattr(
+        "abersetz.listing.build_catalog",
+        lambda *a, **k: [CatalogEntry("tr::google", "provider")],
+    )
+    printed: list[str] = []
+    monkeypatch.setattr("builtins.print", lambda value: printed.append(str(value)))
+
+    AbersetzCLI().ls("tr", job=True, to_lang="pl")
+
+    payload = _json.loads(printed[0])
+    assert payload["to_lang"] == "pl"
+    assert payload["entries"][0]["selector"] == "tr::google"
 
 
 def test_cli_discover_subcommand(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -1,0 +1,6023 @@
+{
+  "version": "1.0.0",
+  "gitCommitHash": "d766e3368a04b4671817dd94940161502e55f8d5",
+  "generatedAt": "2026-05-25T14:18:46.838Z",
+  "files": {
+    ".cursor/rules/codegraph.mdc": {
+      "filePath": ".cursor/rules/codegraph.mdc",
+      "contentHash": "afc24704996e99e84856a4c280f81634ceb1579232536503b61e85fb2178e1de",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 40,
+      "hasStructuralAnalysis": false
+    },
+    ".github/workflows/push.yml": {
+      "filePath": ".github/workflows/push.yml",
+      "contentHash": "4690955de3582a4bcf3f0504753191a56b059fef38a2d388266e7f0119f45b98",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 112,
+      "hasStructuralAnalysis": true
+    },
+    ".github/workflows/release.yml": {
+      "filePath": ".github/workflows/release.yml",
+      "contentHash": "808962dc830d1da3a941c38970d54306829c9bb53a7140785bf7b93a468b9338",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 59,
+      "hasStructuralAnalysis": true
+    },
+    ".pre-commit-config.yaml": {
+      "filePath": ".pre-commit-config.yaml",
+      "contentHash": "cd8f13e274a553c5f3b3babaf3e0582ada92cb5bc1bddc23e95441a065affe46",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 19,
+      "hasStructuralAnalysis": true
+    },
+    ".understand-anything/.understandignore": {
+      "filePath": ".understand-anything/.understandignore",
+      "contentHash": "a4f6ab9901190c055d42441beb94b0e90ef97f917bea5a0612ca1814106203f0",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 327,
+      "hasStructuralAnalysis": false
+    },
+    "AGENTS.md": {
+      "filePath": "AGENTS.md",
+      "contentHash": "68c49c0d5236f6ddb66084886d065e746667149bab6832a8ac2883118d54882b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 348,
+      "hasStructuralAnalysis": true
+    },
+    "build.sh": {
+      "filePath": "build.sh",
+      "contentHash": "8c083ca662b50ceda1be791e25c150b4b4f9546fca7506905d29ec373c1518d2",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 19,
+      "hasStructuralAnalysis": true
+    },
+    "CHANGELOG.md": {
+      "filePath": "CHANGELOG.md",
+      "contentHash": "6d93b56c5f52e1b4be8d786d7aae18971ea018ea4f29c72a64339436d1802e87",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 160,
+      "hasStructuralAnalysis": true
+    },
+    "CLAUDE.md": {
+      "filePath": "CLAUDE.md",
+      "contentHash": "68c49c0d5236f6ddb66084886d065e746667149bab6832a8ac2883118d54882b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 348,
+      "hasStructuralAnalysis": true
+    },
+    "DEPENDENCIES.md": {
+      "filePath": "DEPENDENCIES.md",
+      "contentHash": "6d3b1e527fbd42cfd85730b12e265ecc8b229f2fe482d5a49c3b0ce6d68db5fb",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 74,
+      "hasStructuralAnalysis": true
+    },
+    "docs/_config.yml": {
+      "filePath": "docs/_config.yml",
+      "contentHash": "410c5c8e756d69fa68bad4b3ce877650d123fca78b053da901de56898a406bc8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 77,
+      "hasStructuralAnalysis": true
+    },
+    "docs/api.md": {
+      "filePath": "docs/api.md",
+      "contentHash": "27c476dbbc1a449535f5bc624dae7406ce40860437690c8443e50919ef956efa",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 442,
+      "hasStructuralAnalysis": true
+    },
+    "docs/cli.md": {
+      "filePath": "docs/cli.md",
+      "contentHash": "48343bab2ed0b9654872b421cf1581accbf9e581e02c4fd9363ffb43ab31d7bd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 369,
+      "hasStructuralAnalysis": true
+    },
+    "docs/configuration.md": {
+      "filePath": "docs/configuration.md",
+      "contentHash": "8f895f3fe1288547c04dc2c714ddc082c665312663e88003e51e91dddb979caa",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 435,
+      "hasStructuralAnalysis": true
+    },
+    "docs/index.md": {
+      "filePath": "docs/index.md",
+      "contentHash": "280205b464c2d6cf8a1f9de2feff6afea53a00cc30ddd70336b780d7e29146b6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 150,
+      "hasStructuralAnalysis": true
+    },
+    "docs/installation.md": {
+      "filePath": "docs/installation.md",
+      "contentHash": "03c1b2ae9124285494f31d08c2546ff54a74b5c55d0ec270f3352ec0860d0a45",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 180,
+      "hasStructuralAnalysis": true
+    },
+    "examples/benchmark_results.json": {
+      "filePath": "examples/benchmark_results.json",
+      "contentHash": "25a314e2250ff5d3ba207b8f693656c01f69994553246c05a78904de8f64b0db",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 314,
+      "hasStructuralAnalysis": true
+    },
+    "examples/benchmark_results.md": {
+      "filePath": "examples/benchmark_results.md",
+      "contentHash": "22551feaa5e7071cbdfa54c92aa1f73790009c583cd6bd46e58318b7c222c5e7",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 127,
+      "hasStructuralAnalysis": true
+    },
+    "examples/benchmark.py": {
+      "filePath": "examples/benchmark.py",
+      "contentHash": "2b805266137947102595fd90f5825c60cf68ee3c7b4247f0a8ab80712a846191",
+      "functions": [
+        {
+          "name": "sanitize_name",
+          "params": [
+            "name"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "get_engine_descriptor",
+          "params": [
+            "selector",
+            "cfg"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 39
+        },
+        {
+          "name": "resolve_provider_to_engines",
+          "params": [
+            "provider",
+            "cfg"
+          ],
+          "returnType": "list[str]",
+          "exported": true,
+          "lineCount": 26
+        },
+        {
+          "name": "main",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 2
+        }
+      ],
+      "classes": [
+        {
+          "name": "BenchmarkRunner",
+          "methods": [
+            "run"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 298
+        }
+      ],
+      "imports": [
+        {
+          "source": "contextlib",
+          "specifiers": [
+            "contextlib"
+          ]
+        },
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "re",
+          "specifiers": [
+            "re"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "time",
+          "specifiers": [
+            "time"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": "fire",
+          "specifiers": [
+            "fire"
+          ]
+        },
+        {
+          "source": "rich.console",
+          "specifiers": [
+            "Console"
+          ]
+        },
+        {
+          "source": "rich.table",
+          "specifiers": [
+            "Table"
+          ]
+        },
+        {
+          "source": "abersetz.config",
+          "specifiers": [
+            "load_config"
+          ]
+        },
+        {
+          "source": "abersetz.engine_catalog",
+          "specifiers": [
+            "normalize_selector"
+          ]
+        },
+        {
+          "source": "abersetz.pipeline",
+          "specifiers": [
+            "TranslatorOptions",
+            "translate_path"
+          ]
+        }
+      ],
+      "exports": [
+        "sanitize_name",
+        "get_engine_descriptor",
+        "resolve_provider_to_engines",
+        "BenchmarkRunner",
+        "main"
+      ],
+      "totalLines": 424,
+      "hasStructuralAnalysis": true
+    },
+    "examples/data/fontlab/fontlab-7-tldr.en.md": {
+      "filePath": "examples/data/fontlab/fontlab-7-tldr.en.md",
+      "contentHash": "c83ea970d45f4497c9fe521bec4e0a908a338ff33db4d807ae5e3c22ebc38f49",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 840,
+      "hasStructuralAnalysis": true
+    },
+    "examples/data/fontlab/fontlab-7-tldr.pl--dt-google.md": {
+      "filePath": "examples/data/fontlab/fontlab-7-tldr.pl--dt-google.md",
+      "contentHash": "d4c0035dedf7e38070dc305b83e89a8359255ac92ca670eed1e337d5f022c090",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 699,
+      "hasStructuralAnalysis": true
+    },
+    "examples/data/fontlab/fontlab-7-tldr.pl--mthy-mlx-1.8b-mlx.md": {
+      "filePath": "examples/data/fontlab/fontlab-7-tldr.pl--mthy-mlx-1.8b-mlx.md",
+      "contentHash": "40ccf31428647cc00f5bea5e1bf770071db8608f19d3a3489f18fe750c425067",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 719,
+      "hasStructuralAnalysis": true
+    },
+    "examples/data/fontlab/fontlab-7-tldr.pl--tr-google.md": {
+      "filePath": "examples/data/fontlab/fontlab-7-tldr.pl--tr-google.md",
+      "contentHash": "ef3d79c9875333c36ef94208addf08afc57a02728347cf1c683f89fbecdef941",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 699,
+      "hasStructuralAnalysis": true
+    },
+    "examples/data/poem/poem.en.md": {
+      "filePath": "examples/data/poem/poem.en.md",
+      "contentHash": "39dfde558aae319e612e7a035be5b0535c176a6190af61c011ab22f64967f7b6",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 33,
+      "hasStructuralAnalysis": true
+    },
+    "examples/data/poem/poem.pl--dt-google.md": {
+      "filePath": "examples/data/poem/poem.pl--dt-google.md",
+      "contentHash": "8885040ec639be9b8bcefbdf57a840dc27c3924479d0dc56a43181782358380d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 32,
+      "hasStructuralAnalysis": true
+    },
+    "examples/data/poem/poem.pl--mthy-gguf-1.8b-gguf.md": {
+      "filePath": "examples/data/poem/poem.pl--mthy-gguf-1.8b-gguf.md",
+      "contentHash": "83ea89407697e234d56c5ab68437fc731859e2c811e1575ca34abaea0ea0b39a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 32,
+      "hasStructuralAnalysis": true
+    },
+    "examples/data/poem/poem.pl--mthy-mlx-1.8b-mlx.md": {
+      "filePath": "examples/data/poem/poem.pl--mthy-mlx-1.8b-mlx.md",
+      "contentHash": "064ac78c816bb87f5119cab1e18deeec735effa1e500ced2503e4087d28d87ed",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 32,
+      "hasStructuralAnalysis": true
+    },
+    "examples/data/poem/poem.pl--tr-google.md": {
+      "filePath": "examples/data/poem/poem.pl--tr-google.md",
+      "contentHash": "764e35f61ae918da606f4b38163022816965e3ca801637cec4d22973cd1c931b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 32,
+      "hasStructuralAnalysis": true
+    },
+    "examples/README.md": {
+      "filePath": "examples/README.md",
+      "contentHash": "49287464a8e656544b3e7b09dbc476dce13b1f09dc70b74144255a092e05022d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 36,
+      "hasStructuralAnalysis": true
+    },
+    "GEMINI.md": {
+      "filePath": "GEMINI.md",
+      "contentHash": "68c49c0d5236f6ddb66084886d065e746667149bab6832a8ac2883118d54882b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 348,
+      "hasStructuralAnalysis": true
+    },
+    "IDEA.md": {
+      "filePath": "IDEA.md",
+      "contentHash": "bade462add9f49c68653f0cd70f4100a03bceb6e196d719e61fc3171d2e05619",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 169,
+      "hasStructuralAnalysis": true
+    },
+    "install.sh": {
+      "filePath": "install.sh",
+      "contentHash": "11ed8c226f8d5f94f7e458de91713f1ba37cf3ce18695e38f62173de8a93d81f",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 11,
+      "hasStructuralAnalysis": true
+    },
+    "LLXPRT.md": {
+      "filePath": "LLXPRT.md",
+      "contentHash": "68c49c0d5236f6ddb66084886d065e746667149bab6832a8ac2883118d54882b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 348,
+      "hasStructuralAnalysis": true
+    },
+    "package.toml": {
+      "filePath": "package.toml",
+      "contentHash": "b046c9e2d9813a021682367988b31dc3cff9070e537e191d1c9dea1e86ae1cf8",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 11,
+      "hasStructuralAnalysis": true
+    },
+    "publish.sh": {
+      "filePath": "publish.sh",
+      "contentHash": "fc9e7b41dbe74304c15dc355a27392971be83378b4f2879a1deaf20701dfc024",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 31,
+      "hasStructuralAnalysis": true
+    },
+    "pyproject.toml": {
+      "filePath": "pyproject.toml",
+      "contentHash": "282ef0439e642d081c078701f147315de73fbef5713babcc024d5df5b6d0ef60",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 172,
+      "hasStructuralAnalysis": true
+    },
+    "QWEN.md": {
+      "filePath": "QWEN.md",
+      "contentHash": "68c49c0d5236f6ddb66084886d065e746667149bab6832a8ac2883118d54882b",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 348,
+      "hasStructuralAnalysis": true
+    },
+    "README.md": {
+      "filePath": "README.md",
+      "contentHash": "005cef9a10533e6b6c485110ac6584c3155110e31dcbd6bcc102b47058451a29",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 125,
+      "hasStructuralAnalysis": true
+    },
+    "SPEC.md": {
+      "filePath": "SPEC.md",
+      "contentHash": "f2f86f5dc64810eee6282ba43ecaacd04cb13f7e83fcd561fd0c15f6f1056947",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 110,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/__init__.py": {
+      "filePath": "src/abersetz/__init__.py",
+      "contentHash": "82e16f7637cfbf069aba07125afca7e6649fa35404b5f30f37f033bbd6701d0a",
+      "functions": [
+        {
+          "name": "__getattr__",
+          "params": [
+            "name"
+          ],
+          "returnType": "Any",
+          "exported": true,
+          "lineCount": 24
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "importlib",
+          "specifiers": [
+            "_metadata"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "TYPE_CHECKING",
+            "Any"
+          ]
+        }
+      ],
+      "exports": [
+        "__getattr__"
+      ],
+      "totalLines": 70,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/__main__.py": {
+      "filePath": "src/abersetz/__main__.py",
+      "contentHash": "c29c4a246db1e9ef549926b2232fc6415963f4c1fcd5a8ab1b284d7a6470c9c6",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": ".cli_fast",
+          "specifiers": [
+            "main"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 10,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/abersetz.py": {
+      "filePath": "src/abersetz/abersetz.py",
+      "contentHash": "cfc96ff5842dbf7d710d78eff333ece07ae91a164eecb220a74c44593d06212c",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": ".pipeline",
+          "specifiers": [
+            "PipelineError",
+            "TranslationResult",
+            "TranslatorOptions",
+            "translate_path"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 16,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/chunking.py": {
+      "filePath": "src/abersetz/chunking.py",
+      "contentHash": "a714cca9c1c13499a173e89c41b007642e08228414c3890da594483d1fe7a087",
+      "functions": [
+        {
+          "name": "detect_format",
+          "params": [
+            "text"
+          ],
+          "returnType": "TextFormat",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "_fallback_chunks",
+          "params": [
+            "text",
+            "max_size"
+          ],
+          "returnType": "list[str]",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "_semantic_chunks",
+          "params": [
+            "text",
+            "max_size"
+          ],
+          "returnType": "Iterable[str]",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "chunk_text",
+          "params": [
+            "text",
+            "max_size",
+            "fmt"
+          ],
+          "returnType": "list[str]",
+          "exported": true,
+          "lineCount": 9
+        }
+      ],
+      "classes": [
+        {
+          "name": "TextFormat",
+          "methods": [],
+          "properties": [],
+          "exported": true,
+          "lineCount": 7
+        }
+      ],
+      "imports": [
+        {
+          "source": "re",
+          "specifiers": [
+            "re"
+          ]
+        },
+        {
+          "source": "collections.abc",
+          "specifiers": [
+            "Iterable"
+          ]
+        },
+        {
+          "source": "enum",
+          "specifiers": [
+            "Enum"
+          ]
+        }
+      ],
+      "exports": [
+        "TextFormat",
+        "detect_format",
+        "_fallback_chunks",
+        "_semantic_chunks",
+        "chunk_text"
+      ],
+      "totalLines": 66,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/cli_fast.py": {
+      "filePath": "src/abersetz/cli_fast.py",
+      "contentHash": "15cf5afbba07710ee7863d259edcd2f2f73c25e5b5f9630d2f0b3352dda56d4d",
+      "functions": [
+        {
+          "name": "handle_version",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "main",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 11
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        }
+      ],
+      "exports": [
+        "handle_version",
+        "main"
+      ],
+      "totalLines": 42,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/cli.py": {
+      "filePath": "src/abersetz/cli.py",
+      "contentHash": "992b6f06572c9a5babae038918affbf936038e54524ed44f30c2d66af014fe6f",
+      "functions": [
+        {
+          "name": "_configure_logging",
+          "params": [
+            "verbose"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "_parse_patterns",
+          "params": [
+            "value"
+          ],
+          "returnType": "tuple[str, ...]",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "_load_json_data",
+          "params": [
+            "reference"
+          ],
+          "returnType": "dict[str, str]",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "_render_results",
+          "params": [
+            "results"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "_render_engine_entries",
+          "params": [
+            "entries"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 21
+        },
+        {
+          "name": "_render_validation_entries",
+          "params": [
+            "results"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "_collect_engine_entries",
+          "params": [
+            "include_paid",
+            "family",
+            "configured_only"
+          ],
+          "returnType": "list[EngineEntry]",
+          "exported": true,
+          "lineCount": 141
+        },
+        {
+          "name": "_validate_language_code",
+          "params": [
+            "code",
+            "param_name"
+          ],
+          "returnType": "str | None",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "_build_options_from_cli",
+          "params": [
+            "path",
+            "engine",
+            "from_lang",
+            "to_lang",
+            "recurse",
+            "write_over",
+            "output",
+            "save_voc",
+            "chunk_size",
+            "html_chunk_size",
+            "include",
+            "xclude",
+            "dry_run",
+            "prolog",
+            "voc",
+            "temperature",
+            "n_gpu_layers",
+            "n_ctx",
+            "max_tokens",
+            "n_threads"
+          ],
+          "returnType": "TranslatorOptions",
+          "exported": true,
+          "lineCount": 55
+        },
+        {
+          "name": "_iter_language_rows",
+          "params": [],
+          "returnType": "list[str]",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "main",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "abtr_main",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 10
+        }
+      ],
+      "classes": [
+        {
+          "name": "ConfigCommands",
+          "methods": [
+            "show",
+            "path"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 26
+        },
+        {
+          "name": "AbersetzCLI",
+          "methods": [
+            "version",
+            "tr",
+            "config",
+            "lang",
+            "engines",
+            "setup",
+            "validate",
+            "discover"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 249
+        }
+      ],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "collections.abc",
+          "specifiers": [
+            "Iterable",
+            "Sequence"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "fire",
+          "specifiers": [
+            "fire"
+          ]
+        },
+        {
+          "source": "tomli_w",
+          "specifiers": [
+            "tomli_w"
+          ]
+        },
+        {
+          "source": "loguru",
+          "specifiers": [
+            "logger"
+          ]
+        },
+        {
+          "source": "rich.console",
+          "specifiers": [
+            "Console"
+          ]
+        },
+        {
+          "source": "rich.table",
+          "specifiers": [
+            "Table"
+          ]
+        },
+        {
+          "source": ".config",
+          "specifiers": [
+            "config_path",
+            "load_config"
+          ]
+        },
+        {
+          "source": ".engine_catalog",
+          "specifiers": [
+            "DEEP_TRANSLATOR_PAID_PROVIDERS",
+            "PAID_TRANSLATOR_PROVIDERS",
+            "EngineEntry",
+            "collect_deep_translator_providers",
+            "collect_translator_providers",
+            "normalize_selector"
+          ]
+        }
+      ],
+      "exports": [
+        "_configure_logging",
+        "_parse_patterns",
+        "_load_json_data",
+        "_render_results",
+        "_render_engine_entries",
+        "_render_validation_entries",
+        "_collect_engine_entries",
+        "ConfigCommands",
+        "_validate_language_code",
+        "_build_options_from_cli",
+        "_iter_language_rows",
+        "AbersetzCLI",
+        "main",
+        "abtr_main"
+      ],
+      "totalLines": 654,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/config.py": {
+      "filePath": "src/abersetz/config.py",
+      "contentHash": "ad6a582631f39aa55cae611a9bf64bf9cef299461ee629fdbc341fea24e7b5f3",
+      "functions": [
+        {
+          "name": "_default_dict",
+          "params": [],
+          "returnType": "dict[str, Any]",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "_default_config",
+          "params": [],
+          "returnType": "AbersetzConfig",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "config_dir",
+          "params": [],
+          "returnType": "Path",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "config_path",
+          "params": [],
+          "returnType": "Path",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "load_config",
+          "params": [],
+          "returnType": "AbersetzConfig",
+          "exported": true,
+          "lineCount": 38
+        },
+        {
+          "name": "save_config",
+          "params": [
+            "config"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "resolve_credential",
+          "params": [
+            "config",
+            "reference"
+          ],
+          "returnType": "str | None",
+          "exported": true,
+          "lineCount": 36
+        }
+      ],
+      "classes": [
+        {
+          "name": "Defaults",
+          "methods": [
+            "__setattr__",
+            "to_dict",
+            "from_dict"
+          ],
+          "properties": [
+            "engine",
+            "from_lang",
+            "to_lang",
+            "chunk_size",
+            "html_chunk_size"
+          ],
+          "exported": true,
+          "lineCount": 37
+        },
+        {
+          "name": "Credential",
+          "methods": [
+            "to_dict",
+            "from_any"
+          ],
+          "properties": [
+            "name",
+            "env",
+            "value"
+          ],
+          "exported": true,
+          "lineCount": 34
+        },
+        {
+          "name": "EngineConfig",
+          "methods": [
+            "to_dict",
+            "from_dict"
+          ],
+          "properties": [
+            "name",
+            "chunk_size",
+            "html_chunk_size",
+            "credential",
+            "options"
+          ],
+          "exported": true,
+          "lineCount": 32
+        },
+        {
+          "name": "AbersetzConfig",
+          "methods": [
+            "to_dict",
+            "from_dict"
+          ],
+          "properties": [
+            "defaults",
+            "credentials",
+            "engines"
+          ],
+          "exported": true,
+          "lineCount": 28
+        }
+      ],
+      "imports": [
+        {
+          "source": "contextlib",
+          "specifiers": [
+            "contextlib"
+          ]
+        },
+        {
+          "source": "copy",
+          "specifiers": [
+            "copy"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "collections.abc",
+          "specifiers": [
+            "Mapping"
+          ]
+        },
+        {
+          "source": "dataclasses",
+          "specifiers": [
+            "dataclass",
+            "field"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": "platformdirs",
+          "specifiers": [
+            "user_config_dir"
+          ]
+        },
+        {
+          "source": ".engine_catalog",
+          "specifiers": [
+            "DEEP_TRANSLATOR_FREE_PROVIDERS",
+            "FREE_TRANSLATOR_PROVIDERS",
+            "ULLM_DEFAULT_MODEL",
+            "ULLM_DEFAULT_TEMPERATURE",
+            "normalize_selector"
+          ]
+        },
+        {
+          "source": "tomli_w",
+          "specifiers": [
+            "tomli_w"
+          ]
+        }
+      ],
+      "exports": [
+        "Defaults",
+        "Credential",
+        "EngineConfig",
+        "AbersetzConfig",
+        "_default_dict",
+        "_default_config",
+        "config_dir",
+        "config_path",
+        "load_config",
+        "save_config",
+        "resolve_credential"
+      ],
+      "totalLines": 357,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/engine_catalog.py": {
+      "filePath": "src/abersetz/engine_catalog.py",
+      "contentHash": "62cba6de431f3a304e3c24d77a845769bf1c5dcddd02464b3bf6f794026dd909",
+      "functions": [
+        {
+          "name": "_split_selector",
+          "params": [
+            "selector"
+          ],
+          "returnType": "tuple[str, str | None]",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "normalize_selector",
+          "params": [
+            "selector"
+          ],
+          "returnType": "str | None",
+          "exported": true,
+          "lineCount": 21
+        },
+        {
+          "name": "resolve_engine_reference",
+          "params": [
+            "selector"
+          ],
+          "returnType": "tuple[str, str | None]",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "_filter_available",
+          "params": [
+            "pool",
+            "allowed"
+          ],
+          "returnType": "list[str]",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "collect_translator_providers",
+          "params": [
+            "include_paid"
+          ],
+          "returnType": "list[str]",
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "collect_deep_translator_providers",
+          "params": [
+            "include_paid"
+          ],
+          "returnType": "list[str]",
+          "exported": true,
+          "lineCount": 14
+        }
+      ],
+      "classes": [
+        {
+          "name": "EngineEntry",
+          "methods": [],
+          "properties": [
+            "selector",
+            "configured",
+            "requires_api_key",
+            "notes"
+          ],
+          "exported": true,
+          "lineCount": 9
+        }
+      ],
+      "imports": [
+        {
+          "source": "collections.abc",
+          "specifiers": [
+            "Iterable"
+          ]
+        },
+        {
+          "source": "dataclasses",
+          "specifiers": [
+            "dataclass"
+          ]
+        }
+      ],
+      "exports": [
+        "_split_selector",
+        "normalize_selector",
+        "resolve_engine_reference",
+        "_filter_available",
+        "collect_translator_providers",
+        "collect_deep_translator_providers",
+        "EngineEntry"
+      ],
+      "totalLines": 185,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/engines.py": {
+      "filePath": "src/abersetz/engines.py",
+      "contentHash": "b7d6e0f03aa413d1faecffc81b48a58107801e4eaf3b5baf99f919e253b16b72",
+      "functions": [
+        {
+          "name": "_make_openai_client",
+          "params": [
+            "token",
+            "base_url"
+          ],
+          "returnType": "OpenAI",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "_build_llm_engine",
+          "params": [
+            "selector",
+            "config",
+            "engine_cfg",
+            "profile",
+            "client",
+            "temperature"
+          ],
+          "returnType": "Engine",
+          "exported": true,
+          "lineCount": 37
+        },
+        {
+          "name": "_translators_provider",
+          "params": [
+            "variant",
+            "engine_cfg"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "_select_profile",
+          "params": [
+            "engine_cfg",
+            "variant"
+          ],
+          "returnType": "Mapping[str, Any] | None",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "create_engine",
+          "params": [
+            "selector",
+            "config",
+            "client",
+            "temperature",
+            "n_gpu_layers",
+            "n_ctx",
+            "max_tokens",
+            "n_threads"
+          ],
+          "returnType": "Engine",
+          "exported": true,
+          "lineCount": 141
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "collections.abc",
+          "specifiers": [
+            "Mapping"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": ".config",
+          "specifiers": [
+            "AbersetzConfig",
+            "EngineConfig",
+            "resolve_credential"
+          ]
+        },
+        {
+          "source": ".engine_catalog",
+          "specifiers": [
+            "normalize_selector",
+            "resolve_engine_reference"
+          ]
+        },
+        {
+          "source": ".openai_lite",
+          "specifiers": [
+            "OpenAI"
+          ]
+        },
+        {
+          "source": ".providers",
+          "specifiers": [
+            "DeepTranslatorEngine",
+            "Engine",
+            "EngineBase",
+            "EngineError",
+            "EngineRequest",
+            "EngineResult",
+            "LlmEngine",
+            "LmstudioEngine",
+            "LocalGgufEngine",
+            "LocalMlxEngine",
+            "TranslatorsEngine"
+          ]
+        },
+        {
+          "source": ".providers.mlx",
+          "specifiers": [
+            "_resolve_mthy_language"
+          ]
+        }
+      ],
+      "exports": [
+        "_make_openai_client",
+        "_build_llm_engine",
+        "_translators_provider",
+        "_select_profile",
+        "create_engine"
+      ],
+      "totalLines": 248,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/openai_lite.py": {
+      "filePath": "src/abersetz/openai_lite.py",
+      "contentHash": "ac6c6f0e28b548cd385e64ac8ddb28e99cf568817a78619b7a72a620b1d55d7b",
+      "functions": [],
+      "classes": [
+        {
+          "name": "ChatCompletionMessage",
+          "methods": [],
+          "properties": [
+            "content",
+            "role"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "ChatCompletionChoice",
+          "methods": [],
+          "properties": [
+            "message",
+            "index",
+            "finish_reason"
+          ],
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "ChatCompletionResponse",
+          "methods": [],
+          "properties": [
+            "choices",
+            "id",
+            "model",
+            "usage"
+          ],
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "ChatCompletions",
+          "methods": [
+            "__init__",
+            "create"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 57
+        },
+        {
+          "name": "OpenAI",
+          "methods": [
+            "__init__"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "Chat",
+          "methods": [
+            "__init__"
+          ],
+          "properties": [
+            "completions"
+          ],
+          "exported": true,
+          "lineCount": 7
+        }
+      ],
+      "imports": [
+        {
+          "source": "dataclasses",
+          "specifiers": [
+            "dataclass"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": "httpx",
+          "specifiers": [
+            "httpx"
+          ]
+        },
+        {
+          "source": "tenacity",
+          "specifiers": [
+            "retry",
+            "stop_after_attempt",
+            "wait_exponential"
+          ]
+        }
+      ],
+      "exports": [
+        "ChatCompletionMessage",
+        "ChatCompletionChoice",
+        "ChatCompletionResponse",
+        "ChatCompletions",
+        "OpenAI",
+        "Chat"
+      ],
+      "totalLines": 136,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/pipeline.py": {
+      "filePath": "src/abersetz/pipeline.py",
+      "contentHash": "4b8958fbfa7de86d11109ca2c44e7988ee6d66e46ae7cd30ab245dfebdd43f24",
+      "functions": [
+        {
+          "name": "translate_path",
+          "params": [
+            "path",
+            "options",
+            "config",
+            "client"
+          ],
+          "returnType": "list[TranslationResult]",
+          "exported": true,
+          "lineCount": 57
+        },
+        {
+          "name": "_merge_defaults",
+          "params": [
+            "options",
+            "config"
+          ],
+          "returnType": "TranslatorOptions",
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "_discover_files",
+          "params": [
+            "root",
+            "opts"
+          ],
+          "returnType": "Iterable[Path]",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "_is_xcluded",
+          "params": [
+            "path",
+            "patterns"
+          ],
+          "returnType": "bool",
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "_translate_file",
+          "params": [
+            "source",
+            "engine",
+            "opts",
+            "config"
+          ],
+          "returnType": "TranslationResult",
+          "exported": true,
+          "lineCount": 74
+        },
+        {
+          "name": "_translate_html",
+          "params": [
+            "text",
+            "engine",
+            "opts",
+            "config"
+          ],
+          "returnType": "tuple[str, int, dict[str, str]]",
+          "exported": true,
+          "lineCount": 69
+        },
+        {
+          "name": "_cached_translate_call",
+          "params": [
+            "engine_name",
+            "model_name",
+            "text",
+            "source_lang",
+            "target_lang",
+            "is_html",
+            "voc_json",
+            "prolog_json",
+            "temperature"
+          ],
+          "returnType": "tuple[str, str]",
+          "exported": true,
+          "lineCount": 30
+        },
+        {
+          "name": "_apply_engine",
+          "params": [
+            "engine",
+            "chunks",
+            "fmt",
+            "opts",
+            "config"
+          ],
+          "returnType": "tuple[list[EngineResult], dict[str, str]]",
+          "exported": true,
+          "lineCount": 49
+        },
+        {
+          "name": "_build_request",
+          "params": [
+            "chunk",
+            "index",
+            "total",
+            "fmt",
+            "opts",
+            "config",
+            "voc",
+            "prolog"
+          ],
+          "returnType": "EngineRequest",
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "_select_chunk_size",
+          "params": [
+            "fmt",
+            "engine",
+            "opts",
+            "config"
+          ],
+          "returnType": "int",
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "_persist_output",
+          "params": [
+            "source",
+            "content",
+            "voc",
+            "fmt",
+            "opts",
+            "target_lang"
+          ],
+          "returnType": "Path",
+          "exported": true,
+          "lineCount": 20
+        }
+      ],
+      "classes": [
+        {
+          "name": "TranslatorOptions",
+          "methods": [],
+          "properties": [
+            "engine",
+            "from_lang",
+            "to_lang",
+            "recurse",
+            "write_over",
+            "output_dir",
+            "save_voc",
+            "chunk_size",
+            "html_chunk_size",
+            "include",
+            "xclude",
+            "dry_run",
+            "prolog",
+            "initial_voc",
+            "temperature",
+            "n_gpu_layers",
+            "n_ctx",
+            "max_tokens",
+            "n_threads"
+          ],
+          "exported": true,
+          "lineCount": 24
+        },
+        {
+          "name": "TranslationResult",
+          "methods": [],
+          "properties": [
+            "source",
+            "destination",
+            "chunks",
+            "voc",
+            "format",
+            "engine",
+            "source_lang",
+            "target_lang",
+            "chunk_size"
+          ],
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "PipelineError",
+          "methods": [],
+          "properties": [],
+          "exported": true,
+          "lineCount": 4
+        }
+      ],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "threading",
+          "specifiers": [
+            "threading"
+          ]
+        },
+        {
+          "source": "collections.abc",
+          "specifiers": [
+            "Iterable"
+          ]
+        },
+        {
+          "source": "dataclasses",
+          "specifiers": [
+            "dataclass",
+            "field"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": ".chunking",
+          "specifiers": [
+            "TextFormat",
+            "chunk_text",
+            "detect_format"
+          ]
+        },
+        {
+          "source": ".config",
+          "specifiers": [
+            "AbersetzConfig",
+            "load_config"
+          ]
+        },
+        {
+          "source": ".engine_catalog",
+          "specifiers": [
+            "normalize_selector"
+          ]
+        },
+        {
+          "source": ".engines",
+          "specifiers": [
+            "Engine",
+            "EngineRequest",
+            "EngineResult",
+            "create_engine"
+          ]
+        }
+      ],
+      "exports": [
+        "TranslatorOptions",
+        "TranslationResult",
+        "PipelineError",
+        "translate_path",
+        "_merge_defaults",
+        "_discover_files",
+        "_is_xcluded",
+        "_translate_file",
+        "_translate_html",
+        "_cached_translate_call",
+        "_apply_engine",
+        "_build_request",
+        "_select_chunk_size",
+        "_persist_output"
+      ],
+      "totalLines": 476,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/__init__.py": {
+      "filePath": "src/abersetz/providers/__init__.py",
+      "contentHash": "eaed234447b8a3851d316ac3a531b85e0eb1674e788c632bead4dbe986300e18",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": ".base",
+          "specifiers": [
+            "Engine",
+            "EngineBase",
+            "EngineError",
+            "EngineRequest",
+            "EngineResult"
+          ]
+        },
+        {
+          "source": ".deep_translator",
+          "specifiers": [
+            "DeepTranslatorEngine"
+          ]
+        },
+        {
+          "source": ".gguf",
+          "specifiers": [
+            "LocalGgufEngine"
+          ]
+        },
+        {
+          "source": ".llm",
+          "specifiers": [
+            "LlmEngine"
+          ]
+        },
+        {
+          "source": ".lmstudio",
+          "specifiers": [
+            "LmstudioEngine"
+          ]
+        },
+        {
+          "source": ".mlx",
+          "specifiers": [
+            "LocalMlxEngine"
+          ]
+        },
+        {
+          "source": ".translators",
+          "specifiers": [
+            "TranslatorsEngine"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 26,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/base.py": {
+      "filePath": "src/abersetz/providers/base.py",
+      "contentHash": "a9444b3f3b9917d3878ab1874fc6fbe8d16d4f45c29725531056bfbc549f0c1f",
+      "functions": [],
+      "classes": [
+        {
+          "name": "EngineError",
+          "methods": [],
+          "properties": [],
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "EngineRequest",
+          "methods": [],
+          "properties": [
+            "text",
+            "source_lang",
+            "target_lang",
+            "is_html",
+            "voc",
+            "prolog",
+            "chunk_index",
+            "total_chunks"
+          ],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "EngineResult",
+          "methods": [],
+          "properties": [
+            "text",
+            "voc"
+          ],
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "Engine",
+          "methods": [
+            "translate",
+            "chunk_size_for"
+          ],
+          "properties": [
+            "name",
+            "chunk_size",
+            "html_chunk_size"
+          ],
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "EngineBase",
+          "methods": [
+            "__init__",
+            "chunk_size_for"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 17
+        }
+      ],
+      "imports": [
+        {
+          "source": "dataclasses",
+          "specifiers": [
+            "dataclass"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Protocol"
+          ]
+        },
+        {
+          "source": "..chunking",
+          "specifiers": [
+            "TextFormat"
+          ]
+        }
+      ],
+      "exports": [
+        "EngineError",
+        "EngineRequest",
+        "EngineResult",
+        "Engine",
+        "EngineBase"
+      ],
+      "totalLines": 68,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/deep_translator.py": {
+      "filePath": "src/abersetz/providers/deep_translator.py",
+      "contentHash": "4e00ecf2615fc919f4517a670113351ca3898d2060cca2b5d0b5f6c4d8f3d112",
+      "functions": [],
+      "classes": [
+        {
+          "name": "DeepTranslatorEngine",
+          "methods": [
+            "_get_providers",
+            "__init__",
+            "_resolve_lang",
+            "_translate_with_retry",
+            "translate"
+          ],
+          "properties": [
+            "PROVIDERS"
+          ],
+          "exported": true,
+          "lineCount": 128
+        }
+      ],
+      "imports": [
+        {
+          "source": "collections.abc",
+          "specifiers": [
+            "Mapping"
+          ]
+        },
+        {
+          "source": "tenacity",
+          "specifiers": [
+            "retry",
+            "stop_after_attempt",
+            "wait_exponential"
+          ]
+        },
+        {
+          "source": "..config",
+          "specifiers": [
+            "EngineConfig"
+          ]
+        },
+        {
+          "source": ".base",
+          "specifiers": [
+            "EngineBase",
+            "EngineError",
+            "EngineRequest",
+            "EngineResult"
+          ]
+        }
+      ],
+      "exports": [
+        "DeepTranslatorEngine"
+      ],
+      "totalLines": 141,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/gguf.py": {
+      "filePath": "src/abersetz/providers/gguf.py",
+      "contentHash": "3082fc2ad926d2fb11825385725be377239b98a1346db3a887fe1f85087674ed",
+      "functions": [],
+      "classes": [
+        {
+          "name": "LocalGgufEngine",
+          "methods": [
+            "__init__",
+            "translate"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 68
+        }
+      ],
+      "imports": [
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": "..config",
+          "specifiers": [
+            "EngineConfig"
+          ]
+        },
+        {
+          "source": ".base",
+          "specifiers": [
+            "EngineBase",
+            "EngineError",
+            "EngineRequest",
+            "EngineResult"
+          ]
+        },
+        {
+          "source": ".mlx",
+          "specifiers": [
+            "_resolve_mthy_language",
+            "build_mthy_prompt",
+            "resolve_and_download_model"
+          ]
+        }
+      ],
+      "exports": [
+        "LocalGgufEngine"
+      ],
+      "totalLines": 81,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/llm/__init__.py": {
+      "filePath": "src/abersetz/providers/llm/__init__.py",
+      "contentHash": "1abe8cfb9f2a435e9eb4309d3d17b89a4c481e2338d0ef3080eca216805216b1",
+      "functions": [],
+      "classes": [],
+      "imports": [
+        {
+          "source": ".discovery",
+          "specifiers": [
+            "Endpoint",
+            "all_endpoints",
+            "discover_env_endpoints",
+            "fetch_models",
+            "load_recommended_settings",
+            "resolve_model"
+          ]
+        },
+        {
+          "source": ".inference",
+          "specifiers": [
+            "LlmEngine"
+          ]
+        }
+      ],
+      "exports": [],
+      "totalLines": 23,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/llm/api/anthropic.py": {
+      "filePath": "src/abersetz/providers/llm/api/anthropic.py",
+      "contentHash": "903479731ec48413e72c6b3a398738eeb824b3a5c976c0e31bbd66655c99063c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 12,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/llm/api/deepseek.py": {
+      "filePath": "src/abersetz/providers/llm/api/deepseek.py",
+      "contentHash": "72d41b962a7d7c9f301c9de0329aa49e922cd7d348a2ed3935fc543b39423484",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 11,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/llm/api/gemini.py": {
+      "filePath": "src/abersetz/providers/llm/api/gemini.py",
+      "contentHash": "404c410cadd0d029b30d71a221c02cc91ac092b2ba6755954a100300de6ec693",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 13,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/llm/api/groq.py": {
+      "filePath": "src/abersetz/providers/llm/api/groq.py",
+      "contentHash": "ae8aa1262164c8c51458eb0bdc4f7f519906eefd30ccf04f085b4a094a03ae9d",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 14,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/llm/api/lmstudio.py": {
+      "filePath": "src/abersetz/providers/llm/api/lmstudio.py",
+      "contentHash": "89810a2a3312260b0dfa01f2faabab773bcaf99216c7fdaa8ece0eb6d4c7d88c",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 10,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/llm/api/openai.py": {
+      "filePath": "src/abersetz/providers/llm/api/openai.py",
+      "contentHash": "3c470dab2cc765427be64d8e395b0a58d6820a1cd6f1bf35eade7aad7088e885",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 13,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/llm/api/openrouter.py": {
+      "filePath": "src/abersetz/providers/llm/api/openrouter.py",
+      "contentHash": "74fae8daca8bda51bedd34a053dbbd9695961b57cf6c1ec2965e71b560f13d93",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 13,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/llm/api/siliconflow.py": {
+      "filePath": "src/abersetz/providers/llm/api/siliconflow.py",
+      "contentHash": "5e0ed72c897a83fdce756b4a7135d17a47037109f1c957385b9cd0120f1e99b3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 14,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/llm/api/together.py": {
+      "filePath": "src/abersetz/providers/llm/api/together.py",
+      "contentHash": "2a6a64e48b1f4774b934b84f29024a95ddf90598e942f5bf1679033331ae2613",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 12,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/llm/discovery.py": {
+      "filePath": "src/abersetz/providers/llm/discovery.py",
+      "contentHash": "d0d0875f90829c06761e7723716a286ea61912daff3de59c1321a93d7faa56fa",
+      "functions": [
+        {
+          "name": "discover_env_endpoints",
+          "params": [],
+          "returnType": "dict[str, Endpoint]",
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "all_endpoints",
+          "params": [],
+          "returnType": "dict[str, Endpoint]",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "fetch_models",
+          "params": [
+            "endpoint"
+          ],
+          "returnType": "list[str]",
+          "exported": true,
+          "lineCount": 38
+        },
+        {
+          "name": "resolve_model",
+          "params": [
+            "selector"
+          ],
+          "returnType": "tuple[Endpoint, str]",
+          "exported": true,
+          "lineCount": 39
+        },
+        {
+          "name": "resolve_wildcard_to_model",
+          "params": [
+            "provider_name",
+            "endpoint",
+            "pattern"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "load_recommended_settings",
+          "params": [
+            "provider_name"
+          ],
+          "returnType": "dict[str, Any]",
+          "exported": true,
+          "lineCount": 15
+        }
+      ],
+      "classes": [
+        {
+          "name": "Endpoint",
+          "methods": [],
+          "properties": [
+            "name",
+            "base_url",
+            "api_key_env",
+            "known_models"
+          ],
+          "exported": true,
+          "lineCount": 5
+        }
+      ],
+      "imports": [
+        {
+          "source": "fnmatch",
+          "specifiers": [
+            "fnmatch"
+          ]
+        },
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "dataclasses",
+          "specifiers": [
+            "dataclass",
+            "field"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": "httpx",
+          "specifiers": [
+            "httpx"
+          ]
+        },
+        {
+          "source": "loguru",
+          "specifiers": [
+            "logger"
+          ]
+        },
+        {
+          "source": ".api",
+          "specifiers": [
+            "anthropic",
+            "deepseek",
+            "gemini",
+            "groq",
+            "lmstudio",
+            "openai",
+            "openrouter",
+            "siliconflow",
+            "together"
+          ]
+        }
+      ],
+      "exports": [
+        "Endpoint",
+        "discover_env_endpoints",
+        "all_endpoints",
+        "fetch_models",
+        "resolve_model",
+        "resolve_wildcard_to_model",
+        "load_recommended_settings"
+      ],
+      "totalLines": 197,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/llm/inference.py": {
+      "filePath": "src/abersetz/providers/llm/inference.py",
+      "contentHash": "87f038231ea7604e231c8de2e4d8b5b7b720486b3a1131104b304ac3c1e0015f",
+      "functions": [],
+      "classes": [
+        {
+          "name": "LlmEngine",
+          "methods": [
+            "__init__",
+            "_invoke",
+            "translate",
+            "_build_messages",
+            "_parse_payload"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 88
+        }
+      ],
+      "imports": [
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "re",
+          "specifiers": [
+            "re"
+          ]
+        },
+        {
+          "source": "collections.abc",
+          "specifiers": [
+            "Mapping"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": "tenacity",
+          "specifiers": [
+            "retry",
+            "stop_after_attempt",
+            "wait_exponential"
+          ]
+        },
+        {
+          "source": "...config",
+          "specifiers": [
+            "EngineConfig"
+          ]
+        },
+        {
+          "source": "..base",
+          "specifiers": [
+            "EngineBase",
+            "EngineRequest",
+            "EngineResult"
+          ]
+        }
+      ],
+      "exports": [
+        "LlmEngine"
+      ],
+      "totalLines": 103,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/llm/local_discovery.py": {
+      "filePath": "src/abersetz/providers/llm/local_discovery.py",
+      "contentHash": "185be7960563eb2737fcf356b2c3ed400cc9bd8004f7b31987845face608d1a0",
+      "functions": [],
+      "classes": [
+        {
+          "name": "LocalModel",
+          "methods": [],
+          "properties": [
+            "path",
+            "name",
+            "app",
+            "format",
+            "size"
+          ],
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "LocalModelFinder",
+          "methods": [
+            "__init__",
+            "_get_lmstudio_path",
+            "_get_search_paths",
+            "_get_dir_size",
+            "discover_models",
+            "scan"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 175
+        }
+      ],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "dataclasses",
+          "specifiers": [
+            "dataclass"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "fire",
+          "specifiers": [
+            "fire"
+          ]
+        }
+      ],
+      "exports": [
+        "LocalModel",
+        "LocalModelFinder"
+      ],
+      "totalLines": 201,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/llm/recommended_settings.json": {
+      "filePath": "src/abersetz/providers/llm/recommended_settings.json",
+      "contentHash": "0d1a92ae553a503998a24bd77b498b4ffe2dabf91fe9678d913a301dbed00ad3",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 45,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/lmstudio.py": {
+      "filePath": "src/abersetz/providers/lmstudio.py",
+      "contentHash": "092f6da5255f7e5e661aa79b805dfb825ff68b1c9dd28ea66b7fbfc86f9a7dce",
+      "functions": [],
+      "classes": [
+        {
+          "name": "LmstudioEngine",
+          "methods": [
+            "__init__",
+            "_ensure_lmstudio_daemon",
+            "_invoke",
+            "translate",
+            "_language_name"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 106
+        }
+      ],
+      "imports": [
+        {
+          "source": "tenacity",
+          "specifiers": [
+            "retry",
+            "stop_after_attempt",
+            "wait_exponential"
+          ]
+        },
+        {
+          "source": "..config",
+          "specifiers": [
+            "EngineConfig"
+          ]
+        },
+        {
+          "source": ".base",
+          "specifiers": [
+            "EngineBase",
+            "EngineError",
+            "EngineRequest",
+            "EngineResult"
+          ]
+        }
+      ],
+      "exports": [
+        "LmstudioEngine"
+      ],
+      "totalLines": 117,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/mlx.py": {
+      "filePath": "src/abersetz/providers/mlx.py",
+      "contentHash": "1400e21e9a6ef5e9fdb2b51ef7403929e7ff562ce53df1c1ccd1b8739069addf",
+      "functions": [
+        {
+          "name": "_resolve_mthy_language",
+          "params": [
+            "code"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "build_mthy_prompt",
+          "params": [
+            "source_text",
+            "target_language",
+            "voc"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "find_local_model_path",
+          "params": [
+            "model_identifier",
+            "backend"
+          ],
+          "returnType": "str | None",
+          "exported": true,
+          "lineCount": 46
+        },
+        {
+          "name": "resolve_and_download_model",
+          "params": [
+            "model_name_or_path",
+            "backend"
+          ],
+          "returnType": "str",
+          "exported": true,
+          "lineCount": 69
+        }
+      ],
+      "classes": [
+        {
+          "name": "LocalMlxEngine",
+          "methods": [
+            "__init__",
+            "translate"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 75
+        }
+      ],
+      "imports": [
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": "..config",
+          "specifiers": [
+            "EngineConfig"
+          ]
+        },
+        {
+          "source": ".base",
+          "specifiers": [
+            "EngineBase",
+            "EngineError",
+            "EngineRequest",
+            "EngineResult"
+          ]
+        }
+      ],
+      "exports": [
+        "_resolve_mthy_language",
+        "build_mthy_prompt",
+        "find_local_model_path",
+        "resolve_and_download_model",
+        "LocalMlxEngine"
+      ],
+      "totalLines": 344,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/providers/translators.py": {
+      "filePath": "src/abersetz/providers/translators.py",
+      "contentHash": "6d0e7697650c2ee3d8245213c0fdef87a029c307f4c5f3d9f012b2e5e53ff596",
+      "functions": [],
+      "classes": [
+        {
+          "name": "TranslatorsEngine",
+          "methods": [
+            "__init__",
+            "_translate_with_retry",
+            "translate"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 35
+        }
+      ],
+      "imports": [
+        {
+          "source": "tenacity",
+          "specifiers": [
+            "retry",
+            "stop_after_attempt",
+            "wait_exponential"
+          ]
+        },
+        {
+          "source": "..config",
+          "specifiers": [
+            "EngineConfig"
+          ]
+        },
+        {
+          "source": ".base",
+          "specifiers": [
+            "EngineBase",
+            "EngineRequest",
+            "EngineResult"
+          ]
+        }
+      ],
+      "exports": [
+        "TranslatorsEngine"
+      ],
+      "totalLines": 46,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/setup.py": {
+      "filePath": "src/abersetz/setup.py",
+      "contentHash": "18ae625d5c144460a0ab939d7dc802f804ad34bca974696a348a435142397903",
+      "functions": [
+        {
+          "name": "_select_default_engine",
+          "params": [
+            "engines",
+            "providers"
+          ],
+          "returnType": "str | None",
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "setup_command",
+          "params": [
+            "non_interactive",
+            "verbose",
+            "include_community"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 26
+        }
+      ],
+      "classes": [
+        {
+          "name": "DiscoveredProvider",
+          "methods": [],
+          "properties": [
+            "name",
+            "api_key_env",
+            "base_url",
+            "is_available",
+            "model_count",
+            "error",
+            "engine_names",
+            "pricing_hint"
+          ],
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "SetupWizard",
+          "methods": [
+            "__init__",
+            "run",
+            "_validate_config",
+            "_discover_providers",
+            "_test_endpoints",
+            "_test_single_endpoint",
+            "_display_results",
+            "_generate_config"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 388
+        }
+      ],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "collections.abc",
+          "specifiers": [
+            "Sequence"
+          ]
+        },
+        {
+          "source": "dataclasses",
+          "specifiers": [
+            "dataclass",
+            "field"
+          ]
+        },
+        {
+          "source": "httpx",
+          "specifiers": [
+            "httpx"
+          ]
+        },
+        {
+          "source": "loguru",
+          "specifiers": [
+            "logger"
+          ]
+        },
+        {
+          "source": "rich.console",
+          "specifiers": [
+            "Console"
+          ]
+        },
+        {
+          "source": "rich.progress",
+          "specifiers": [
+            "Progress"
+          ]
+        },
+        {
+          "source": "rich.table",
+          "specifiers": [
+            "Table"
+          ]
+        },
+        {
+          "source": ".config",
+          "specifiers": [
+            "AbersetzConfig",
+            "Credential",
+            "EngineConfig",
+            "save_config"
+          ]
+        },
+        {
+          "source": ".engine_catalog",
+          "specifiers": [
+            "COMMUNITY_DEEP_TRANSLATOR_PROVIDERS",
+            "COMMUNITY_TRANSLATOR_PROVIDERS",
+            "DEEP_TRANSLATOR_FREE_PROVIDERS",
+            "FREE_TRANSLATOR_PROVIDERS",
+            "PAID_TRANSLATOR_PROVIDERS",
+            "ULLM_DEFAULT_MODEL",
+            "ULLM_DEFAULT_TEMPERATURE",
+            "collect_deep_translator_providers",
+            "collect_translator_providers",
+            "normalize_selector"
+          ]
+        },
+        {
+          "source": ".validation",
+          "specifiers": [
+            "ValidationResult",
+            "validate_engines"
+          ]
+        }
+      ],
+      "exports": [
+        "DiscoveredProvider",
+        "SetupWizard",
+        "_select_default_engine",
+        "setup_command"
+      ],
+      "totalLines": 531,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/tasks.py": {
+      "filePath": "src/abersetz/tasks.py",
+      "contentHash": "482c2845e555a6c6eeaed9eb01a037460f8a613cc62e15f7a817bc5ec0814e50",
+      "functions": [
+        {
+          "name": "translate_task",
+          "params": [
+            "path",
+            "options",
+            "client"
+          ],
+          "returnType": "list[TranslationResult]",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "translate_flow",
+          "params": [
+            "path",
+            "to_lang",
+            "engine",
+            "options"
+          ],
+          "returnType": "list[dict[str, Any]]",
+          "exported": true,
+          "lineCount": 26
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "TYPE_CHECKING",
+            "Any"
+          ]
+        },
+        {
+          "source": "prefect",
+          "specifiers": [
+            "flow",
+            "task"
+          ]
+        },
+        {
+          "source": ".pipeline",
+          "specifiers": [
+            "TranslatorOptions",
+            "translate_path"
+          ]
+        }
+      ],
+      "exports": [
+        "translate_task",
+        "translate_flow"
+      ],
+      "totalLines": 52,
+      "hasStructuralAnalysis": true
+    },
+    "src/abersetz/validation.py": {
+      "filePath": "src/abersetz/validation.py",
+      "contentHash": "48b84f18a2e491ad1ab4b61a674f2ae5737728c526a47e3eaf9f8916364cb6d2",
+      "functions": [
+        {
+          "name": "_append_selector",
+          "params": [
+            "collection",
+            "seen",
+            "selector"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "_extract_providers",
+          "params": [
+            "options",
+            "key"
+          ],
+          "returnType": "list[str]",
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "_selector_sort_key",
+          "params": [
+            "selector"
+          ],
+          "returnType": "tuple[int, str]",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "_selectors_from_config",
+          "params": [
+            "config",
+            "include_defaults"
+          ],
+          "returnType": "list[str]",
+          "exported": true,
+          "lineCount": 36
+        },
+        {
+          "name": "_ensure_engine_request",
+          "params": [
+            "sample_text",
+            "source_lang",
+            "target_lang"
+          ],
+          "returnType": "EngineRequest",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "validate_engines",
+          "params": [
+            "config",
+            "selectors",
+            "sample_text",
+            "source_lang",
+            "target_lang",
+            "client",
+            "create_engine_fn",
+            "include_defaults"
+          ],
+          "returnType": "list[ValidationResult]",
+          "exported": true,
+          "lineCount": 59
+        }
+      ],
+      "classes": [
+        {
+          "name": "ValidationResult",
+          "methods": [],
+          "properties": [
+            "selector",
+            "success",
+            "translation",
+            "error",
+            "latency"
+          ],
+          "exported": true,
+          "lineCount": 10
+        }
+      ],
+      "imports": [
+        {
+          "source": "collections.abc",
+          "specifiers": [
+            "Callable",
+            "Iterable",
+            "Sequence"
+          ]
+        },
+        {
+          "source": "dataclasses",
+          "specifiers": [
+            "dataclass"
+          ]
+        },
+        {
+          "source": "time",
+          "specifiers": [
+            "perf_counter"
+          ]
+        },
+        {
+          "source": "loguru",
+          "specifiers": [
+            "logger"
+          ]
+        },
+        {
+          "source": ".config",
+          "specifiers": [
+            "AbersetzConfig",
+            "load_config"
+          ]
+        },
+        {
+          "source": ".engine_catalog",
+          "specifiers": [
+            "normalize_selector"
+          ]
+        },
+        {
+          "source": ".engines",
+          "specifiers": [
+            "EngineError",
+            "EngineRequest",
+            "create_engine"
+          ]
+        }
+      ],
+      "exports": [
+        "ValidationResult",
+        "_append_selector",
+        "_extract_providers",
+        "_selector_sort_key",
+        "_selectors_from_config",
+        "_ensure_engine_request",
+        "validate_engines"
+      ],
+      "totalLines": 178,
+      "hasStructuralAnalysis": true
+    },
+    "TASKS.md": {
+      "filePath": "TASKS.md",
+      "contentHash": "5ba6f648e3c1eeede032aa1588433d318c3ff5c6b67013f759a0212baae1e691",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 71,
+      "hasStructuralAnalysis": true
+    },
+    "TESTING.md": {
+      "filePath": "TESTING.md",
+      "contentHash": "4af2cb8885221a5ed02a5bf4c6036c602c51a0bc493bd2787d773740c5ba30dd",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 60,
+      "hasStructuralAnalysis": true
+    },
+    "tests/conftest.py": {
+      "filePath": "tests/conftest.py",
+      "contentHash": "9769aff0a2b126867fec9d7131e29a774e6bfb85e38af748123a03ca6c83b33f",
+      "functions": [
+        {
+          "name": "mock_bcache",
+          "params": [
+            "*args",
+            "**kwargs"
+          ],
+          "exported": true,
+          "lineCount": 32
+        },
+        {
+          "name": "_temp_config_dir",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "Path",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "_clear_cache",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "twat_cache.decorators",
+          "specifiers": [
+            "twat_cache.decorators"
+          ]
+        }
+      ],
+      "exports": [
+        "mock_bcache",
+        "_temp_config_dir",
+        "_clear_cache"
+      ],
+      "totalLines": 72,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_chunking.py": {
+      "filePath": "tests/test_chunking.py",
+      "contentHash": "0555bb8a4984f69f5b70b70a4fa84398ee061bb70438ed40f23bb2d06a5dcf56",
+      "functions": [
+        {
+          "name": "test_detect_format_identifies_html",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "test_chunk_text_preserves_round_trip",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "test_html_chunking_returns_single_chunk",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "test_chunk_text_returns_empty_for_blank_input",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "test_chunk_text_fallback_runs_without_semantic_splitter",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 15
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "builtins",
+          "specifiers": [
+            "builtins"
+          ]
+        },
+        {
+          "source": "abersetz.chunking",
+          "specifiers": [
+            "TextFormat",
+            "chunk_text",
+            "detect_format"
+          ]
+        }
+      ],
+      "exports": [
+        "test_detect_format_identifies_html",
+        "test_chunk_text_preserves_round_trip",
+        "test_html_chunking_returns_single_chunk",
+        "test_chunk_text_returns_empty_for_blank_input",
+        "test_chunk_text_fallback_runs_without_semantic_splitter"
+      ],
+      "totalLines": 48,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_cli.py": {
+      "filePath": "tests/test_cli.py",
+      "contentHash": "85b68d005cb64ecea987d2044cd5c0affbb566d328353b4ce32e9f0ed79f86c1",
+      "functions": [
+        {
+          "name": "test_cli_translate_wires_arguments",
+          "params": [
+            "monkeypatch",
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 26
+        },
+        {
+          "name": "test_cli_translate_accepts_path_output",
+          "params": [
+            "monkeypatch",
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 25
+        },
+        {
+          "name": "test_cli_accepts_legacy_engine_selector",
+          "params": [
+            "monkeypatch",
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "test_cli_translate_reports_pipeline_error",
+          "params": [
+            "monkeypatch",
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "test_parse_patterns_handles_none_and_iterables",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "test_load_json_data_prefers_files",
+          "params": [
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "test_build_options_requires_target_language",
+          "params": [
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "test_build_options_loads_prolog_and_voc_json",
+          "params": [
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 24
+        },
+        {
+          "name": "test_build_options_propagates_optional_flags",
+          "params": [
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "test_build_options_defaults_include_when_none",
+          "params": [
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 22
+        },
+        {
+          "name": "test_build_options_resolves_output_dir",
+          "params": [
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "test_render_engine_entries_handles_empty",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "test_render_validation_entries_handles_empty",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "test_render_results_lists_destinations",
+          "params": [
+            "monkeypatch",
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 45
+        },
+        {
+          "name": "_stub_engine_entries",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "AbersetzConfig",
+          "exported": true,
+          "lineCount": 33
+        },
+        {
+          "name": "test_collect_engine_entries_handles_provider_strings",
+          "params": [
+            "_stub_engine_entries"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 22
+        },
+        {
+          "name": "test_collect_engine_entries_family_accepts_long_name",
+          "params": [
+            "_stub_engine_entries"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "test_collect_engine_entries_configured_only_with_family",
+          "params": [
+            "_stub_engine_entries"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "test_collect_engine_entries_accepts_single_provider_string",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "test_collect_engine_entries_string_branches",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 31
+        },
+        {
+          "name": "test_collect_engine_entries_includes_local_engines",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 22
+        },
+        {
+          "name": "test_collect_engine_entries_handles_deep_translator_string_providers",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 22
+        },
+        {
+          "name": "test_cli_config_commands_show_and_path",
+          "params": [
+            "monkeypatch",
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "test_cli_lang_lists_languages",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "test_cli_verbose_logs_translation_details",
+          "params": [
+            "monkeypatch",
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 58
+        },
+        {
+          "name": "test_cli_engines_lists_configured_providers",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 41
+        },
+        {
+          "name": "test_cli_engines_supports_filters",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 42
+        },
+        {
+          "name": "test_cli_validate_renders_results",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 34
+        },
+        {
+          "name": "test_cli_validate_accepts_selector_string",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "test_cli_setup_forwards_flags",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "test_cli_main_invokes_fire",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "test_cli_abtr_main_invokes_fire_with_tr",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "test_cli_translate_accepts_case_overrides",
+          "params": [
+            "monkeypatch",
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 33
+        },
+        {
+          "name": "test_cli_validate_accepts_case_overrides",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 31
+        },
+        {
+          "name": "test_cli_discover_subcommand",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 19
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "tomllib",
+          "specifiers": [
+            "tomllib"
+          ]
+        },
+        {
+          "source": "abersetz.chunking",
+          "specifiers": [
+            "TextFormat"
+          ]
+        },
+        {
+          "source": "abersetz.cli",
+          "specifiers": [
+            "AbersetzCLI",
+            "_build_options_from_cli",
+            "_collect_engine_entries",
+            "_load_json_data",
+            "_parse_patterns",
+            "_render_engine_entries",
+            "_render_results",
+            "_render_validation_entries",
+            "abtr_main",
+            "main"
+          ]
+        },
+        {
+          "source": "abersetz.config",
+          "specifiers": [
+            "AbersetzConfig",
+            "Credential",
+            "Defaults",
+            "EngineConfig",
+            "save_config"
+          ]
+        },
+        {
+          "source": "abersetz.pipeline",
+          "specifiers": [
+            "PipelineError",
+            "TranslationResult",
+            "TranslatorOptions"
+          ]
+        },
+        {
+          "source": "abersetz.validation",
+          "specifiers": [
+            "ValidationResult"
+          ]
+        }
+      ],
+      "exports": [
+        "test_cli_translate_wires_arguments",
+        "test_cli_translate_accepts_path_output",
+        "test_cli_accepts_legacy_engine_selector",
+        "test_cli_translate_reports_pipeline_error",
+        "test_parse_patterns_handles_none_and_iterables",
+        "test_load_json_data_prefers_files",
+        "test_build_options_requires_target_language",
+        "test_build_options_loads_prolog_and_voc_json",
+        "test_build_options_propagates_optional_flags",
+        "test_build_options_defaults_include_when_none",
+        "test_build_options_resolves_output_dir",
+        "test_render_engine_entries_handles_empty",
+        "test_render_validation_entries_handles_empty",
+        "test_render_results_lists_destinations",
+        "_stub_engine_entries",
+        "test_collect_engine_entries_handles_provider_strings",
+        "test_collect_engine_entries_family_accepts_long_name",
+        "test_collect_engine_entries_configured_only_with_family",
+        "test_collect_engine_entries_accepts_single_provider_string",
+        "test_collect_engine_entries_string_branches",
+        "test_collect_engine_entries_includes_local_engines",
+        "test_collect_engine_entries_handles_deep_translator_string_providers",
+        "test_cli_config_commands_show_and_path",
+        "test_cli_lang_lists_languages",
+        "test_cli_verbose_logs_translation_details",
+        "test_cli_engines_lists_configured_providers",
+        "test_cli_engines_supports_filters",
+        "test_cli_validate_renders_results",
+        "test_cli_validate_accepts_selector_string",
+        "test_cli_setup_forwards_flags",
+        "test_cli_main_invokes_fire",
+        "test_cli_abtr_main_invokes_fire_with_tr",
+        "test_cli_translate_accepts_case_overrides",
+        "test_cli_validate_accepts_case_overrides",
+        "test_cli_discover_subcommand"
+      ],
+      "totalLines": 895,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_config.py": {
+      "filePath": "tests/test_config.py",
+      "contentHash": "7857dfb51d41c81260e9d3cec293f2bc1ae6c01136cf31ff5568c991b51ea9ca",
+      "functions": [
+        {
+          "name": "test_load_config_yields_defaults",
+          "params": [
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "test_save_config_persists_changes",
+          "params": [
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "test_resolve_credential_prefers_environment",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "test_load_config_handles_malformed_toml",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "test_load_config_handles_permission_error",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 21
+        },
+        {
+          "name": "test_defaults_normalize_legacy_selector",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "test_defaults_from_dict_normalizes_selector",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "test_defaults_from_dict_when_none_returns_defaults",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "test_engine_config_from_dict_when_none_returns_empty_block",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "test_engine_config_to_dict_includes_optional_fields",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "test_credential_to_dict_includes_optional_fields",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "test_credential_from_any_rejects_unsupported_payload",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "test_credential_from_any_handles_mapping_payload",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "test_config_dir_when_env_missing_then_uses_platformdirs",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "test_resolve_credential_when_env_missing_then_logs_hint",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "test_resolve_credential_recurses_into_stored_secret",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 25
+        },
+        {
+          "name": "test_resolve_credential_with_recursive_name_logs_once",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 21
+        },
+        {
+          "name": "test_resolve_credential_returns_none_for_null_reference",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "test_resolve_credential_reuses_stored_alias_object",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 5
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "abersetz.config",
+          "specifiers": [
+            "config_module"
+          ]
+        }
+      ],
+      "exports": [
+        "test_load_config_yields_defaults",
+        "test_save_config_persists_changes",
+        "test_resolve_credential_prefers_environment",
+        "test_load_config_handles_malformed_toml",
+        "test_load_config_handles_permission_error",
+        "test_defaults_normalize_legacy_selector",
+        "test_defaults_from_dict_normalizes_selector",
+        "test_defaults_from_dict_when_none_returns_defaults",
+        "test_engine_config_from_dict_when_none_returns_empty_block",
+        "test_engine_config_to_dict_includes_optional_fields",
+        "test_credential_to_dict_includes_optional_fields",
+        "test_credential_from_any_rejects_unsupported_payload",
+        "test_credential_from_any_handles_mapping_payload",
+        "test_config_dir_when_env_missing_then_uses_platformdirs",
+        "test_resolve_credential_when_env_missing_then_logs_hint",
+        "test_resolve_credential_recurses_into_stored_secret",
+        "test_resolve_credential_with_recursive_name_logs_once",
+        "test_resolve_credential_returns_none_for_null_reference",
+        "test_resolve_credential_reuses_stored_alias_object"
+      ],
+      "totalLines": 260,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_engine_catalog.py": {
+      "filePath": "tests/test_engine_catalog.py",
+      "contentHash": "96e8fc8f0d7ce9ee9b3ce697aed672acf014f1a39fe6ba31278b218a98fedf7b",
+      "functions": [
+        {
+          "name": "test_normalize_selector_converts_long_to_short",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "test_normalize_selector_is_idempotent",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "test_normalize_selector_preserves_unknowns",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "test_normalize_selector_returns_none_for_none",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "test_normalize_selector_handles_blank_input",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "test_normalize_selector_handles_missing_base",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "test_resolve_engine_reference_handles_short_alias",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "test_resolve_engine_reference_handles_long_selector",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "test_resolve_engine_reference_handles_base_only_alias",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "test_filter_available_when_allowed_duplicates_then_dedupes",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "test_collect_translator_providers_when_import_fails_then_returns_empty",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "test_collect_translator_providers_when_paid_requested_then_keeps_order",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "test_collect_deep_translator_providers_include_paid_appends_once",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 8
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "builtins",
+          "specifiers": [
+            "builtins"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "types",
+          "specifiers": [
+            "SimpleNamespace"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "abersetz.engine_catalog",
+          "specifiers": [
+            "_filter_available",
+            "collect_deep_translator_providers",
+            "collect_translator_providers",
+            "normalize_selector",
+            "resolve_engine_reference"
+          ]
+        }
+      ],
+      "exports": [
+        "test_normalize_selector_converts_long_to_short",
+        "test_normalize_selector_is_idempotent",
+        "test_normalize_selector_preserves_unknowns",
+        "test_normalize_selector_returns_none_for_none",
+        "test_normalize_selector_handles_blank_input",
+        "test_normalize_selector_handles_missing_base",
+        "test_resolve_engine_reference_handles_short_alias",
+        "test_resolve_engine_reference_handles_long_selector",
+        "test_resolve_engine_reference_handles_base_only_alias",
+        "test_filter_available_when_allowed_duplicates_then_dedupes",
+        "test_collect_translator_providers_when_import_fails_then_returns_empty",
+        "test_collect_translator_providers_when_paid_requested_then_keeps_order",
+        "test_collect_deep_translator_providers_include_paid_appends_once"
+      ],
+      "totalLines": 102,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_engines.py": {
+      "filePath": "tests/test_engines.py",
+      "contentHash": "aba4c0bce02a610fd3f19fadc169f24982465aa433bcfabb4a38ed1f5f11e168",
+      "functions": [
+        {
+          "name": "test_translators_engine_invokes_library",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 39
+        },
+        {
+          "name": "test_translators_engine_handles_html_requests",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 42
+        },
+        {
+          "name": "test_lmstudio_engine_invokes_sdk",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 49
+        },
+        {
+          "name": "test_engine_base_chunk_size_prefers_html_then_plain",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "test_ullm_engine_uses_profile",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 26
+        },
+        {
+          "name": "test_translators_engine_retry_on_failure",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 39
+        },
+        {
+          "name": "test_create_engine_accepts_legacy_selector",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "test_deep_translator_engine_retry_on_failure",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 48
+        },
+        {
+          "name": "test_deep_translator_engine_resolves_languages",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 27
+        },
+        {
+          "name": "test_deep_translator_engine_rejects_unknown_provider",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "test_build_llm_engine_without_model_raises_engine_error",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "test_build_llm_engine_with_discontinued_model_raises_engine_error",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "test_build_llm_engine_without_credential_raises_engine_error",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "test_lmstudio_engine_without_package_raises_engine_error",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "test_select_profile_defaults_to_default_variant",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "test_select_profile_without_profiles_returns_none",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "test_select_profile_unknown_variant_raises_engine_error",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "test_make_openai_client_respects_base_url",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "test_make_openai_client_defaults_to_openai_url",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "test_create_engine_with_unknown_configured_base_raises_engine_error",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "_make_llm_engine",
+          "params": [],
+          "returnType": "engines_module.LlmEngine",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "test_llm_engine_parse_payload_without_vocab",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "test_llm_engine_parse_payload_with_malformed_vocab",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "test_llm_engine_parse_payload_with_non_mapping_vocab",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "test_create_engine_raises_when_config_missing_selector",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "test_resolve_mthy_language_accepts_codes_and_names",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "test_resolve_mthy_language_unknown_raises_engine_error",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "test_local_mthy_mlx_engine_translates_with_prompt",
+          "params": [
+            "monkeypatch",
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 51
+        },
+        {
+          "name": "test_local_gemma_gguf_engine_uses_structured_messages",
+          "params": [
+            "monkeypatch",
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 43
+        },
+        {
+          "name": "test_local_gemma_gguf_engine_propagates_n_threads",
+          "params": [
+            "monkeypatch",
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 29
+        },
+        {
+          "name": "test_local_mthy_mlx_engine_hymt2_prompt_with_terminology",
+          "params": [
+            "monkeypatch",
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 54
+        },
+        {
+          "name": "test_legacy_hymt1_models_raise_engine_error",
+          "params": [
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "test_resolve_and_download_model_uses_lmstudio_path",
+          "params": [
+            "monkeypatch",
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "test_resolve_and_download_model_triggers_huggingface_download",
+          "params": [
+            "monkeypatch",
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 24
+        },
+        {
+          "name": "test_create_engine_override_parameters",
+          "params": [
+            "monkeypatch",
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 28
+        }
+      ],
+      "classes": [
+        {
+          "name": "DummyClient",
+          "methods": [
+            "__init__",
+            "_create"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 13
+        }
+      ],
+      "imports": [
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "types",
+          "specifiers": [
+            "SimpleNamespace"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "langcodes",
+          "specifiers": [
+            "get_language"
+          ]
+        },
+        {
+          "source": "abersetz.config",
+          "specifiers": [
+            "config_module"
+          ]
+        },
+        {
+          "source": "abersetz.engines",
+          "specifiers": [
+            "engines_module"
+          ]
+        },
+        {
+          "source": "abersetz.chunking",
+          "specifiers": [
+            "TextFormat"
+          ]
+        },
+        {
+          "source": "abersetz.engines",
+          "specifiers": [
+            "EngineBase",
+            "EngineError",
+            "EngineRequest",
+            "create_engine"
+          ]
+        }
+      ],
+      "exports": [
+        "DummyClient",
+        "test_translators_engine_invokes_library",
+        "test_translators_engine_handles_html_requests",
+        "test_lmstudio_engine_invokes_sdk",
+        "test_engine_base_chunk_size_prefers_html_then_plain",
+        "test_ullm_engine_uses_profile",
+        "test_translators_engine_retry_on_failure",
+        "test_create_engine_accepts_legacy_selector",
+        "test_deep_translator_engine_retry_on_failure",
+        "test_deep_translator_engine_resolves_languages",
+        "test_deep_translator_engine_rejects_unknown_provider",
+        "test_build_llm_engine_without_model_raises_engine_error",
+        "test_build_llm_engine_with_discontinued_model_raises_engine_error",
+        "test_build_llm_engine_without_credential_raises_engine_error",
+        "test_lmstudio_engine_without_package_raises_engine_error",
+        "test_select_profile_defaults_to_default_variant",
+        "test_select_profile_without_profiles_returns_none",
+        "test_select_profile_unknown_variant_raises_engine_error",
+        "test_make_openai_client_respects_base_url",
+        "test_make_openai_client_defaults_to_openai_url",
+        "test_create_engine_with_unknown_configured_base_raises_engine_error",
+        "_make_llm_engine",
+        "test_llm_engine_parse_payload_without_vocab",
+        "test_llm_engine_parse_payload_with_malformed_vocab",
+        "test_llm_engine_parse_payload_with_non_mapping_vocab",
+        "test_create_engine_raises_when_config_missing_selector",
+        "test_resolve_mthy_language_accepts_codes_and_names",
+        "test_resolve_mthy_language_unknown_raises_engine_error",
+        "test_local_mthy_mlx_engine_translates_with_prompt",
+        "test_local_gemma_gguf_engine_uses_structured_messages",
+        "test_local_gemma_gguf_engine_propagates_n_threads",
+        "test_local_mthy_mlx_engine_hymt2_prompt_with_terminology",
+        "test_legacy_hymt1_models_raise_engine_error",
+        "test_resolve_and_download_model_uses_lmstudio_path",
+        "test_resolve_and_download_model_triggers_huggingface_download",
+        "test_create_engine_override_parameters"
+      ],
+      "totalLines": 764,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_examples.py": {
+      "filePath": "tests/test_examples.py",
+      "contentHash": "8f7f4790ca4011fb3900e16b6478688d62f51b66b9f453c44085660138679c74",
+      "functions": [
+        {
+          "name": "_load_benchmark",
+          "params": [],
+          "returnType": "Any",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "test_sanitize_name_when_input_has_special_chars_then_replaces_with_hyphens",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "test_sanitize_name_when_input_has_leading_trailing_hyphens_then_strips_them",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "test_get_engine_descriptor_when_translators_then_returns_correct_prefix",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "test_get_engine_descriptor_when_deep_translator_then_returns_correct_prefix",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 7
+        },
+        {
+          "name": "test_get_engine_descriptor_when_lmstudio_then_returns_model_details",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "test_get_engine_descriptor_when_ullm_then_returns_profile_details",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "test_get_engine_descriptor_when_mthy_or_gemma_then_returns_backend_details",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "test_get_engine_descriptor_when_unknown_engine_then_returns_sanitized_selector",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "test_runner_run_when_dry_run_then_completes_successfully",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 58
+        },
+        {
+          "name": "test_runner_run_when_no_engines_specified_and_api_key_set_then_discovers_siliconflow",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 64
+        },
+        {
+          "name": "test_runner_run_when_translate_path_raises_exception_then_captures_failure",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 38
+        },
+        {
+          "name": "test_runner_run_when_source_files_missing_then_exits_with_error",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "test_runner_run_when_destination_exists_and_not_force_then_skips",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 68
+        },
+        {
+          "name": "test_runner_run_when_destination_exists_and_force_then_translates",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 68
+        },
+        {
+          "name": "test_main_when_called_then_invokes_fire",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "test_resolve_provider_to_engines",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "test_benchmark_runner_nondestructive_save",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 94
+        }
+      ],
+      "classes": [
+        {
+          "name": "DummyEngineConfig",
+          "methods": [
+            "__init__"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "DummyConfig",
+          "methods": [
+            "__init__"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 3
+        }
+      ],
+      "imports": [
+        {
+          "source": "importlib.util",
+          "specifiers": [
+            "importlib.util"
+          ]
+        },
+        {
+          "source": "json",
+          "specifiers": [
+            "json"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": "unittest.mock",
+          "specifiers": [
+            "patch"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        }
+      ],
+      "exports": [
+        "_load_benchmark",
+        "DummyEngineConfig",
+        "DummyConfig",
+        "test_sanitize_name_when_input_has_special_chars_then_replaces_with_hyphens",
+        "test_sanitize_name_when_input_has_leading_trailing_hyphens_then_strips_them",
+        "test_get_engine_descriptor_when_translators_then_returns_correct_prefix",
+        "test_get_engine_descriptor_when_deep_translator_then_returns_correct_prefix",
+        "test_get_engine_descriptor_when_lmstudio_then_returns_model_details",
+        "test_get_engine_descriptor_when_ullm_then_returns_profile_details",
+        "test_get_engine_descriptor_when_mthy_or_gemma_then_returns_backend_details",
+        "test_get_engine_descriptor_when_unknown_engine_then_returns_sanitized_selector",
+        "test_runner_run_when_dry_run_then_completes_successfully",
+        "test_runner_run_when_no_engines_specified_and_api_key_set_then_discovers_siliconflow",
+        "test_runner_run_when_translate_path_raises_exception_then_captures_failure",
+        "test_runner_run_when_source_files_missing_then_exits_with_error",
+        "test_runner_run_when_destination_exists_and_not_force_then_skips",
+        "test_runner_run_when_destination_exists_and_force_then_translates",
+        "test_main_when_called_then_invokes_fire",
+        "test_resolve_provider_to_engines",
+        "test_benchmark_runner_nondestructive_save"
+      ],
+      "totalLines": 569,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_htmladapt_twat.py": {
+      "filePath": "tests/test_htmladapt_twat.py",
+      "contentHash": "7b18f9cbe66bc87967d373e6352ace1e9a5d0a0f1ffc32ecf5b19ca3276efd5e",
+      "functions": [
+        {
+          "name": "test_htmladapt_translation_preserves_structure",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 48
+        },
+        {
+          "name": "test_twat_cache_caching_behavior",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 42
+        },
+        {
+          "name": "test_prefect_workflow_integration",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 35
+        }
+      ],
+      "classes": [
+        {
+          "name": "MockCounterEngine",
+          "methods": [
+            "__init__",
+            "translate"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 12
+        }
+      ],
+      "imports": [
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "abersetz.engines",
+          "specifiers": [
+            "EngineBase",
+            "EngineRequest",
+            "EngineResult"
+          ]
+        },
+        {
+          "source": "abersetz.pipeline",
+          "specifiers": [
+            "AbersetzConfig",
+            "TranslatorOptions",
+            "translate_path"
+          ]
+        },
+        {
+          "source": "abersetz.tasks",
+          "specifiers": [
+            "translate_flow",
+            "translate_task"
+          ]
+        }
+      ],
+      "exports": [
+        "MockCounterEngine",
+        "test_htmladapt_translation_preserves_structure",
+        "test_twat_cache_caching_behavior",
+        "test_prefect_workflow_integration"
+      ],
+      "totalLines": 156,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_integration.py": {
+      "filePath": "tests/test_integration.py",
+      "contentHash": "58e04186985e6fb0c008179d0c0f4bf65d579629c9eb16ee50226724ca804da6",
+      "functions": [
+        {
+          "name": "test_translators_google_real",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "test_deep_translator_google_real",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "test_ullm_engine_real",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 20
+        },
+        {
+          "name": "test_translate_file_api",
+          "params": [
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 27
+        },
+        {
+          "name": "test_html_translation",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "test_translators_bing_real",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 27
+        },
+        {
+          "name": "test_batch_translation_with_voc",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 34
+        },
+        {
+          "name": "test_retry_on_network_failure",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 39
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "abersetz",
+          "specifiers": [
+            "TranslatorOptions",
+            "translate_path"
+          ]
+        },
+        {
+          "source": "abersetz.config",
+          "specifiers": [
+            "load_config"
+          ]
+        },
+        {
+          "source": "abersetz.engines",
+          "specifiers": [
+            "EngineRequest",
+            "create_engine"
+          ]
+        }
+      ],
+      "exports": [
+        "test_translators_google_real",
+        "test_deep_translator_google_real",
+        "test_ullm_engine_real",
+        "test_translate_file_api",
+        "test_html_translation",
+        "test_translators_bing_real",
+        "test_batch_translation_with_voc",
+        "test_retry_on_network_failure"
+      ],
+      "totalLines": 255,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_local_discovery.py": {
+      "filePath": "tests/test_local_discovery.py",
+      "contentHash": "dbc347295c73bcb3b2cff2480fd9b906217171b2d5e85df49de7a9dd0096440a",
+      "functions": [
+        {
+          "name": "test_local_model_finder_scans_correctly",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 63
+        },
+        {
+          "name": "test_resolve_local_situation_model",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 63
+        },
+        {
+          "name": "test_obsolete_model_rejection",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "test_resolve_local_mlx_situation_model",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 57
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "abersetz.providers.llm.local_discovery",
+          "specifiers": [
+            "LocalModelFinder"
+          ]
+        },
+        {
+          "source": "abersetz.providers.mlx",
+          "specifiers": [
+            "EngineError",
+            "resolve_and_download_model"
+          ]
+        }
+      ],
+      "exports": [
+        "test_local_model_finder_scans_correctly",
+        "test_resolve_local_situation_model",
+        "test_obsolete_model_rejection",
+        "test_resolve_local_mlx_situation_model"
+      ],
+      "totalLines": 210,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_offline.py": {
+      "filePath": "tests/test_offline.py",
+      "contentHash": "2b84fc95f55279694eeb7ac6581302f4c5c60a21d1b1b98e217c3572f02a20b6",
+      "functions": [
+        {
+          "name": "test_cli_help_works_offline",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "test_config_commands_work_offline",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "test_dry_run_works_offline",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "test_input_validation_works_offline",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "test_empty_file_handling_works_offline",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "test_import_works_offline",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "test_edge_case_files_offline",
+          "params": [
+            "file_content"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 16
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "tempfile",
+          "specifiers": [
+            "tempfile"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "abersetz.cli",
+          "specifiers": [
+            "AbersetzCLI"
+          ]
+        },
+        {
+          "source": "abersetz.pipeline",
+          "specifiers": [
+            "TranslatorOptions",
+            "translate_path"
+          ]
+        }
+      ],
+      "exports": [
+        "test_cli_help_works_offline",
+        "test_config_commands_work_offline",
+        "test_dry_run_works_offline",
+        "test_input_validation_works_offline",
+        "test_empty_file_handling_works_offline",
+        "test_import_works_offline",
+        "test_edge_case_files_offline"
+      ],
+      "totalLines": 119,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_openai_lite.py": {
+      "filePath": "tests/test_openai_lite.py",
+      "contentHash": "fbd3e8431a51ce0ff0ee9ad3046cc0d92d10de02296fcac269cbdb07dfdb2bc7",
+      "functions": [
+        {
+          "name": "test_chat_completions_create_parses_response",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 54
+        },
+        {
+          "name": "test_chat_completions_create_raises_for_http_errors",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 17
+        },
+        {
+          "name": "test_openai_base_url_trims_trailing_slash",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "test_chat_declares_completions_attribute",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 3
+        },
+        {
+          "name": "test_openai_initializes_chat_completions",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 3
+        }
+      ],
+      "classes": [
+        {
+          "name": "_DummyResponse",
+          "methods": [
+            "__init__",
+            "raise_for_status",
+            "json"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "_DummyClient",
+          "methods": [
+            "__init__",
+            "__enter__",
+            "__exit__",
+            "post"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 14
+        }
+      ],
+      "imports": [
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any",
+            "get_type_hints"
+          ]
+        },
+        {
+          "source": "httpx",
+          "specifiers": [
+            "httpx"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "abersetz.openai_lite",
+          "specifiers": [
+            "Chat",
+            "ChatCompletions",
+            "OpenAI"
+          ]
+        }
+      ],
+      "exports": [
+        "_DummyResponse",
+        "_DummyClient",
+        "test_chat_completions_create_parses_response",
+        "test_chat_completions_create_raises_for_http_errors",
+        "test_openai_base_url_trims_trailing_slash",
+        "test_chat_declares_completions_attribute",
+        "test_openai_initializes_chat_completions"
+      ],
+      "totalLines": 132,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_package.py": {
+      "filePath": "tests/test_package.py",
+      "contentHash": "ead5d10424eb717ae50da1d295fa0d01f902ed87cf6e4b174e8629be7bc2ec4e",
+      "functions": [
+        {
+          "name": "test_version",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "test_getattr_rejects_unknown_symbol",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 12
+        }
+      ],
+      "classes": [],
+      "imports": [
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        }
+      ],
+      "exports": [
+        "test_version",
+        "test_getattr_rejects_unknown_symbol"
+      ],
+      "totalLines": 26,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_pipeline.py": {
+      "filePath": "tests/test_pipeline.py",
+      "contentHash": "7756fe3eaa4e9dadb23c49f1f1b7fafd0d536f747edc40b3dfe646a4defd6594",
+      "functions": [
+        {
+          "name": "test_translate_path_processes_files",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 19
+        },
+        {
+          "name": "test_translate_path_accepts_string_source_paths",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "test_translate_path_normalizes_engine_selector",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "test_translate_path_requires_matches",
+          "params": [
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "test_translate_path_uses_engine_chunk_size_when_defaults_falsy",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 36
+        },
+        {
+          "name": "test_translate_path_uses_dummy_chunk_size_when_defaults_zero",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 34
+        },
+        {
+          "name": "test_translate_path_html_uses_engine_chunk_hint",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 41
+        },
+        {
+          "name": "test_translate_path_with_html_engine_handles_mixed_formats",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 41
+        },
+        {
+          "name": "test_translate_path_handles_mixed_formats",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 39
+        },
+        {
+          "name": "test_translate_path_errors_on_unreadable_file",
+          "params": [
+            "tmp_path"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "test_translate_path_write_over_updates_source",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "test_translate_path_dry_run_skips_io",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 16
+        },
+        {
+          "name": "test_translate_path_warns_on_large_file",
+          "params": [
+            "tmp_path",
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 30
+        }
+      ],
+      "classes": [
+        {
+          "name": "DummyEngine",
+          "methods": [
+            "__init__",
+            "chunk_size_for",
+            "translate"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 17
+        }
+      ],
+      "imports": [
+        {
+          "source": "os",
+          "specifiers": [
+            "os"
+          ]
+        },
+        {
+          "source": "sys",
+          "specifiers": [
+            "sys"
+          ]
+        },
+        {
+          "source": "pathlib",
+          "specifiers": [
+            "Path"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "abersetz.chunking",
+          "specifiers": [
+            "TextFormat"
+          ]
+        },
+        {
+          "source": "abersetz.config",
+          "specifiers": [
+            "AbersetzConfig"
+          ]
+        },
+        {
+          "source": "abersetz.engines",
+          "specifiers": [
+            "EngineResult"
+          ]
+        },
+        {
+          "source": "abersetz.pipeline",
+          "specifiers": [
+            "PipelineError",
+            "TranslatorOptions",
+            "translate_path"
+          ]
+        }
+      ],
+      "exports": [
+        "DummyEngine",
+        "test_translate_path_processes_files",
+        "test_translate_path_accepts_string_source_paths",
+        "test_translate_path_normalizes_engine_selector",
+        "test_translate_path_requires_matches",
+        "test_translate_path_uses_engine_chunk_size_when_defaults_falsy",
+        "test_translate_path_uses_dummy_chunk_size_when_defaults_zero",
+        "test_translate_path_html_uses_engine_chunk_hint",
+        "test_translate_path_with_html_engine_handles_mixed_formats",
+        "test_translate_path_handles_mixed_formats",
+        "test_translate_path_errors_on_unreadable_file",
+        "test_translate_path_write_over_updates_source",
+        "test_translate_path_dry_run_skips_io",
+        "test_translate_path_warns_on_large_file"
+      ],
+      "totalLines": 401,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_setup.py": {
+      "filePath": "tests/test_setup.py",
+      "contentHash": "92aac806e270e9c62f3a8b0023124af171b1674e7be67633a00ad62461cc908d",
+      "functions": [
+        {
+          "name": "_stub_phase",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 2
+        },
+        {
+          "name": "test_setup_wizard_triggers_validation",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "test_setup_wizard_skips_validation_when_no_config",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "test_discover_providers_adds_pricing_hint",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 6
+        },
+        {
+          "name": "test_discover_providers_includes_deepl_engine_mapping",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "test_display_results_shows_pricing_column",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 25
+        },
+        {
+          "name": "test_generate_config_builds_engines",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 34
+        },
+        {
+          "name": "test_generate_config_excludes_community_providers_by_default",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 24
+        },
+        {
+          "name": "test_generate_config_includes_community_providers_when_requested",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 24
+        },
+        {
+          "name": "test_generate_config_prefers_ullm_when_translators_unavailable",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 26
+        },
+        {
+          "name": "test_generate_config_defaults_to_ullm_when_only_openai",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 24
+        },
+        {
+          "name": "test_test_single_endpoint_success",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 36
+        },
+        {
+          "name": "test_test_single_endpoint_parses_list_payload",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 32
+        },
+        {
+          "name": "test_test_single_endpoint_logs_verbose_status",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 39
+        },
+        {
+          "name": "test_test_single_endpoint_timeout",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 27
+        },
+        {
+          "name": "test_test_single_endpoint_http_error",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 31
+        },
+        {
+          "name": "test_validate_config_logs_failures",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "test_validate_config_returns_immediately_when_no_results",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 13
+        },
+        {
+          "name": "test_test_endpoints_handles_non_api_providers",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 15
+        },
+        {
+          "name": "test_test_endpoints_invokes_single_endpoint_for_api_providers",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 22
+        },
+        {
+          "name": "test_test_single_endpoint_uses_anthropic_headers",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 36
+        },
+        {
+          "name": "test_test_single_endpoint_defaults_model_count_for_unknown_payload",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 31
+        },
+        {
+          "name": "test_test_single_endpoint_logs_failure_when_verbose",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 39
+        },
+        {
+          "name": "test_test_single_endpoint_general_exception",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 24
+        },
+        {
+          "name": "test_generate_config_returns_none_when_empty",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 5
+        },
+        {
+          "name": "test_setup_wizard_run_interactive_success",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 59
+        },
+        {
+          "name": "test_setup_wizard_run_interactive_no_config",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 26
+        },
+        {
+          "name": "test_validate_config_renders_table",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 30
+        },
+        {
+          "name": "test_discover_providers_verbose_logs",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "test_test_single_endpoint_connect_error",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 24
+        },
+        {
+          "name": "test_test_single_endpoint_handles_json_errors",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 31
+        },
+        {
+          "name": "test_test_single_endpoint_no_base_url",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 11
+        },
+        {
+          "name": "test_display_results_no_providers",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 14
+        },
+        {
+          "name": "test_select_default_engine_prefers_deepl",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "test_select_default_engine_prefers_translators_then_ullm",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "test_select_default_engine_prefers_ullm_when_present",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "test_select_default_engine_falls_back_to_first_engine",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "test_select_default_engine_returns_none_when_empty",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 4
+        },
+        {
+          "name": "test_generate_config_uses_fallbacks",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 29
+        },
+        {
+          "name": "test_setup_command_exits_on_failure",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 8
+        },
+        {
+          "name": "test_setup_command_succeeds",
+          "params": [
+            "monkeypatch"
+          ],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 16
+        }
+      ],
+      "classes": [
+        {
+          "name": "_StubProgress",
+          "methods": [
+            "__enter__",
+            "__exit__",
+            "add_task",
+            "update"
+          ],
+          "properties": [],
+          "exported": true,
+          "lineCount": 12
+        }
+      ],
+      "imports": [
+        {
+          "source": "collections.abc",
+          "specifiers": [
+            "Sequence"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": "httpx",
+          "specifiers": [
+            "httpx"
+          ]
+        },
+        {
+          "source": "pytest",
+          "specifiers": [
+            "pytest"
+          ]
+        },
+        {
+          "source": "abersetz.config",
+          "specifiers": [
+            "AbersetzConfig"
+          ]
+        },
+        {
+          "source": "abersetz.engine_catalog",
+          "specifiers": [
+            "normalize_selector"
+          ]
+        },
+        {
+          "source": "abersetz.setup",
+          "specifiers": [
+            "DiscoveredProvider",
+            "EngineConfig",
+            "SetupWizard",
+            "_select_default_engine",
+            "setup_command"
+          ]
+        }
+      ],
+      "exports": [
+        "_stub_phase",
+        "_StubProgress",
+        "test_setup_wizard_triggers_validation",
+        "test_setup_wizard_skips_validation_when_no_config",
+        "test_discover_providers_adds_pricing_hint",
+        "test_discover_providers_includes_deepl_engine_mapping",
+        "test_display_results_shows_pricing_column",
+        "test_generate_config_builds_engines",
+        "test_generate_config_excludes_community_providers_by_default",
+        "test_generate_config_includes_community_providers_when_requested",
+        "test_generate_config_prefers_ullm_when_translators_unavailable",
+        "test_generate_config_defaults_to_ullm_when_only_openai",
+        "test_test_single_endpoint_success",
+        "test_test_single_endpoint_parses_list_payload",
+        "test_test_single_endpoint_logs_verbose_status",
+        "test_test_single_endpoint_timeout",
+        "test_test_single_endpoint_http_error",
+        "test_validate_config_logs_failures",
+        "test_validate_config_returns_immediately_when_no_results",
+        "test_test_endpoints_handles_non_api_providers",
+        "test_test_endpoints_invokes_single_endpoint_for_api_providers",
+        "test_test_single_endpoint_uses_anthropic_headers",
+        "test_test_single_endpoint_defaults_model_count_for_unknown_payload",
+        "test_test_single_endpoint_logs_failure_when_verbose",
+        "test_test_single_endpoint_general_exception",
+        "test_generate_config_returns_none_when_empty",
+        "test_setup_wizard_run_interactive_success",
+        "test_setup_wizard_run_interactive_no_config",
+        "test_validate_config_renders_table",
+        "test_discover_providers_verbose_logs",
+        "test_test_single_endpoint_connect_error",
+        "test_test_single_endpoint_handles_json_errors",
+        "test_test_single_endpoint_no_base_url",
+        "test_display_results_no_providers",
+        "test_select_default_engine_prefers_deepl",
+        "test_select_default_engine_prefers_translators_then_ullm",
+        "test_select_default_engine_prefers_ullm_when_present",
+        "test_select_default_engine_falls_back_to_first_engine",
+        "test_select_default_engine_returns_none_when_empty",
+        "test_generate_config_uses_fallbacks",
+        "test_setup_command_exits_on_failure",
+        "test_setup_command_succeeds"
+      ],
+      "totalLines": 999,
+      "hasStructuralAnalysis": true
+    },
+    "tests/test_validation.py": {
+      "filePath": "tests/test_validation.py",
+      "contentHash": "49e2e5b048136af205ec267e218c02e54bc8274076d28ea88c9e9dc8e9bb555e",
+      "functions": [
+        {
+          "name": "_build_config",
+          "params": [],
+          "returnType": "AbersetzConfig",
+          "exported": true,
+          "lineCount": 21
+        },
+        {
+          "name": "test_validate_engines_collects_results",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 30
+        },
+        {
+          "name": "test_validate_engines_handles_failures",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 23
+        },
+        {
+          "name": "test_validate_engines_limits_selectors",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 18
+        },
+        {
+          "name": "test_validate_engines_flags_empty_translations",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 12
+        },
+        {
+          "name": "test_append_selector_handles_empty_and_duplicates",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 10
+        },
+        {
+          "name": "test_extract_providers_merges_lists_and_fallback",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 9
+        },
+        {
+          "name": "test_selectors_from_config_collects_all_engines",
+          "params": [],
+          "returnType": "None",
+          "exported": true,
+          "lineCount": 23
+        }
+      ],
+      "classes": [
+        {
+          "name": "_StubEngine",
+          "methods": [
+            "translate",
+            "chunk_size_for"
+          ],
+          "properties": [
+            "selector",
+            "text",
+            "should_fail",
+            "return_empty",
+            "name",
+            "chunk_size",
+            "html_chunk_size"
+          ],
+          "exported": true,
+          "lineCount": 20
+        }
+      ],
+      "imports": [
+        {
+          "source": "dataclasses",
+          "specifiers": [
+            "dataclass"
+          ]
+        },
+        {
+          "source": "typing",
+          "specifiers": [
+            "Any"
+          ]
+        },
+        {
+          "source": "abersetz",
+          "specifiers": [
+            "validation"
+          ]
+        },
+        {
+          "source": "abersetz.config",
+          "specifiers": [
+            "AbersetzConfig",
+            "Defaults",
+            "EngineConfig"
+          ]
+        },
+        {
+          "source": "abersetz.engines",
+          "specifiers": [
+            "EngineError",
+            "EngineRequest",
+            "EngineResult"
+          ]
+        },
+        {
+          "source": "abersetz.validation",
+          "specifiers": [
+            "validate_engines"
+          ]
+        }
+      ],
+      "exports": [
+        "_StubEngine",
+        "_build_config",
+        "test_validate_engines_collects_results",
+        "test_validate_engines_handles_failures",
+        "test_validate_engines_limits_selectors",
+        "test_validate_engines_flags_empty_translations",
+        "test_append_selector_handles_empty_and_duplicates",
+        "test_extract_providers_merges_lists_and_fallback",
+        "test_selectors_from_config_collects_all_engines"
+      ],
+      "totalLines": 198,
+      "hasStructuralAnalysis": true
+    },
+    "TODO.md": {
+      "filePath": "TODO.md",
+      "contentHash": "3642a13d7b971edaa51fe392949a4e269ec00a3b939dfdb29dcb9fcd7882865a",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 47,
+      "hasStructuralAnalysis": true
+    },
+    "WORK.md": {
+      "filePath": "WORK.md",
+      "contentHash": "9679dbf9fee0e55a73442b599d22c08c64677fcf60c4bfe1dc410d3a3cc8c973",
+      "functions": [],
+      "classes": [],
+      "imports": [],
+      "exports": [],
+      "totalLines": 636,
+      "hasStructuralAnalysis": true
+    }
+  }
+}

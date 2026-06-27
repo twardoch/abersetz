@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -52,6 +53,7 @@ def test_local_model_finder_scans_correctly(
     # Monkeypatch the home path to our mock home
     finder = LocalModelFinder()
     monkeypatch.setattr(finder, "home", mock_home)
+    monkeypatch.setattr("shutil.which", lambda _: None)
 
     # Scan with a min size of 0 to match our small dummy files
     models = finder.discover_models(min_size_mb=0.0)
@@ -86,6 +88,7 @@ def test_resolve_local_situation_model(tmp_path: Path, monkeypatch: pytest.Monke
 
     # Monkeypatch Path.home so it queries mock_home
     monkeypatch.setattr(Path, "home", lambda: mock_home)
+    monkeypatch.setattr("shutil.which", lambda _: None)
 
     # Monkeypatch Path.stat to simulate files larger than 100MB
     original_stat = Path.stat
@@ -170,6 +173,7 @@ def test_resolve_local_mlx_situation_model(tmp_path: Path, monkeypatch: pytest.M
 
     # Monkeypatch Path.home so it queries mock_home
     monkeypatch.setattr(Path, "home", lambda: mock_home)
+    monkeypatch.setattr("shutil.which", lambda _: None)
 
     # Monkeypatch Path.stat to simulate files larger than 100MB
     original_stat = Path.stat
@@ -207,3 +211,48 @@ def test_resolve_local_mlx_situation_model(tmp_path: Path, monkeypatch: pytest.M
     # Resolve MLX alias "1.8b-mlx" which should find weights_file but return snapshot dir
     resolved = resolve_and_download_model("1.8b-mlx", "mlx")
     assert resolved == str(mlx_model_path.resolve())
+
+
+def test_local_model_finder_uses_lmstudio_cli_grouped_models(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Test that LM Studio discovery uses `lms ls --json` grouped model entries."""
+    mock_home = tmp_path / "home"
+    lmstudio_home = mock_home / "lmstudio"
+    lm_models_path = lmstudio_home / "models"
+    lm_models_path.mkdir(parents=True)
+    mock_home.mkdir(exist_ok=True)
+    (mock_home / ".lmstudio-home-pointer").write_text(str(lmstudio_home), encoding="utf-8")
+
+    finder = LocalModelFinder()
+    monkeypatch.setattr(finder, "home", mock_home)
+    monkeypatch.setattr("shutil.which", lambda _: "/usr/local/bin/lms")
+
+    payload = """[
+      {
+        "modelKey": "qwen3-test",
+        "format": "safetensors",
+        "path": "publisher/qwen3-test",
+        "sizeBytes": 209715200
+      },
+      {
+        "modelKey": "small-skipped",
+        "format": "gguf",
+        "path": "publisher/small-skipped",
+        "sizeBytes": 1
+      }
+    ]"""
+
+    def fake_run(*args, **kwargs):
+        kwargs["stdout"].write(payload)
+        return SimpleNamespace()
+
+    monkeypatch.setattr("subprocess.run", fake_run)
+
+    models = finder.discover_models(min_size_mb=100.0)
+
+    assert len(models) == 1
+    assert models[0].name == "qwen3-test"
+    assert models[0].app == "LMStudio"
+    assert models[0].format == "Safetensors"
+    assert models[0].path == lm_models_path / "publisher" / "qwen3-test"

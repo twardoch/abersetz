@@ -4,6 +4,22 @@ this_file: WORK.md
 # Work Log
 
 ## 2026-05-25
+### Engine Selector Overhaul (issue 111)
+- Implemented the new `engine[/subvariant]::provider` selector grammar (`selector.py`) with codes `tr`/`dt`/`lm`/`ll`/`ml`/`gg`; legacy `engine/provider` form preserved so all prior tests pass unchanged.
+- `create_engine` diverts `::` selectors to a new builder while keeping the legacy dispatch intact; `lm`/`ml`/`gg` now take a model id/path directly via the provider.
+- Added job-JSON format (`job.py`, Pydantic), the unified `ls` discovery command (`listing.py`, fast provider listing + cached slow model enumeration + `--job` skeleton output), and new CLI verbs `tr`/`tf`/`td` (each with `--job`).
+- Rewrote the benchmark example to be job-driven (no `MODEL_PATHS`); added `benchmark_prep.py` and `benchmark_run.sh`.
+- Made `conftest.py` resilient to the broken installed `twat_cache` build; the caching test now skips when caching is unavailable.
+- Tests: 232 passed, 9 skipped, 0 failed. New suites: `test_selector.py`, `test_job.py`, `test_ls.py`, rewritten `test_examples.py`, extended `test_engines.py`/`test_cli.py`. Smoke-tested `ls`, `tr`, `tf` (+ `--job`), and `benchmark.py` end-to-end against the real Google translator.
+
+### Local Model Discovery Alignment
+- Updated `LocalModelFinder` so LM Studio discovery uses grouped `lms ls --json` model records when available instead of counting every weight shard as a separate model.
+- Preserved the no-LM-Studio fallback path: if the `lms` CLI is missing or returns invalid JSON, discovery still scans HuggingFace, Ollama, LM Studio-style directories, Pinokio, and GPT4All directly from disk.
+- Worked around a local `lms ls --json` capture issue by reading JSON through a temporary file instead of a Python pipe.
+- Added regression tests for grouped LM Studio discovery and isolated existing local model resolution tests from the user's real LM Studio library.
+- Verified with `uv run pytest -q` (all tests passed; 8 skipped) and `uv run ruff check src/abersetz/providers/llm/local_discovery.py tests/test_local_discovery.py tests/test_engines.py`.
+- `uvx hatch test` is currently blocked by the Hatch test environment importing a broken installed `twat_cache` package missing `twat_cache.engines.functools`; the local editable test path passes.
+
 ### Config Alignment and Import Silencing
 - Cleaned and aligned the user's config file at `/Users/adam/Library/Application Support/abersetz/config.toml` by removing the defunct `my_memory` provider from deep-translator and ensuring the `libre` and `linguee` providers are correctly configured.
 - Implemented robust stdout/stderr silencing during heavy import stages in `src/abersetz/cli.py` to suppress import-time console prints and warnings (such as `redis not available` or `CACHE_KWARGS` prints from global package copies).

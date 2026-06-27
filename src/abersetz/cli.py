@@ -42,6 +42,7 @@ with open(os.devnull, "w") as devnull:
             TranslationResult,
             TranslatorOptions,
             translate_path,
+            translate_string,
         )
         from .setup import setup_command  # noqa: E402
         from .validation import ValidationResult, validate_engines  # noqa: E402
@@ -395,7 +396,7 @@ class AbersetzCLI:
         console.print(f"abersetz version {__version__}")
         return __version__
 
-    def tr(
+    def _translate_files(
         self,
         to_lang: str,
         path: str | Path,
@@ -421,42 +422,21 @@ class AbersetzCLI:
         n_ctx: int | None = None,
         max_tokens: int | None = None,
         n_threads: int | None = None,
+        job: str | None = None,
         verbose: bool = False,
     ) -> None:
-        """Translate documents or folders.
-
-        Args:
-            to_lang: Target language code (e.g. 'pl' or 'es'). Maps to short option -t.
-            path: Path to target file or folder.
-            engine: Translation engine/provider selector (e.g. 'tr/google', 'lms').
-            from_lang: Source language code (defaults to 'auto').
-            recurse: Recursively search directories if path is folder.
-            write_over: Backward compatible lowercase overwrite option.
-            Overwrite: Overwrite existing translation files. Maps to uppercase -O (avoids clash with output -o).
-            output: Directory to write output files to. Maps to lowercase -o.
-            save_voc: Save extracted terminology vocabulary file.
-            chunk_size: Split size for text chunks.
-            html_chunk_size: Split size for HTML chunk structure.
-            include: Comma-separated glob patterns to include (e.g. '*.md').
-            xclude: Comma-separated glob patterns to exclude.
-            dry_run: Simulate translation without calling backend APIs.
-            prolog: JSON string or path containing static prolog/system instructions.
-            voc: Backward compatible lowercase vocabulary option.
-            Vocabulary: JSON vocabulary file/string for terminology lookup. Maps to uppercase -V (avoids clash with verbose -v).
-            temperature: Backward compatible lowercase temperature option.
-            Temperature: Inference temperature for LLM-based translation. Maps to uppercase -T (avoids clash with target language -t).
-            n_gpu_layers: GPU layers to offload (specific to local GGUF/llama.cpp engines).
-            n_ctx: Context size / length (specific to local GGUF/llama.cpp engines).
-            max_tokens: Maximum tokens to generate (specific to local MLX/GGUF engines).
-            n_threads: Number of CPU threads to use (specific to local GGUF/llama.cpp engines).
-            verbose: Enable debug log outputs.
-        """
+        """Shared implementation for ``tf`` (file) and ``td`` (directory)."""
         # Handle case-based overrides and fallbacks
         actual_overwrite = Overwrite or (write_over is True)
         actual_voc = Vocabulary if Vocabulary is not None else voc
         actual_temperature = Temperature if Temperature is not None else temperature
 
         _configure_logging(verbose)
+
+        if job:
+            self._run_file_job(path, job, output=output, dry_run=dry_run, verbose=verbose)
+            return
+
         opts = _build_options_from_cli(
             to_lang=to_lang,
             path=path,
@@ -499,6 +479,127 @@ class AbersetzCLI:
                 logger.debug("Chunks: {}", result.chunks)
                 logger.debug("Output: {}", result.destination)
             print(result.destination)
+
+    def _run_file_job(
+        self,
+        path: str | Path,
+        job_ref: str,
+        *,
+        output: str | Path | None,
+        dry_run: bool,
+        verbose: bool,
+    ) -> None:
+        """Run every entry of a job against ``path``, one suffixed output each."""
+        from .job import load_job
+
+        loaded = load_job(job_ref)
+        base_output = Path(output).resolve() if output is not None else None
+        for entry in loaded.resolved_entries():
+            suffix = entry.resolved_suffix()
+            out_dir = (base_output or Path(path).resolve().parent) / suffix
+            opts = TranslatorOptions(
+                engine=entry.selector,
+                from_lang=entry.from_lang,
+                to_lang=entry.to_lang,
+                chunk_size=entry.chunk_size,
+                html_chunk_size=entry.html_chunk_size,
+                output_dir=out_dir,
+                dry_run=dry_run,
+                temperature=entry.params.get("temperature"),
+                max_tokens=entry.params.get("max_tokens"),
+                n_gpu_layers=entry.params.get("n_gpu_layers"),
+                n_ctx=entry.params.get("n_ctx"),
+                n_threads=entry.params.get("n_threads"),
+            )
+            try:
+                results = translate_path(path, opts)
+            except PipelineError as error:
+                console.print(f"[red]{entry.selector}: {error}[/red]")
+                continue
+            for result in results:
+                print(f"{entry.selector}\t{result.destination}")
+
+    def tf(self, to_lang: str, path: str | Path, **kwargs: object) -> None:
+        """Translate a single file.
+
+        Args:
+            to_lang: Target language code (e.g. 'pl').
+            path: Path to the file to translate.
+            **kwargs: engine, from_lang, output, chunk_size, --job, etc.
+                See ``tr``/``td`` for the full option list.
+        """
+        self._translate_files(to_lang, path, **kwargs)  # type: ignore[arg-type]
+
+    def td(self, to_lang: str, path: str | Path, **kwargs: object) -> None:
+        """Translate a directory tree of files.
+
+        Args:
+            to_lang: Target language code (e.g. 'pl').
+            path: Path to the directory to translate.
+            **kwargs: engine, from_lang, output, recurse, include, xclude, --job, etc.
+        """
+        self._translate_files(to_lang, path, **kwargs)  # type: ignore[arg-type]
+
+    def tr(
+        self,
+        to_lang: str,
+        text: str,
+        *,
+        engine: str | None = None,
+        from_lang: str | None = None,
+        chunk_size: int | None = None,
+        temperature: float | None = None,
+        job: str | None = None,
+        verbose: bool = False,
+    ) -> None:
+        """Translate a string and print the result to stdout.
+
+        Args:
+            to_lang: Target language code (e.g. 'pl').
+            text: The text to translate.
+            engine: Engine selector (e.g. 'tr::google', 'll::openai:gpt-4o-mini').
+            from_lang: Source language code (defaults to 'auto').
+            chunk_size: Override chunk size for the text.
+            temperature: Inference temperature for LLM-based engines.
+            job: JSON job (file path or inline) — translates the text with every
+                entry and prints ``selector<TAB>translation`` lines.
+            verbose: Enable debug log output.
+        """
+        _configure_logging(verbose)
+
+        if job:
+            from .job import load_job
+
+            loaded = load_job(job)
+            for entry in loaded.resolved_entries():
+                opts = TranslatorOptions(
+                    engine=entry.selector,
+                    from_lang=entry.from_lang or from_lang,
+                    to_lang=entry.to_lang or to_lang,
+                    chunk_size=entry.chunk_size,
+                    temperature=entry.params.get("temperature"),
+                )
+                try:
+                    out = translate_string(text, opts)
+                except PipelineError as error:
+                    console.print(f"[red]{entry.selector}: {error}[/red]")
+                    continue
+                print(f"{entry.selector}\t{out}")
+            return
+
+        opts = TranslatorOptions(
+            engine=normalize_selector(engine) if engine else engine,
+            from_lang=from_lang,
+            to_lang=to_lang,
+            chunk_size=chunk_size,
+            temperature=temperature,
+        )
+        try:
+            output = translate_string(text, opts)
+        except PipelineError as error:
+            console.print(f"[red]{error}[/red]")
+            raise
+        print(output)
 
     def config(self) -> ConfigCommands:
         """Access configuration helper subcommands.
@@ -549,6 +650,61 @@ class AbersetzCLI:
             configured_only=configured_only,
         )
         _render_engine_entries(entries)
+
+    def ls(
+        self,
+        selector: str | None = None,
+        *,
+        include_paid: bool = False,
+        force: bool = False,
+        job: bool = False,
+        to_lang: str = "en",
+        from_lang: str = "auto",
+    ) -> None:
+        """List available engines, providers and models.
+
+        Combines the old ``engines`` and ``discover`` commands. Without a
+        ``selector`` it lists engines and provider names (fast). A selector
+        prefix narrows the listing and — for model-bearing engines like ``ll::``,
+        ``lm``, ``ml``, ``gg`` — enumerates models (slow; cached).
+
+        Args:
+            selector: Optional selector prefix or wildcard (e.g. 'tr', 'll::', 'tr::goog*').
+            include_paid: Include providers that require a paid API key.
+            force: Bypass the discovery cache and re-query model lists.
+            job: Emit an abersetz job-JSON skeleton for the matched combos instead of a table.
+            to_lang: Target language used when emitting a job (--job).
+            from_lang: Source language used when emitting a job (--job).
+        """
+        from .job import job_to_dict
+        from .listing import build_catalog, catalog_to_job
+
+        entries = build_catalog(selector, include_paid=include_paid, force=force)
+        if job:
+            built = catalog_to_job(entries, to_lang=to_lang, from_lang=from_lang)
+            print(json.dumps(job_to_dict(built), indent=2, ensure_ascii=False))
+            return
+        self._render_catalog(entries)
+
+    def _render_catalog(self, entries: list) -> None:
+        if not entries:
+            console.print("No matching engines, providers, or models found.")
+            return
+        table = Table(title="abersetz catalog", show_header=True, header_style="bold cyan")
+        table.add_column("Selector", style="white")
+        table.add_column("Kind", style="cyan")
+        table.add_column("Available", style="green")
+        table.add_column("Key", style="yellow")
+        table.add_column("Notes", style="magenta")
+        for entry in entries:
+            table.add_row(
+                entry.selector,
+                entry.kind,
+                "✓" if entry.available else "✗",
+                "required" if entry.requires_key else "free",
+                entry.notes,
+            )
+        console.print(table)
 
     def setup(
         self,

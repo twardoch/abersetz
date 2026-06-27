@@ -23,6 +23,7 @@ this_file: DEPENDENCIES.md
 - **tomli** (>=2.0, Python <3.11 only): Backport of the standard library TOML parser. Keeps config loading consistent across Python versions.
 - **semantic-text-splitter** (>=0.7): Smart text chunking that respects semantic boundaries. Helps preserve context during translation.
 - **tenacity** (>=8.4): Retry logic with exponential backoff. Handles API failures and rate limits.
+- **pydantic** (>=2.0): Data validation for the job-JSON format (`Job`/`JobEntry`). Parses and validates job files at the I/O boundary so the rest of the code works with typed objects.
 
 ### Optional Local Engines
 - **mlx-lm**: Enables local MLX inference for HY-MT and TranslateGemma (`mthy/mlx`, `gemma/mlx`). Optional dependency, conditional for macOS only.

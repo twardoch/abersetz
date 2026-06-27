@@ -10,16 +10,23 @@ Translation memory carries vocabulary terms forward across chunks so "widget" in
 
 ## Engines
 
-Abersetz speaks to several translation backends through a unified interface:
+Abersetz speaks to several translation backends through a unified selector
+grammar: `engine[/subvariant]::provider`.
 
-| Selector | What it uses |
-|---|---|
-| `tr/google`, `tr/bing`, … | `translators` package — scrapes web translation endpoints |
-| `dt/google`, `dt/deepl`, `dt/microsoft`, … | `deep-translator` — more stable, official APIs |
-| `ullm/<profile>` | Any OpenAI-compatible LLM endpoint (OpenAI, Anthropic, SiliconFlow, local Ollama) |
-| `lms` | LMStudio local models via the official `lmstudio` SDK |
-| `mthy/mlx`, `mthy/gguf` | Tencent Hunyuan-MT running locally (Apple Silicon or CPU via llama.cpp) |
-| `gemma/mlx`, `gemma/gguf` | Google TranslateGemma running locally |
+| Engine code | What it uses | Example selector |
+|---|---|---|
+| `tr` | `translators` package — scrapes web endpoints | `tr::google`, `tr::bing` |
+| `dt` | `deep-translator` — more stable, official APIs | `dt::deepl`, `dt::microsoft` |
+| `lm` | LMStudio local models via the official `lmstudio` SDK | `lm::gemma-3-4b` |
+| `ll` | Any OpenAI-compatible LLM endpoint | `ll::siliconflow:Qwen/Qwen2.5-7B-Instruct` |
+| `ml` | Local MLX model (`mlx_lm`) | `ml/hy-mt2::/models/Hy-MT2-7B` |
+| `gg` | Local GGUF model (`llama.cpp`) | `gg/gemma::/models/gemma.gguf` |
+
+The text after `::` is the provider: a translation backend (`tr`/`dt`), a model
+id (`lm`), an `endpoint:model` spec (`ll`), or a model folder/file path
+(`ml`/`gg`). An optional subvariant before `::` (e.g. `ml/hy-mt2`, `lm/gemma`)
+picks the prompt family for local models. The legacy `engine/provider` form
+(`tr/google`, `ll/default`) is still accepted.
 
 LLM engines wrap text in XML tags and extract the `<output>` block from the response, which makes them tolerant of chatty models that add extra commentary.
 
@@ -34,39 +41,62 @@ uv pip install abersetz
 ## Quick start
 
 ```bash
-# Translate a single file to Spanish using Google (via translators)
-abersetz translate file.md --to-lang es --engine tr/google
+# Translate a string straight to stdout
+abersetz tr es "Hello world" --engine tr::google
 
-# Translate a directory tree to Polish using OpenAI
-abersetz translate ./docs --to-lang pl --engine ullm/openai
+# Translate a single file to Spanish using Google (via translators)
+abersetz tf es file.md --engine tr::google
+
+# Translate a directory tree to Polish using an OpenAI-compatible LLM
+abersetz td pl ./docs --engine ll::openai:gpt-4o-mini
 
 # Dry run — verify paths and settings without burning API credits
-abersetz translate ./docs --to-lang de --dry-run
+abersetz td de ./docs --dry-run
 
-# Validate that your API keys work
-abersetz validate
+# List engines, providers and models (or a subset)
+abersetz ls            # engines + provider names (fast)
+abersetz ls ll::       # query LLM model lists (slow; cached)
+abersetz ls tr --job   # emit a job-JSON skeleton for all translators providers
 ```
 
-Output files land in a subdirectory named after the target language by default (e.g. `./docs/pl/`). Use `--output-dir` to redirect them, or `--write-over` to replace files in place.
+Output files land in a subdirectory named after the target language by default (e.g. `./docs/pl/`). Use `--output` to redirect them, or `--Overwrite` to replace files in place.
 
 ## CLI reference
 
 ```
-abersetz translate <path> [options]
+abersetz tr <to_lang> <text>   Translate a string to stdout
+abersetz tf <to_lang> <file>   Translate a single file
+abersetz td <to_lang> <dir>    Translate a directory tree
 
-  --engine TEXT      Engine selector, e.g. tr/google, ullm/openai, mthy/mlx
+  --engine TEXT      Engine selector, e.g. tr::google, ll::openai:gpt-4o, ml/hy-mt2::/models/x
   --from-lang TEXT   Source language code (default: auto-detect)
-  --to-lang TEXT     Target language code (required)
-  --output-dir PATH  Where to write translated files
-  --write-over       Overwrite source files instead of creating a subdirectory
+  --output PATH      Where to write translated files (tf/td)
   --chunk-size INT   Max tokens per chunk for LLM engines
-  --save-voc         Write a .voc.json sidecar file with accumulated terminology
-  --dry-run          Show what would be translated without calling any API
-  --recurse / --no-recurse  Walk subdirectories (default: on)
-  --xclude PATTERN   Glob pattern(s) to skip
+  --job JSON         A job-JSON file/string: translate with every entry at once
+  --dry-run          Show what would be translated without calling any API (tf/td)
+
+abersetz ls [SELECTOR]   List engines / providers / models (combines old engines+discover)
+  --job              Emit an abersetz job-JSON skeleton instead of a table
+  --force            Bypass the discovery cache for slow model lookups
+  --include-paid     Include providers needing a paid API key
 
 abersetz validate    Ping all configured engines with a test phrase
-abersetz list        Show available engines from config
+```
+
+### Job JSON
+
+A job pairs selectors with languages, chunk sizes, engine params and an output
+suffix, so one input can be fanned across many engines (used by the benchmark):
+
+```json
+{
+  "to_lang": "pl",
+  "from_lang": "en",
+  "entries": [
+    {"selector": "tr::google"},
+    {"selector": "ll::siliconflow:Qwen/Qwen2.5-7B-Instruct", "params": {"temperature": 0.3}}
+  ]
+}
 ```
 
 ## Configuration

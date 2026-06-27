@@ -7,6 +7,19 @@ All notable changes to abersetz will be documented in this file.
 
 ## [Unreleased]
 
+### Added — Engine selector overhaul (issue 111)
+- New selector grammar `engine[/subvariant]::provider` with six 2-letter engine codes (`tr`, `dt`, `lm`, `ll`, `ml`, `gg`) in `src/abersetz/selector.py`; legacy `engine/provider` form still parses. Includes `parse_selector`, `slugify_selector`, and `Selector`.
+- New `src/abersetz/job.py`: Pydantic `Job`/`JobEntry` job-JSON format (selector + langs + chunk sizes + params + output suffix), `load_job`, `job_to_dict`.
+- New `src/abersetz/listing.py`: `build_catalog` powering the unified `abersetz ls` command (merges old `engines` + `discover`). Fast for engine/provider listing; enumerates models (provider APIs / local disk scan) only when the prefix narrows to a model-bearing engine; caches slow results under the config dir with `--force` override; `--job` emits a job skeleton.
+- New CLI translation verbs: `tr <text>` (string → stdout), `tf <file>`, `td <dir>`. Each accepts `--job` to translate with every job entry at once (per-suffix outputs / `selector<TAB>result` lines).
+- `pipeline.translate_string()` for in-memory string translation.
+- `create_engine` now understands the new `::` grammar directly (model id for `lm`, `endpoint:model` for `ll`, model path for `ml`/`gg`); legacy path unchanged.
+- Rewrote `examples/benchmark.py` to consume a job-JSON file + input document + report path (no hard-coded `MODEL_PATHS`); added `examples/benchmark_prep.py` (generates `benchmark_job.json`) and `examples/benchmark_run.sh` (poem → `benchmark_poem.json`, fontlab → `benchmark_fontlab.json`).
+- Added `pydantic>=2.0` as an explicit dependency.
+
+### Fixed
+- `tests/conftest.py` no longer hard-fails when the installed `twat_cache` build is broken; the `twat_cache` caching test skips gracefully when caching is unavailable.
+
 ### Added
 - Added unified CLI entrypoint routing in `pyproject.toml` pointing `abersetz` to `abersetz.__main__:main` so that both `uvx abersetz` and `python -m abersetz` execute the same entry point.
 - Added return type annotations and descriptive docstrings to all Fire CLI subcommands (`config`, `config show`, `config path`, `lang`) to enable clean `--help` synopses.
@@ -53,6 +66,7 @@ All notable changes to abersetz will be documented in this file.
 - Updated user `config.toml` to align deep-translator and translators provider lists with current codebase catalog (removing obsolete `my_memory` from deep-translator, and ensuring `libre` and `linguee` are correctly configured).
 
 ### Fixed
+- Fixed `abersetz discover` LM Studio handling to use grouped `lms ls --json` model records when the CLI is available, while preserving filesystem scanning fallback when LM Studio is absent.
 - Fixed duplicate client configuration conflict in `LmstudioEngine` by catching and handling the ValueError from `configure_default_client` gracefully.
 - Fixed a cache key serialization error in `pipeline.py` by safely extracting string model names instead of passing full loaded model weight objects (which exceeded SQLite capacity and caused indexing errors).
 - Fixed a log formatting `IndexError` in the `twat_cache` diskcache logger by removing formatted variables from `logger.exception` calls.

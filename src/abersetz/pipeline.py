@@ -140,6 +140,42 @@ def translate_path(
     return results
 
 
+def translate_string(
+    text: str,
+    options: TranslatorOptions | None = None,
+    *,
+    config: AbersetzConfig | None = None,
+    client: object | None = None,
+) -> str:
+    """Translate a raw string and return the translated string.
+
+    Mirrors :func:`translate_path` but operates in memory — used by the ``tr``
+    CLI verb to translate text straight to stdout. Detects HTML vs plain text and
+    chunks accordingly."""
+    cfg = config or load_config()
+    opts = _merge_defaults(options, cfg)
+    engine_selector = normalize_selector(opts.engine or cfg.defaults.engine) or cfg.defaults.engine
+
+    kwargs: dict[str, Any] = {}
+    for attr in ("temperature", "n_gpu_layers", "n_ctx", "max_tokens", "n_threads"):
+        value = getattr(opts, attr, None)
+        if value is not None:
+            kwargs[attr] = value
+    engine = create_engine(engine_selector, cfg, client=client, **kwargs)
+
+    if not text.strip():
+        return text
+
+    fmt = detect_format(text)
+    if fmt is TextFormat.HTML:
+        merged, _chunks, _voc = _translate_html(text, engine, opts, cfg)
+        return merged
+    chunk_size = _select_chunk_size(fmt, engine, opts, cfg)
+    chunks = chunk_text(text, chunk_size, fmt)
+    results, _voc = _apply_engine(engine, chunks, fmt, opts, cfg)
+    return "".join(item.text for item in results)
+
+
 def _merge_defaults(options: TranslatorOptions | None, config: AbersetzConfig) -> TranslatorOptions:
     opts = options or TranslatorOptions()
     if opts.engine is None:
@@ -472,4 +508,5 @@ __all__ = [
     "TranslationResult",
     "TranslatorOptions",
     "translate_path",
+    "translate_string",
 ]

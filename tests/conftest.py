@@ -13,8 +13,15 @@ SRC = ROOT / "src"
 if SRC.exists():
     sys.path.insert(0, str(SRC))
 
-# Isolate twat-cache by using a clean in-memory mock during test runs
-import twat_cache.decorators  # noqa: E402
+# Isolate twat-cache by using a clean in-memory mock during test runs.
+# twat_cache is optional and its installed build may be broken; degrade gracefully.
+try:
+    import twat_cache.decorators  # noqa: E402
+
+    _HAS_TWAT_CACHE = True
+except Exception:  # pragma: no cover - environment dependent
+    twat_cache = None  # type: ignore[assignment]
+    _HAS_TWAT_CACHE = False
 
 test_caches: list[dict] = []
 
@@ -53,7 +60,8 @@ def mock_bcache(*args, **kwargs):
     return decorator
 
 
-twat_cache.decorators.bcache = mock_bcache
+if _HAS_TWAT_CACHE:
+    twat_cache.decorators.bcache = mock_bcache
 
 
 @pytest.fixture(autouse=True)

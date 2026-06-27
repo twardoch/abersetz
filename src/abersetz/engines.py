@@ -27,6 +27,7 @@ from .providers import (
     TranslatorsEngine,
 )
 from .providers.mlx import _resolve_mthy_language
+from .selector import Selector, is_new_syntax, parse_selector
 
 # Re-export for compatibility
 _resolve_mthy_language = _resolve_mthy_language
@@ -94,6 +95,91 @@ def _select_profile(engine_cfg: EngineConfig, variant: str | None) -> Mapping[st
     return profiles[profile_name]
 
 
+def _local_engine_config(config: AbersetzConfig, family: str) -> EngineConfig:
+    """Return the configured block for a local family or a bare default."""
+    return config.engines.get(family) or EngineConfig(name=family)
+
+
+def _create_from_selector(
+    sel: Selector,
+    config: AbersetzConfig,
+    *,
+    client: Any | None,
+    temperature: float | None,
+    n_gpu_layers: int | None,
+    n_ctx: int | None,
+    max_tokens: int | None,
+    n_threads: int | None,
+) -> Engine:
+    """Build an engine from a parsed ``engine[/subvariant]::provider`` selector.
+
+    Delegates ``tr``/``dt``/``ll`` to the legacy factory (which already knows how
+    to read provider/profile config) and builds the model-path engines
+    (``lm``/``ml``/``gg``) directly so the provider can carry a model id or path."""
+    engine = sel.engine
+    provider = sel.provider
+
+    if engine == "tr":
+        return create_engine(f"tr/{provider}" if provider else "tr", config, client=client)
+    if engine == "dt":
+        return create_engine(f"dt/{provider}" if provider else "dt", config, client=client)
+    if engine == "ll":
+        legacy = f"ll/{provider}" if provider else "ll"
+        return create_engine(legacy, config, client=client, temperature=temperature)
+    if engine == "lm":
+        base_cfg = config.engines.get("lmstudio")
+        options = dict(base_cfg.options) if base_cfg else {"base_url": "localhost:1234"}
+        if provider:
+            options["model"] = provider
+        cfg = EngineConfig(
+            name="lmstudio",
+            chunk_size=base_cfg.chunk_size if base_cfg else None,
+            html_chunk_size=base_cfg.html_chunk_size if base_cfg else None,
+            options=options,
+        )
+        return LmstudioEngine(cfg, temperature=temperature)
+    if engine in {"ml", "gg"}:
+        family = sel.family
+        engine_cfg = _local_engine_config(config, family)
+        options = dict(engine_cfg.options)
+        model_path = (
+            provider
+            or options.get("model_path")
+            or options.get("mlx_path" if engine == "ml" else "gguf_path")
+        )
+        max_tokens_val = (
+            max_tokens if max_tokens is not None else int(options.get("max_tokens", 2048))
+        )
+        if engine == "ml":
+            return LocalMlxEngine(
+                family, engine_cfg, str(model_path or ""), max_tokens=max_tokens_val
+            )
+        temp_val = (
+            temperature if temperature is not None else float(options.get("temperature", 0.0))
+        )
+        n_gpu_layers_val = (
+            n_gpu_layers if n_gpu_layers is not None else int(options.get("n_gpu_layers", -1))
+        )
+        n_ctx_val = n_ctx if n_ctx is not None else int(options.get("n_ctx", 4096))
+        n_threads_raw = options.get("n_threads")
+        n_threads_val = (
+            n_threads
+            if n_threads is not None
+            else (int(n_threads_raw) if n_threads_raw is not None else None)
+        )
+        return LocalGgufEngine(
+            family,
+            engine_cfg,
+            str(model_path or ""),
+            max_tokens=max_tokens_val,
+            temperature=temp_val,
+            n_gpu_layers=n_gpu_layers_val,
+            n_ctx=n_ctx_val,
+            n_threads=n_threads_val,
+        )
+    raise EngineError(f"Unsupported engine code '{engine}' in selector '{sel.raw}'")
+
+
 def create_engine(
     selector: str,
     config: AbersetzConfig,
@@ -106,6 +192,21 @@ def create_engine(
     n_threads: int | None = None,
 ) -> Engine:
     """Factory that builds the requested engine supporting short aliases."""
+    # New ``engine[/subvariant]::provider`` grammar is handled separately; the
+    # legacy ``engine/provider`` form falls through to the original dispatch.
+    if is_new_syntax(selector):
+        parsed = parse_selector(selector)
+        assert parsed is not None
+        return _create_from_selector(
+            parsed,
+            config,
+            client=client,
+            temperature=temperature,
+            n_gpu_layers=n_gpu_layers,
+            n_ctx=n_ctx,
+            max_tokens=max_tokens,
+            n_threads=n_threads,
+        )
     normalized = normalize_selector(selector) or selector
     base, variant = resolve_engine_reference(normalized)
 

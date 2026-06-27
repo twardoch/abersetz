@@ -1,46 +1,59 @@
-# Todo List
+# Todo List — Task 111: Engine Selector Overhaul
 
-This file tracks the detailed tasks for Abersetz local model discovery and local situation support. Detailed requirements can be found in [issues/109.md](file:///Users/adam/Developer/vcs3/github.twardoch/pub/abersetz/issues/109.md) and [issues/110.md](file:///Users/adam/Developer/vcs3/github.twardoch/pub/abersetz/issues/110.md).
+Detailed requirements: [issues/111.md](issues/111.md). Full design in [TASKS.md](TASKS.md).
 
-## Task 109: Local Model Discovery
-- [x] Implement the `LocalModelFinder` scanner class in [local_discovery.py](file:///Users/adam/Developer/vcs3/github.twardoch/pub/abersetz/src/abersetz/providers/llm/local_discovery.py) to locate local AI model downloads.
-  - [x] Query standard cache directories using platform-specific logic and `platformdirs`.
-  - [x] Scan Hugging Face hub cache directory (`~/.cache/huggingface/hub`).
-  - [x] Scan Ollama models directory (`~/.ollama/models`), with special support for extensionless SHA-256 files under the `blobs/` directory.
-  - [x] Scan LM Studio models directory by reading `$HOME/.lmstudio-home-pointer` for custom paths, with standard path fallback (`~/.cache/lm-studio/models`).
-  - [x] Scan Pinokio application model subdirectories (`~/pinokio`).
-  - [x] Scan GPT4All model directories (`~/Library/Application Support/nomic.ai/GPT4All` on macOS, or `~/AppData/Local/nomic.ai/GPT4All` on Windows).
-  - [x] Scan and filter files by standard extensions: `.gguf`, `.safetensors`, `.bin`, `.pt`, `.pth`, `.onnx`.
-  - [x] Scan directory-based CoreML `.mlpackage` bundles recursively to calculate total package size without walking inside them.
-  - [x] Support minimum file size threshold (default 100MB) to filter out config and metadata files.
-  - [x] Implement a Fire-based CLI command execution entry point for local discovery.
+**One-sentence scope:** Replace the engine selector grammar with `engine[/subvariant]::provider`, expose a single `ls` discovery command, add a reusable job-JSON format, and split translation into `tr`/`tf`/`td` CLI verbs — used consistently everywhere.
 
-## Task 110: Local Situation Support (Hunyuan-MT2)
-- [x] Support automatic path resolution and usage of local Hunyuan-MT2 models for both GGUF and MLX backends (see [issues/110.md](file:///Users/adam/Developer/vcs3/github.twardoch/pub/abersetz/issues/110.md)).
-  - [x] Map GGUF models:
-    - `models/tencent/Hy-MT2-1.8B-2Bit-GGUF/Hy-MT2-1.8B-2Bit.gguf`
-    - `models/tencent/Hy-MT2-1.8B-1.25Bit-GGUF/Hy-MT2-1.8B-1.25Bit.gguf`
-    - `models/tencent/Hy-MT2-1.8B-GGUF/Hy-MT2-1.8B-Q8_0.gguf`
-    - `models/tencent/Hy-MT2-7B-GGUF/HY-MT2-7B-Q8_0.gguf`
-  - [x] Map MLX models:
-    - `models/p0we7/Hy-MT2-1.8B-oQ8-fp16/`
-    - `models/tevino/Hy-MT2-7B-oQ8/`
-    - `models/QwQbb/Hy-MT2-30B-A3B-MLX-4bit/`
-    - `models/sahilchachra/hy-mt2-7b-8bit-mlx/`
-  - [x] Integrate local model finder into `resolve_and_download_model` in [mlx.py](file:///Users/adam/Developer/vcs3/github.twardoch/pub/abersetz/src/abersetz/providers/mlx.py).
-  - [x] Explicitly block and raise `EngineError` for obsolete/unsupported Hunyuan-MT1.x models (e.g. `Hunyuan-MT-7B`, `Hunyuan-MT1`, `Hy-MT1`, `HY-MT1`).
-  - [x] **Bugfix**: Ensure MLX local model resolution returns the directory containing the model weights (the parent directory of the matched weights file) rather than the path to the individual weight file, since `mlx_lm.load` expects a directory path.
-  - [x] Add unit test for local MLX model resolution directory path returns in [test_local_discovery.py](file:///Users/adam/Developer/vcs3/github.twardoch/pub/abersetz/tests/test_local_discovery.py).
+## Phase 1 — Selector grammar (`selector.py`)
+- [x] Define the 2-letter engine codes: `tr`, `dt`, `lm`, `ll`, `ml`, `gg`.
+- [x] `parse_selector(str) -> Selector(engine, subvariant, provider, raw)`:
+  - [x] New syntax: split on `::`; left = `engine[/subvariant]`, right = provider.
+  - [x] Legacy syntax (no `::`): `engine[/provider]` mapped onto new model (back-compat).
+  - [x] Map legacy aliases (`translators`, `deep-translator`, `lms`, `lmstudio`, `ullm`, `mthy`, `gemma`) onto the new codes.
+- [x] `format_selector(Selector) -> str` canonical `engine[/subvariant]::provider`.
+- [x] `slugify_selector(Selector) -> str` for output-suffix naming.
+- [x] Keep `normalize_selector` / `resolve_engine_reference` working (delegate to new parser) so existing call sites and tests don't break.
+- [x] Unit tests for every form in [tests/test_selector.py](tests/test_selector.py).
 
-## Task 108.1.5: Benchmark Example Rewrite
-- [x] Update [benchmark.py](file:///Users/adam/Developer/vcs3/github.twardoch/pub/abersetz/examples/benchmark.py) to support benchmarking specific providers separately.
-  - [x] Support a `--providers` CLI parameter for a comma-separated list of provider names.
-  - [x] Resolve provider name keywords dynamically to active engine configurations.
-  - [x] Non-destructively merge new results in `benchmark_results.json` to keep previous data.
-  - [x] Support both non-LLM (translators, deep-translator) and local LLM engines.
+## Phase 2 — Engine factory routing
+- [x] Rewrite `create_engine` to consume a parsed `Selector`.
+- [x] `tr` → `TranslatorsEngine(provider)`; `dt` → `DeepTranslatorEngine(provider)`.
+- [x] `lm` → `LmstudioEngine`, provider = model id.
+- [x] `ll` → `LlmEngine`, provider = `endpoint:model` (reuse `resolve_model`).
+- [x] `ml` → `LocalMlxEngine`, subvariant = family (`hy-mt2`→mthy / `gemma`), provider = path/alias.
+- [x] `gg` → `LocalGgufEngine`, subvariant = family, provider = path/alias.
+- [x] Map legacy `mthy/mlx`,`gemma/gguf` etc. onto `ml`/`gg` + family.
+- [x] Tests in [tests/test_engines.py](tests/test_engines.py) (offline-safe).
 
-## Task 108.2: Verification and Quality Control
-- [x] Write unit tests in [test_local_discovery.py](file:///Users/adam/Developer/vcs3/github.twardoch/pub/abersetz/tests/test_local_discovery.py) to cover scanning, filter by size, and alias resolution.
-- [x] Write unit tests in [test_examples.py](file:///Users/adam/Developer/vcs3/github.twardoch/pub/abersetz/tests/test_examples.py) to verify benchmark runner and result merging.
-- [x] Run full test suite, linting, formatting, and verify 100% success.
-- [x] Update [CHANGELOG.md](file:///Users/adam/Developer/vcs3/github.twardoch/pub/abersetz/CHANGELOG.md) and [WORK.md](file:///Users/adam/Developer/vcs3/github.twardoch/pub/abersetz/WORK.md).
+## Phase 3 — Job JSON format (`job.py`)
+- [x] Pydantic models: `JobEntry(selector, from_lang, to_lang, chunk_size, html_chunk_size, params, suffix)` and `Job(input, output_dir, entries[])`.
+- [x] `suffix` defaults to `slugify_selector`.
+- [x] `load_job(path|str) -> Job`, `job_to_dict`.
+- [x] Build `TranslatorOptions` from a `JobEntry` (done inline in CLI/benchmark rather than a separate helper).
+- [x] Tests in [tests/test_job.py](tests/test_job.py).
+
+## Phase 4 — `ls` command (merges `engines` + `discover`)
+- [x] `abersetz ls [selector_prefix]` lists engines / providers / models.
+- [x] Fast for engine/provider listing (no API calls); only query provider model APIs / scan local disk when that engine subset is requested.
+- [x] Wildcard support (`ll::*`, `tr::goog*`).
+- [x] Cache slow results (API model lists, local scans) under config dir; `--force` bypasses cache.
+- [x] `--job` emits an abersetz job-JSON skeleton for the matched combos.
+- [x] Tests in [tests/test_ls.py](tests/test_ls.py).
+
+## Phase 5 — Translation CLI verbs
+- [x] `tr <text>` translates a string to stdout.
+- [x] `tf <file>` single-file translation.
+- [x] `td <dir>` directory-tree translation.
+- [x] Each accepts `--job <json>` plus the existing inline options.
+- [x] Keep old `translate`/`tr` behavior available where reasonable; update README.
+- [x] Tests in [tests/test_cli.py](tests/test_cli.py).
+
+## Phase 6 — Examples & benchmark
+- [x] `examples/benchmark_prep.py`: runs `abersetz ls --job` over all combos → `examples/benchmark_job.json`.
+- [x] Rewrite `examples/benchmark.py` to consume `benchmark_job.json` + input doc + output naming + JSON report path. **No `MODEL_PATHS` literal in benchmark.py.**
+- [x] `examples/benchmark_run.sh`: poem → `benchmark_poem.json`, fontlab → `benchmark_fontlab.json`.
+- [x] Update [tests/test_examples.py](tests/test_examples.py).
+
+## Phase 7 — Wrap-up
+- [x] `fd -e py -x uvx ruff ...` + `uvx hatch test` all green.
+- [x] Update README.md, CHANGELOG.md, WORK.md, DEPENDENCIES.md.

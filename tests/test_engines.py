@@ -252,6 +252,87 @@ def test_create_engine_accepts_legacy_selector() -> None:
     assert engine.name == "translators"
 
 
+def test_create_engine_new_syntax_translators(monkeypatch: pytest.MonkeyPatch) -> None:
+    cfg = config_module.load_config()
+    captured: dict[str, object] = {}
+
+    def fake_translate_text(text, translator, from_language, to_language, **_):
+        captured["translator"] = translator
+        return "ok"
+
+    monkeypatch.setitem(
+        sys.modules,
+        "translators",
+        SimpleNamespace(translate_text=fake_translate_text, translate_html=lambda *a, **k: ""),
+    )
+    engine = create_engine("tr::bing", cfg)
+    assert engine.name == "translators"
+    engine.translate(
+        EngineRequest(
+            text="hi",
+            source_lang="en",
+            target_lang="pl",
+            is_html=False,
+            voc={},
+            prolog={},
+            chunk_index=0,
+            total_chunks=1,
+        )
+    )
+    assert captured["translator"] == "bing"
+
+
+def test_create_engine_new_syntax_lm_overrides_model(monkeypatch: pytest.MonkeyPatch) -> None:
+    cfg = config_module.load_config()
+
+    class MockLmsModel:
+        def __init__(self, name: str):
+            self.name = name
+
+        def respond(self, prompt: str, **kwargs: object) -> str:
+            return "x"
+
+    class MockLms:
+        def __init__(self) -> None:
+            self.model = None
+
+        def configure_default_client(self, url: str) -> None:
+            pass
+
+        def llm(self, name: str) -> MockLmsModel:
+            self.model = MockLmsModel(name)
+            return self.model
+
+    mock_lms = MockLms()
+    monkeypatch.setitem(sys.modules, "lmstudio", mock_lms)
+
+    create_engine("lm::custom-model-id", cfg)
+    assert mock_lms.model is not None
+    assert mock_lms.model.name == "custom-model-id"
+
+
+def test_create_engine_new_syntax_ml_path(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    model_dir = tmp_path / "Hy-MT2-7B"
+    model_dir.mkdir()
+    cfg = config_module.load_config()
+
+    captured: dict[str, object] = {}
+
+    def fake_load(path, *args, **kwargs):
+        captured["path"] = path
+        return object(), SimpleNamespace(chat_template="template")
+
+    def fake_generate(*args, **kwargs):
+        return "translated"
+
+    monkeypatch.setitem(
+        sys.modules, "mlx_lm", SimpleNamespace(load=fake_load, generate=fake_generate)
+    )
+    engine = create_engine(f"ml/hy-mt2::{model_dir}", cfg)
+    assert engine._family == "mthy"
+    assert str(model_dir) in str(captured["path"])
+
+
 def test_deep_translator_engine_retry_on_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test that DeepTranslatorEngine retries on network failures."""
 
@@ -699,6 +780,7 @@ def test_resolve_and_download_model_uses_lmstudio_path(
 
     original_path = KNOWN_MAPPING["QwQbb/Hy-MT2-30B-A3B-MLX-4bit"]["lmstudio_path"]
     KNOWN_MAPPING["QwQbb/Hy-MT2-30B-A3B-MLX-4bit"]["lmstudio_path"] = str(lmstudio_dir)
+    monkeypatch.setattr("abersetz.providers.mlx.find_local_model_path", lambda *_: None)
 
     try:
         res = resolve_and_download_model("QwQbb/Hy-MT2-30B-A3B-MLX-4bit", "mlx")
@@ -715,6 +797,7 @@ def test_resolve_and_download_model_triggers_huggingface_download(
 
     original_path = KNOWN_MAPPING["p0we7/Hy-MT2-1.8B-oQ8-fp16"]["lmstudio_path"]
     KNOWN_MAPPING["p0we7/Hy-MT2-1.8B-oQ8-fp16"]["lmstudio_path"] = "/nonexistent/lmstudio/path"
+    monkeypatch.setattr("abersetz.providers.mlx.find_local_model_path", lambda *_: None)
 
     captured_repo = None
 
