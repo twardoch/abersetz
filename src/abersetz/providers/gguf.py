@@ -11,7 +11,29 @@ from .mlx import _resolve_mthy_language, build_mthy_prompt, resolve_and_download
 
 
 class LocalGgufEngine(EngineBase):
-    """Local GGUF-backed engine for HY-MT and TranslateGemma."""
+    """Local translation engine using GGUF models via ``llama-cpp-python``.
+
+    Loads a ``.gguf`` quantised model file and runs inference locally using
+    llama.cpp.  Works on any platform (macOS, Linux, Windows) and does not
+    require Apple Silicon.
+
+    Supported model families:
+    * **mthy** — Tencent Hy-MT2 series (GGUF quantised variants).
+      Use ``gg/mthy::<model-alias-or-path>`` as the selector.
+    * **gemma** — Google Gemma translation variants (GGUF).
+      Use ``gg/gemma::<model-alias-or-path>`` as the selector.
+
+    **Cost**: Free — inference runs locally.
+    **Rate limits**: None.  CPU-only speed is roughly 2–10 tokens/second;
+      GPU offload (``n_gpu_layers=-1``) is substantially faster.
+    **Privacy**: 100 % local — no data leaves the machine.
+    **Offline**: Yes — after the model file is downloaded once.
+    **Platform**: Any OS with a C++ compiler; install with
+      ``pip install abersetz[gguf]``.  CUDA or Metal GPU offload requires
+      a matching build of ``llama-cpp-python``.
+    **Model size**: Q8_0 quantisation gives good quality at ~8 GB for 7 B models;
+      Q4_K_M halves that at a modest quality cost.
+    """
 
     def __init__(
         self,

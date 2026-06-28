@@ -110,6 +110,33 @@ Before you generate any response, assume your first instinct is wrong. Apply cha
 - `WORK.md` :  work progress updates including test results.
 - `DEPENDENCIES.md` :  list of packages used and why each was chosen.
 
+## Documentation system (MkDocs Material)
+
+The `src_docs/` directory contains the documentation source for the MkDocs
+Material (MaterialX) site.  The `docs/` directory is the published output (used
+by GitHub Pages via the existing Jekyll `_config.yml` until the site is fully
+migrated to MkDocs).
+
+- `src_docs/mkdocs.yaml` — MkDocs configuration.
+- `src_docs/md/` — Markdown source files (edit these, not `docs/*.md` directly).
+- `src_docs/site/` — Build output; gitignored, do not commit.
+
+To build the docs locally:
+
+```bash
+pip install mkdocs-material mkdocstrings[python]
+mkdocs build --config-file src_docs/mkdocs.yaml
+mkdocs serve --config-file src_docs/mkdocs.yaml   # live-reload at localhost:8000
+```
+
+Key doc pages:
+- `src_docs/md/engines.md` — "Choosing an engine" comparison table with rate limits and costs.
+- `src_docs/md/STYLE_GUIDE.md` — Code and documentation conventions.
+
+Engine adapter docstrings must include: cost, rate limits, privacy posture,
+offline capability, and required env vars.  See `STYLE_GUIDE.md` for the full
+template.
+
 ## Code quality standards
 
 - Use constants over magic numbers.

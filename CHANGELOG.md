@@ -7,6 +7,58 @@ All notable changes to abersetz will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed — test suite runs offline and deterministically
+- `tests/conftest.py`: added a session-scoped autouse `_prefect_test_harness`
+  fixture wrapping the suite in `prefect.testing.utilities.prefect_test_harness`.
+  Previously, executing the Prefect `@flow` in
+  `tests/test_htmladapt_twat.py::test_prefect_workflow_integration` started a
+  temporary Prefect server that ran Alembic migrations against the developer's
+  persistent `~/.prefect/prefect.db`. A DB left over from a different Prefect
+  version aborted startup ("Can't locate revision identified by '79e7a60e43d8'"
+  → "Application startup failed"), failing that test and corrupting pytest's
+  summary output via Prefect's exit-time logging to a closed stream. The harness
+  points Prefect at a throwaway temp database with correct migrations and runs
+  in-process, so flows execute without a real server and the suite no longer
+  depends on (or mutates) the user's Prefect state. The fixture degrades
+  gracefully (yields) if Prefect is unavailable.
+- Result: `uvx hatch test` is now self-contained and green — 249 passed,
+  8 skipped (the 8 skips are pre-existing opt-in integration tests gated behind
+  `ABERSETZ_INTEGRATION_TESTS=true`), 0 failures.
+
+### Added — Wave 1 modernisation
+- Created `src_docs/` MaterialX documentation tree with `mkdocs.yaml` (MkDocs
+  Material config) and `src_docs/md/` Markdown sources:
+  `index.md`, `installation.md`, `engines.md` (new "Choosing an engine"
+  comparison table with rate limits and costs), `cli.md`, `configuration.md`,
+  `api.md`, and `STYLE_GUIDE.md`.
+- Added `tests/test_ml_engine.py`: 16 new hermetic smoke tests for the MLX
+  local engine — language resolution, prompt building, model path resolution,
+  alias table integrity, and non-existence of MarianMT (plan documentation
+  clarification: `--engine ml/…` is the MLX backend, not MarianMT).
+- Added `src_docs/site/` to `.gitignore` (MkDocs build output).
+- Added `.gitignore` notes for `ruvector.db` and `llms.txt` (generated
+  artifacts currently tracked; flagged for future `git rm --cached` cleanup).
+
+### Changed
+- CI (`push.yml` test matrix) now pins to Python 3.12 only (was 3.10/3.11/3.12).
+  Keeps the matrix lean; `pyproject.toml` still allows Python ≥ 3.10 for
+  package installs.
+
+### Improved — docstrings and inline comments
+- `TranslatorsEngine`: added docstring documenting cost (free), unofficial rate
+  limits (~50–100 req/min), retry strategy, and privacy posture.
+- `DeepTranslatorEngine`: added docstring with per-provider cost and rate-limit
+  details (DeepL 5 req/s, Microsoft 1 000 req/min, etc.).
+- `LlmEngine`: added docstring with cost table for common providers and a
+  detailed inline comment on `_build_messages` explaining the XML-tag prompt
+  structure, vocabulary continuity mechanism, and system-prompt design intent.
+- `LocalMlxEngine`: added docstring covering cost, rate limits (none), platform
+  requirements, model families (mthy, gemma), and HuggingFace download behaviour.
+- `LocalGgufEngine`: added docstring covering platform support, CPU/GPU
+  performance expectations, and recommended quantisation levels.
+- `LmstudioEngine`: added docstring covering cost, privacy, prerequisites, and
+  automatic daemon start-up behaviour.
+
 ### Added — Engine selector overhaul (issue 111)
 - New selector grammar `engine[/subvariant]::provider` with six 2-letter engine codes (`tr`, `dt`, `lm`, `ll`, `ml`, `gg`) in `src/abersetz/selector.py`; legacy `engine/provider` form still parses. Includes `parse_selector`, `slugify_selector`, and `Selector`.
 - New `src/abersetz/job.py`: Pydantic `Job`/`JobEntry` job-JSON format (selector + langs + chunk sizes + params + output suffix), `load_job`, `job_to_dict`.

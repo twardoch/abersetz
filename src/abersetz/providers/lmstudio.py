@@ -9,7 +9,20 @@ from .base import EngineBase, EngineError, EngineRequest, EngineResult
 
 
 class LmstudioEngine(EngineBase):
-    """Local inference engine using the official lmstudio SDK."""
+    """Local inference engine using the official LMStudio Python SDK.
+
+    Connects to a running LMStudio instance (default: ``localhost:1234``) via the
+    official ``lmstudio`` SDK.  If the LMStudio daemon is not running and the
+    ``lms`` CLI tool is on PATH, abersetz will attempt to start it automatically.
+
+    **Cost**: Free — inference runs locally; you pay only hardware and electricity.
+    **Rate limits**: None.  Throughput is bounded by your GPU/CPU speed.
+    **Privacy**: 100 % local — no data leaves the machine.
+    **Offline**: Yes — after the model is loaded in LMStudio.
+    **Prerequisite**: LMStudio must be installed and a model must be loaded.
+      Install the ``lmstudio`` SDK extra: ``pip install abersetz[lms]``.
+    **Selector**: ``lm::<model-id-or-alias>`` or ``lm`` for the currently loaded model.
+    """
 
     def __init__(self, config: EngineConfig, *, temperature: float | None = None) -> None:
         super().__init__(config.name, config.chunk_size, config.html_chunk_size)

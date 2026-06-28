@@ -11,7 +11,25 @@ from .base import EngineBase, EngineError, EngineRequest, EngineResult
 
 
 class DeepTranslatorEngine(EngineBase):
-    """Adapter for `deep-translator` providers with retry logic."""
+    """Adapter for the ``deep-translator`` package (official translation APIs).
+
+    Unlike ``TranslatorsEngine`` (web scraping), each ``deep-translator`` backend
+    uses an official, documented API.  Costs and rate limits vary by provider:
+
+    * **google** — unofficial free tier; same throttle risk as ``tr::google``.
+    * **deepl** — free tier: 500 000 characters/month; Pro: ~€25/month per 1M chars.
+      Rate limit: 5 requests/second.  API key env var: ``DEEPL_API_KEY``.
+    * **microsoft** — pay-as-you-go: ~$10/1M characters.
+      Rate limit: 1 000 requests/minute, 100 per 10 seconds.
+      API key env var: ``MICROSOFT_TRANSLATOR_KEY``.
+    * **libre** — self-hosted instance: no limit; public instances are rate-limited.
+    * **linguee / papago** — unofficial; undocumented limits.
+
+    **Privacy**: Text is sent to the chosen provider's servers.
+    **Offline**: No — requires internet access.
+
+    Abersetz retries up to 3 times with exponential back-off on network errors.
+    """
 
     PROVIDERS: Mapping[str, type] | None = None
 

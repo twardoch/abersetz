@@ -267,7 +267,28 @@ def resolve_and_download_model(model_name_or_path: str | None, backend: str) -> 
 
 
 class LocalMlxEngine(EngineBase):
-    """Local MLX-backed engine for HY-MT and TranslateGemma."""
+    """Local translation engine using the ``mlx_lm`` framework (Apple Silicon only).
+
+    Loads a model from disk (or downloads it from Hugging Face on first use) and
+    runs inference entirely on the local Apple Silicon GPU via the MLX framework.
+
+    Supported model families:
+    * **mthy** — Tencent Hy-MT2 series: specialised neural machine translation
+      models optimised for Chinese↔European and Chinese↔Asian language pairs.
+      Use ``ml/mthy::<model-alias-or-path>`` as the selector.
+    * **gemma** — Google Gemma translation variants.
+      Use ``ml/gemma::<model-alias-or-path>`` as the selector.
+
+    **Cost**: Free — inference runs locally; you pay only hardware and electricity.
+    **Rate limits**: None.  Throughput is bounded by GPU memory bandwidth
+      (typically 50–300 tokens/second on M-series chips).
+    **Privacy**: 100 % local — no data leaves the machine.
+    **Offline**: Yes — after the model is downloaded once.
+    **Platform**: macOS with Apple Silicon (M1 or later) only.
+      Install with ``pip install abersetz[mlx]``.
+    **Model download**: First-time use triggers a Hugging Face download (several GB).
+      Subsequent runs use the cached snapshot.
+    """
 
     def __init__(
         self,
