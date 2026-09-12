@@ -338,6 +338,10 @@ def _build_options_from_cli(
     tm_minimum: float = 0.5,
     tm_context_chars: int = 4000,
     tm_exact_only: bool = False,
+    tm_search_backend: str | None = None,
+    tm_related_to: list[str] | None = None,
+    tm_max_hops: int = 2,
+    tm_origins: list[str] | None = None,
 ) -> TranslatorOptions:
     # Validate language codes
     validated_from_lang = _validate_language_code(from_lang, "--from-lang")
@@ -357,6 +361,10 @@ def _build_options_from_cli(
         tm_minimum=tm_minimum,
         tm_context_chars=tm_context_chars,
         tm_exact_only=tm_exact_only,
+        tm_search_backend=tm_search_backend,
+        tm_related_to=tm_related_to,
+        tm_max_hops=tm_max_hops,
+        tm_origins=tm_origins,
         to_lang=validated_to_lang,
         engine=normalized_engine,
         from_lang=validated_from_lang,
@@ -442,6 +450,10 @@ class AbersetzCLI:
         tm_minimum: float = 0.5,
         tm_context_chars: int = 4000,
         tm_exact_only: bool = False,
+        tm_search_backend: str | None = None,
+        tm_related_to: list[str] | None = None,
+        tm_max_hops: int = 2,
+        tm_origins: list[str] | None = None,
     ) -> None:
         """Shared implementation for ``tf`` (file) and ``td`` (directory)."""
         # Handle case-based overrides and fallbacks
@@ -464,6 +476,10 @@ class AbersetzCLI:
             tm_minimum=tm_minimum,
             tm_context_chars=tm_context_chars,
             tm_exact_only=tm_exact_only,
+            tm_search_backend=tm_search_backend,
+            tm_related_to=tm_related_to,
+            tm_max_hops=tm_max_hops,
+            tm_origins=tm_origins,
             to_lang=to_lang,
             path=path,
             engine=engine,
@@ -583,6 +599,10 @@ class AbersetzCLI:
         tm_minimum: float = 0.5,
         tm_context_chars: int = 4000,
         tm_exact_only: bool = False,
+        tm_search_backend: str | None = None,
+        tm_related_to: list[str] | None = None,
+        tm_max_hops: int = 2,
+        tm_origins: list[str] | None = None,
     ) -> None:
         """Translate a string and print the result to stdout.
 
@@ -611,6 +631,10 @@ class AbersetzCLI:
                     tm_minimum=tm_minimum,
                     tm_context_chars=tm_context_chars,
                     tm_exact_only=tm_exact_only,
+                    tm_search_backend=tm_search_backend,
+                    tm_related_to=tm_related_to,
+                    tm_max_hops=tm_max_hops,
+                    tm_origins=tm_origins,
                     engine=entry.selector,
                     from_lang=entry.from_lang or from_lang,
                     to_lang=entry.to_lang or to_lang,
@@ -632,6 +656,10 @@ class AbersetzCLI:
             tm_minimum=tm_minimum,
             tm_context_chars=tm_context_chars,
             tm_exact_only=tm_exact_only,
+            tm_search_backend=tm_search_backend,
+            tm_related_to=tm_related_to,
+            tm_max_hops=tm_max_hops,
+            tm_origins=tm_origins,
             engine=normalize_selector(engine) if engine else engine,
             from_lang=from_lang,
             to_lang=to_lang,

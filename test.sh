@@ -9,8 +9,8 @@ if [[ -f "$uubed_source/pyproject.toml" && -f "$native_source/Cargo.toml" ]]; th
     wheels=$(mktemp -d)
     trap 'rm -rf "$wheels"' EXIT
     (cd "$native_source" && uvx maturin build --release --out "$wheels" --interpreter python3.12)
-    uv pip install --python "$test_python" --reinstall-package uubed-rs -e "$uubed_source" "$wheels"/*.whl
+    uv pip install --python "$test_python" --reinstall-package uubed-rs -e "$uubed_source" "$wheels"/*.whl 'turbovec==1.0.0'
 else
-    uv pip install --python "$test_python" 'uubed[tm]>=1.0.6'
+    uv pip install --python "$test_python" 'uubed[tm]>=1.0.6' 'turbovec==1.0.0'
 fi
 uvx hatch test -py 3.12

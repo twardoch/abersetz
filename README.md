@@ -185,34 +185,13 @@ Translation APIs reject large inputs. LLMs have context windows. Abersetz handle
 
 Vocabulary accumulated during earlier chunks is included in the prompt for later ones (for LLM engines), so terminology stays consistent across the whole document.
 
-## License
+License: MIT.
 
-MIT
+## Uubed translation memory and Rust caching
 
-## Uubed translation memory
-
-Use `--tm=/path/to/localization.sqlite` with `tr`, `tf`, or `td` for English-source
-localization. A unique verbatim match is returned without loading the translation
-or embedding model. On a miss/conflict, `ll`, `lm`, and Hy-MT MLX/GGUF engines receive
-near bilingual examples in their prompt. Examples remain request-local and are
-included in the translation cache key.
-
-Install the `tm` extra plus the Uubed inference backend needed by your index.
-For local development, see `../uubed-project/README.md`; the corresponding package
-changes have not been published. Build the database using `uubed tm build`.
-
-```bash
-abersetz tr pl 'Make the font bold' --from-lang=en --tm=localization.sqlite \
-  --tm-model-path=/path/to/embedding-model.gguf --engine='gg/mthy::1.8b-gguf'
-```
-
-`--tm-top-k=5`, `--tm-minimum=0.5`, and `--tm-context-chars=4000` bound the example
-count, cosine threshold and serialized JSON character budget. Complete pairs are
-retained; context is not truncated inside a source/target string. Token usage
-still depends on the translation model's tokenizer. Regional language codes must
-match the index exactly. `--tm-exact-only` uses verbatim reuse with any engine and
-disables semantic context. TranslateGemma and conventional translator adapters
-currently require this mode. File `--job` cannot be combined with `--tm` yet.
+Use `--tm=localization.sqlite` with Uubed FastEmbed and TurboQuant search.
+`diskcache-rs` persists translations and TM examples; `ABERSETZ_CACHE=0` disables it.
+See [installation, graph constraints and cache controls](src_docs/md/translation-memory.md).
 
 ## Releases and local data
 

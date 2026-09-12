@@ -94,6 +94,7 @@ class LocalGgufEngine(EngineBase):
         self._family = family
 
         resolved_path = resolve_and_download_model(model_path, "gguf")
+        self._cache_model_path = resolved_path
         self._model_name = Path(resolved_path).name
         self._sampling = hymt2_sampling(f"{model_path} {resolved_path}")
         if family == "mthy":

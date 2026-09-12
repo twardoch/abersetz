@@ -701,3 +701,19 @@ registry artifact hashes match the saved manifests. The repaired uubed-rs 1.0.13
 sdist is also published with its expected recovery hash. Abersetz v1.0.27 has no
 local/remote release tag or PyPI release. Continue from the workspace root using
 `./publish.sh --from abersetz`.
+
+## 2026-09-12 — Uubed FastEmbed, TurboQuant and Rust caching
+
+Integrated stored Turbovec/Turbo-Graph backend selection and graph constraints
+through tr/tf/td. diskcache-rs 0.4.10 replaces the twat-cache translation decorator
+and also caches bounded TM examples. Keys cover retrieval settings, database
+identity, examples, sampler/options and resolved local model file metadata.
+ABERSETZ_CACHE_DIR selects storage; ABERSETZ_CACHE=0 bypasses caching. Cache I/O
+failures do not retry or discard a completed translation. Old cache files remain.
+
+Final suite: 387 passed / 8 existing skips. Cache/retrieval coverage: 90% combined
+(98% cache, 86% retrieval), with actual Turbovec and Turbo-Graph installed. Real
+Gemma/FastEmbed TM plus local Hy-MT2 translation reused its second request without
+embedding or translation calls. Fresh wheel-only offline TM/cache smoke passed.
+Native/core/application archives and rendered documentation passed verification.
+See ../uubed-project/research/fastembed/REPORT.md. Unpublished; macOS ARM64 tested.

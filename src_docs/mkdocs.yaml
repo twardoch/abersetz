@@ -71,5 +71,6 @@ nav:
   - Choosing an Engine: engines.md
   - CLI Reference: cli.md
   - Configuration: configuration.md
+  - Translation Memory and Caching: translation-memory.md
   - Python API: api.md
   - Style Guide: STYLE_GUIDE.md

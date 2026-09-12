@@ -70,3 +70,9 @@ Detailed requirements: [issues/111.md](issues/111.md). Full design in [TASKS.md]
 ## Release tooling — completed 2026-09-12
 
 - [x] Provide verified Git-tag releases, a real dry run, same-tag retries, and private-data exclusions.
+
+## Uubed integration — 2026-09-12
+- [x] Integrate FastEmbed-backed Uubed memories and TurboQuant/graph search.
+- [x] Replace translation caching with diskcache-rs and cache TM examples.
+- [x] Test cross-process persistence, failures, invalidation and real local translation.
+- [x] Verify native/source/wheel artifacts and document installation and constraints.

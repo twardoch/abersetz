@@ -317,3 +317,16 @@ registry artifact hashes match the saved manifests. The repaired uubed-rs 1.0.13
 sdist is also published with its expected recovery hash. Abersetz v1.0.27 has no
 local/remote release tag or PyPI release. Continue from the workspace root using
 `./publish.sh --from abersetz`.
+
+## Unreleased — FastEmbed/TurboQuant and persistent Rust caching
+
+- Load Uubed Turbovec/Turbo-Graph memories automatically; expose
+  tm-search-backend, tm-related-to, tm-max-hops and tm-origins in the API/CLI.
+- Cache translations and TM example lists with diskcache-rs 0.4.10, including
+  local weight/settings invalidation, environment controls and cache I/O handling.
+- Remove the direct twat-cache dependency and mocked cache test harness; keep
+  previous cache files intact. The tm extra now includes Turbovec 1.0.0.
+- Document source installation, FastEmbed model support, graph constraints,
+  approximate candidate recall, SQLite fallback and caching behavior.
+- Verify 387 tests, real native retrieval, persistent cache reuse, local Hy-MT
+  translation, rebuilt wheels/source archives and rendered documentation.

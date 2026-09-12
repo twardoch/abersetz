@@ -28,8 +28,8 @@ dependencies = [
     "huggingface-hub>=1.16.1",
     "htmladapt",
     "twat",
-    "twat-cache",
     "twat-task",
+    "diskcache-rs==0.4.10",
 ]
 
 [[project.authors]]
@@ -60,6 +60,7 @@ all = [
     "lmstudio>=1.3.0",
 ]
 tm = [
+    "turbovec==1.0.0",
     "uubed>=1.0.6",
     "uubed-rs>=1.0.12",
 ]
@@ -170,4 +171,4 @@ module = [
 ignore_missing_imports = true
 
 [tool.hatch.build.targets.sdist]
-only-include = ["src/abersetz", "tests", "README.md", "LICENSE"]
+only-include = ["src/abersetz", "tests", "README.md", "LICENSE", "src_docs/md/translation-memory.md"]

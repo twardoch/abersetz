@@ -68,6 +68,7 @@ class LocalMlxEngine(EngineBase):
         resolved_path = resolve_and_download_model(model_path, "mlx")
         # A Hugging Face snapshot resolves to ``…/snapshots/<sha>``; keep the
         # user's alias/repo as the display name and look at both for sizing.
+        self._cache_model_path = resolved_path
         self._model_name = Path(str(model_path).rstrip("/")).name or Path(resolved_path).name
         self._sampling = hymt2_sampling(f"{model_path} {resolved_path}")
         if max_tokens is not None:

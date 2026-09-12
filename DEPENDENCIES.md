@@ -73,7 +73,16 @@ this_file: DEPENDENCIES.md
 - 2025-09-21 06:38 UTC — /report verification: reran full test/coverage/mypy/bandit sweep; dependency lineup unchanged.
 - 2025-09-21 06:46 UTC — Configuration hardening tests added without altering dependencies; latest sweep confirms package set remains stable.
 
-Optional `tm` dependencies: uubed (TMX/model-aware API) and uubed-rs (native SQLite exact/int8 search). Install an inference backend separately for semantic queries.
+Optional `tm` dependencies: uubed (TMX/model-aware API), uubed-rs (native SQLite
+and FastEmbed inference) and Turbovec 1.0.0 (TurboQuant candidate search). Install
+`uubed[fastembed]` for pinned ONNX model downloads; it needs the updated native
+wheel. Turbo-Graph is optional, pinned to upstream commit
+`72f10416d4c954d42561f90465190f000e29cca9`, and installed from source.
+
+diskcache-rs 0.4.10 is a production dependency for persistent translation and
+TM-example caching. Its Rust-backed cache replaces the twat-cache decorator and
+stores JSON bytes, with explicit cache-write failure handling. The direct
+twat-cache dependency was removed; existing files remain untouched.
 
 ## Release tools
 

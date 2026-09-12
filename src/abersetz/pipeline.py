@@ -8,26 +8,16 @@ from __future__ import annotations
 import json
 import threading
 from collections.abc import Iterable
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field, is_dataclass
 from pathlib import Path
 from typing import Any
 
+from .cache import cached_result, local_model_identity
 from .chunking import TextFormat, chunk_text, detect_format
 from .config import AbersetzConfig, load_config
 from .engine_catalog import normalize_selector
 from .engines import Engine, EngineRequest, EngineResult, create_engine
 from .retrieval import exact_translation, example_json, examples_for, with_memory
-
-try:
-    from twat_cache.decorators import bcache
-except ImportError:
-    # Fallback decorator if twat_cache is not present
-    def bcache(*args, **kwargs):
-        def decorator(func):
-            return func
-
-        return decorator
-
 
 DEFAULT_PATTERNS = ("*.txt", "*.md", "*.mdx", "*.html", "*.htm")
 
@@ -63,6 +53,10 @@ class TranslatorOptions:
     tm_minimum: float = 0.5
     tm_context_chars: int = 4000
     tm_exact_only: bool = False
+    tm_search_backend: str | None = None
+    tm_related_to: list[str] | None = None
+    tm_max_hops: int = 2
+    tm_origins: list[str] | None = None
 
 
 @dataclass(slots=True)
@@ -401,7 +395,6 @@ def _translate_html(
 _active_engine = threading.local()
 
 
-@bcache(folder_name="abersetz_chunk_translations")
 def _cached_translate_call(
     engine_name: str,
     model_name: str | None,
@@ -413,7 +406,27 @@ def _cached_translate_call(
     prolog_json: str,
     temperature: float | None,
     examples_json: str = "[]",
+    settings_json: str = "{}",
 ) -> tuple[str, str]:
+    identity = dict(locals())
+    return tuple(
+        cached_result(
+            "translation",
+            identity,
+            lambda: _translate_call(
+                text,
+                source_lang,
+                target_lang,
+                is_html,
+                voc_json,
+                prolog_json,
+                examples_json,
+            ),
+        )
+    )
+
+
+def _translate_call(text, source_lang, target_lang, is_html, voc_json, prolog_json, examples_json):
     engine = getattr(_active_engine, "current", None)
     if not engine:
         raise RuntimeError("No active engine configured in thread-local storage")
@@ -482,6 +495,28 @@ def _apply_engine(
                 voc_json=voc_json,
                 prolog_json=prolog_json,
                 temperature=temperature,
+                settings_json=json.dumps(
+                    {
+                        "selector": opts.engine,
+                        "family": getattr(
+                            engine, "_family", getattr(engine, "_prompt_family", None)
+                        ),
+                        "max_tokens": getattr(engine, "_max_tokens", opts.max_tokens),
+                        "n_ctx": opts.n_ctx,
+                        "static_prolog": getattr(engine, "_static_prolog", {}),
+                        "local_model": local_model_identity(
+                            getattr(engine, "_cache_model_path", None)
+                        ),
+                        "sampling": asdict(engine._sampling)
+                        if is_dataclass(getattr(engine, "_sampling", None))
+                        else None,
+                        "engine_options": {
+                            name: cfg.options for name, cfg in config.engines.items()
+                        },
+                    },
+                    sort_keys=True,
+                    ensure_ascii=False,
+                ),
                 **({"examples_json": example_json(examples)} if examples else {}),
             )
 

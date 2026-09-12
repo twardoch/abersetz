@@ -8,6 +8,8 @@ from dataclasses import replace
 from functools import wraps
 from pathlib import Path
 
+from .cache import cached_result
+
 
 def with_memory(function):
     """Open one lazy embedding runtime per pipeline call, including directory jobs."""
@@ -27,7 +29,11 @@ def with_memory(function):
             return function(value, options, **kwargs)
         from uubed.memory import TranslationMemory
 
-        with TranslationMemory(options.tm, model_path=options.tm_model_path) as memory:
+        with TranslationMemory(
+            options.tm,
+            model_path=options.tm_model_path,
+            search_backend=options.tm_search_backend,
+        ) as memory:
             return function(value, replace(options, tm=memory), **kwargs)
 
     return wrapped
@@ -61,8 +67,46 @@ def select_examples(result, *, limit, budget):
 def examples_for(text, opts):
     if opts.tm is None or opts.tm_exact_only:
         return []
-    result = opts.tm.lookup(text, opts.to_lang, top_k=opts.tm_top_k, minimum=opts.tm_minimum)
-    return select_examples(result, limit=opts.tm_top_k, budget=opts.tm_context_chars)
+
+    def lookup():
+        result = opts.tm.lookup(
+            text,
+            opts.to_lang,
+            top_k=opts.tm_top_k,
+            minimum=opts.tm_minimum,
+            related_to=opts.tm_related_to,
+            max_hops=opts.tm_max_hops,
+            origins=opts.tm_origins,
+        )
+        return select_examples(result, limit=opts.tm_top_k, budget=opts.tm_context_chars)
+
+    # Only a portable Uubed database has an immutable snapshot identity. Custom
+    # in-memory providers are deliberately queried each time.
+    path = getattr(opts.tm, "_path", None)
+    if path is None or not getattr(opts.tm, "_owns_embedder", False):
+        return lookup()
+    stat = path.stat()
+    identity = {
+        "database": str(path),
+        "snapshot": [stat.st_ino, stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns],
+        "backend": opts.tm.search_backend,
+        "config": opts.tm.config,
+        "text": text,
+        "language": opts.to_lang,
+        "limit": opts.tm_top_k,
+        "minimum": opts.tm_minimum,
+        "budget": opts.tm_context_chars,
+        "related_to": opts.tm_related_to,
+        "max_hops": opts.tm_max_hops,
+        "origins": opts.tm_origins,
+    }
+    # A replacement GGUF must be validated by Uubed, even when text is cached.
+    if (
+        opts.tm_model_path is not None
+        or opts.tm.config.get("engine", {}).get("backend") == "llama.cpp"
+    ):
+        return lookup()
+    return cached_result("tm-examples", identity, lookup)
 
 
 def example_json(examples):
