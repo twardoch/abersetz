@@ -14,7 +14,6 @@ import pytest
 
 from abersetz.providers.base import EngineError
 
-
 # ---------------------------------------------------------------------------
 # Module-level import smoke tests
 # ---------------------------------------------------------------------------
@@ -25,9 +24,6 @@ def test_mlx_module_imports() -> None:
     from abersetz.providers import mlx as mlx_mod
 
     assert hasattr(mlx_mod, "LocalMlxEngine")
-    assert hasattr(mlx_mod, "_resolve_mthy_language")
-    assert hasattr(mlx_mod, "build_mthy_prompt")
-    assert hasattr(mlx_mod, "resolve_and_download_model")
 
 
 def test_gguf_module_imports() -> None:
@@ -44,7 +40,7 @@ def test_gguf_module_imports() -> None:
 
 def test_resolve_mthy_language_iso_code() -> None:
     """Standard 2-letter ISO codes map to their Chinese label."""
-    from abersetz.providers.mlx import _resolve_mthy_language
+    from abersetz.providers.hymt2 import hymt2_language_name_zh as _resolve_mthy_language
 
     assert _resolve_mthy_language("en") == "英语"
     assert _resolve_mthy_language("de") == "德语"
@@ -55,7 +51,7 @@ def test_resolve_mthy_language_iso_code() -> None:
 
 def test_resolve_mthy_language_english_name() -> None:
     """English language names also resolve correctly."""
-    from abersetz.providers.mlx import _resolve_mthy_language
+    from abersetz.providers.hymt2 import hymt2_language_name_zh as _resolve_mthy_language
 
     assert _resolve_mthy_language("english") == "英语"
     assert _resolve_mthy_language("german") == "德语"
@@ -64,7 +60,7 @@ def test_resolve_mthy_language_english_name() -> None:
 
 def test_resolve_mthy_language_chinese_label() -> None:
     """Chinese labels round-trip through the lookup table."""
-    from abersetz.providers.mlx import _resolve_mthy_language
+    from abersetz.providers.hymt2 import hymt2_language_name_zh as _resolve_mthy_language
 
     assert _resolve_mthy_language("英语") == "英语"
     assert _resolve_mthy_language("德语") == "德语"
@@ -72,15 +68,15 @@ def test_resolve_mthy_language_chinese_label() -> None:
 
 def test_resolve_mthy_language_unsupported_raises() -> None:
     """An unsupported language code raises EngineError."""
-    from abersetz.providers.mlx import _resolve_mthy_language
+    from abersetz.providers.hymt2 import hymt2_language_name_zh as _resolve_mthy_language
 
-    with pytest.raises(EngineError, match="Unsupported HY-MT language"):
+    with pytest.raises(EngineError, match="Unsupported Hy-MT2 language"):
         _resolve_mthy_language("xx-BOGUS")
 
 
 def test_resolve_mthy_language_traditional_chinese() -> None:
     """Traditional Chinese variant maps correctly."""
-    from abersetz.providers.mlx import _resolve_mthy_language
+    from abersetz.providers.hymt2 import hymt2_language_name_zh as _resolve_mthy_language
 
     assert _resolve_mthy_language("zh-Hant") == "繁体中文"
 
@@ -92,33 +88,32 @@ def test_resolve_mthy_language_traditional_chinese() -> None:
 
 def test_build_mthy_prompt_no_voc() -> None:
     """Prompt without vocabulary is correctly formatted."""
-    from abersetz.providers.mlx import build_mthy_prompt
+    from abersetz.providers.hymt2 import build_hymt2_prompt
 
-    prompt = build_mthy_prompt("Hello", "英语")
-    assert "Hello" in prompt
-    assert "英语" in prompt
-    # No vocabulary section when voc is empty
-    assert "翻译成" not in prompt or "英语" in prompt
+    prompt = build_hymt2_prompt("Hello", "英语")
+    assert prompt.endswith("Hello")
+    # Chinese labels are accepted but the rendered prompt is the English template
+    assert "Translate the following text into English." in prompt
+    assert "Reference the following translations" not in prompt
 
 
 def test_build_mthy_prompt_with_voc() -> None:
     """Prompt includes vocabulary terms when provided."""
-    from abersetz.providers.mlx import build_mthy_prompt
+    from abersetz.providers.hymt2 import build_hymt2_prompt
 
-    prompt = build_mthy_prompt("Hello", "德语", voc={"Hello": "Hallo"})
-    assert "Hello" in prompt
-    assert "Hallo" in prompt
-    assert "德语" in prompt
+    prompt = build_hymt2_prompt("Hello", "德语", voc={"Hello": "Hallo"})
+    assert "Hello translates to Hallo" in prompt
+    assert "Translate the following text into German." in prompt
     # Vocabulary injection marker
-    assert "参考下面的翻译" in prompt
+    assert prompt.startswith("Reference the following translations:")
 
 
 def test_build_mthy_prompt_empty_voc() -> None:
     """Empty vocabulary dict is treated the same as no vocabulary."""
-    from abersetz.providers.mlx import build_mthy_prompt
+    from abersetz.providers.hymt2 import build_hymt2_prompt
 
-    prompt_none = build_mthy_prompt("Test", "法语", voc=None)
-    prompt_empty = build_mthy_prompt("Test", "法语", voc={})
+    prompt_none = build_hymt2_prompt("Test", "法语", voc=None)
+    prompt_empty = build_hymt2_prompt("Test", "法语", voc={})
     assert prompt_none == prompt_empty
 
 
@@ -129,7 +124,7 @@ def test_build_mthy_prompt_empty_voc() -> None:
 
 def test_resolve_model_nonexistent_path_raises() -> None:
     """A path that does not exist on disk raises EngineError."""
-    from abersetz.providers.mlx import resolve_and_download_model
+    from abersetz.providers.local_models import resolve_and_download_model
 
     with pytest.raises(EngineError):
         resolve_and_download_model("/nonexistent/path/to/model.gguf", "mlx")
@@ -137,7 +132,7 @@ def test_resolve_model_nonexistent_path_raises() -> None:
 
 def test_resolve_model_legacy_hy_mt1_raises() -> None:
     """Legacy Hy-MT1 model identifiers raise EngineError with a helpful message."""
-    from abersetz.providers.mlx import resolve_and_download_model
+    from abersetz.providers.local_models import resolve_and_download_model
 
     with pytest.raises(EngineError, match="Hy-MT1.x models are no longer supported"):
         resolve_and_download_model("Hunyuan-MT-7B", "gguf")
@@ -153,7 +148,7 @@ def test_resolve_model_existing_path() -> None:
     import tempfile
     from pathlib import Path
 
-    from abersetz.providers.mlx import resolve_and_download_model
+    from abersetz.providers.local_models import resolve_and_download_model
 
     with tempfile.TemporaryDirectory() as tmpdir:
         resolved = resolve_and_download_model(tmpdir, "mlx")
@@ -168,7 +163,7 @@ def test_resolve_model_existing_path() -> None:
 
 def test_alias_table_coverage() -> None:
     """All aliases in ALIASES map to keys in KNOWN_MAPPING."""
-    from abersetz.providers.mlx import ALIASES, KNOWN_MAPPING
+    from abersetz.providers.local_models import ALIASES, KNOWN_MAPPING
 
     for alias, repo_key in ALIASES.items():
         assert repo_key in KNOWN_MAPPING, (
@@ -178,7 +173,7 @@ def test_alias_table_coverage() -> None:
 
 def test_known_mapping_has_required_fields() -> None:
     """Every entry in KNOWN_MAPPING has 'repo' and 'type' fields."""
-    from abersetz.providers.mlx import KNOWN_MAPPING
+    from abersetz.providers.local_models import KNOWN_MAPPING
 
     for key, info in KNOWN_MAPPING.items():
         assert "repo" in info, f"Missing 'repo' in KNOWN_MAPPING['{key}']"

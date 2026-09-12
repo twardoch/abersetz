@@ -26,11 +26,13 @@ from .providers import (
     LocalMlxEngine,
     TranslatorsEngine,
 )
-from .providers.mlx import _resolve_mthy_language
+from .providers.hymt2 import hymt2_sampling
+from .providers.llm.inference import llm_prompt_family
+from .providers.lmstudio import lmstudio_family
+from .providers.local_models import family_for_model
+from .providers.salamandra import SALAMANDRA_TEMPERATURE
+from .providers.translategemma import TRANSLATEGEMMA_TEMPERATURE
 from .selector import Selector, is_new_syntax, parse_selector
-
-# Re-export for compatibility
-_resolve_mthy_language = _resolve_mthy_language
 
 
 def _make_openai_client(token: str, base_url: str | None) -> OpenAI:
@@ -50,6 +52,7 @@ def _build_llm_engine(
     profile: Mapping[str, Any] | None,
     client: Any | None,
     temperature: float | None = None,
+    subvariant: str | None = None,
 ) -> Engine:
     options = dict(engine_cfg.options)
     settings = dict(profile or {})
@@ -62,11 +65,9 @@ def _build_llm_engine(
             f"The model '{model}' has been discontinued by SiliconFlow. Please update your configuration "
             f"to a supported model, such as 'Qwen/Qwen2.5-7B-Instruct'."
         )
-    temp = (
-        temperature
-        if temperature is not None
-        else float(settings.get("temperature", options.get("temperature", 0.9)))
-    )
+    family = llm_prompt_family(model, subvariant)
+    configured_temp = settings.get("temperature", options.get("temperature"))
+    temp = _llm_temperature(temperature, configured_temp, family, model, fallback=0.9)
     token = resolve_credential(config, engine_cfg.credential)
     if token is None:
         raise EngineError(f"Missing credential for engine {selector}")
@@ -78,6 +79,90 @@ def _build_llm_engine(
         model=model,
         temperature=temp,
         static_prolog=static_prolog,
+        prompt_family=family,
+    )
+
+
+def _credential_matches(reference: Any, endpoint_name: str) -> bool:
+    from .config import Credential
+
+    credential = Credential.from_any(reference)
+    return bool(credential and credential.name and credential.name.lower() == endpoint_name)
+
+
+def _llm_temperature(
+    override: float | None, configured: Any, family: str, model: str, *, fallback: float
+) -> float:
+    """CLI override > config value > model-family recommendation > generic fallback."""
+    if override is not None:
+        return override
+    if configured is not None:
+        return float(configured)
+    if family == "mthy":
+        return hymt2_sampling(model).temperature
+    if family == "gemma":
+        return TRANSLATEGEMMA_TEMPERATURE
+    if family == "salamandra":
+        return SALAMANDRA_TEMPERATURE
+    return fallback
+
+
+def _create_dynamic_llm_engine(
+    variant: str | None,
+    config: AbersetzConfig,
+    engine_cfg: EngineConfig | None,
+    *,
+    client: Any | None,
+    temperature: float | None,
+    subvariant: str | None = None,
+) -> Engine:
+    """Build an ``ll`` engine from an ``endpoint:model`` spec (no config profile)."""
+    from .providers.llm.discovery import (
+        endpoint_api_key,
+        load_recommended_settings,
+        resolve_model,
+    )
+
+    try:
+        sel = variant if variant else "siliconflow"
+        endpoint, resolved_model_name = resolve_model(sel)
+    except Exception as e:
+        raise EngineError(f"Failed to resolve LLM model from '{variant}': {e}") from e
+
+    rec = load_recommended_settings(endpoint.name)
+
+    token = endpoint_api_key(endpoint)
+    if not token and engine_cfg and _credential_matches(engine_cfg.credential, endpoint.name):
+        # Only borrow the configured ``ullm`` credential when it belongs to this
+        # provider; never send one vendor's key to another vendor's endpoint.
+        token = resolve_credential(config, engine_cfg.credential)
+
+    if not token:
+        raise EngineError(
+            f"Missing API key for provider '{endpoint.name}'. "
+            f"Please set the environment variable '{endpoint.api_key_env}'."
+        )
+
+    model = resolved_model_name
+    family = llm_prompt_family(model, subvariant)
+    temp = _llm_temperature(
+        temperature, None, family, model, fallback=float(rec.get("temperature", 0.3))
+    )
+
+    openai_client = client or _make_openai_client(token, endpoint.base_url)
+    dummy_cfg = EngineConfig(
+        name=f"ullm/{variant}" if variant else "ullm",
+        chunk_size=rec.get("chunk_size", 2000),
+        html_chunk_size=rec.get("chunk_size", 2000),
+    )
+
+    return LlmEngine(
+        dummy_cfg,
+        openai_client,
+        model=model,
+        temperature=temp,
+        static_prolog={},
+        prompt_family=family,
     )
 
 
@@ -93,6 +178,19 @@ def _select_profile(engine_cfg: EngineConfig, variant: str | None) -> Mapping[st
     if profile_name not in profiles:
         raise EngineError(f"Unknown profile '{profile_name}' for engine '{engine_cfg.name}'")
     return profiles[profile_name]
+
+
+def _optional_int(override: int | None, configured: Any) -> int | None:
+    """CLI override wins, then the config value; ``None`` lets the engine pick a default."""
+    if override is not None:
+        return override
+    return int(configured) if configured is not None else None
+
+
+def _optional_float(override: float | None, configured: Any) -> float | None:
+    if override is not None:
+        return override
+    return float(configured) if configured is not None else None
 
 
 def _local_engine_config(config: AbersetzConfig, family: str) -> EngineConfig:
@@ -124,8 +222,26 @@ def _create_from_selector(
     if engine == "dt":
         return create_engine(f"dt/{provider}" if provider else "dt", config, client=client)
     if engine == "ll":
-        legacy = f"ll/{provider}" if provider else "ll"
-        return create_engine(legacy, config, client=client, temperature=temperature)
+        engine_cfg = config.engines.get("ullm")
+        profiles = engine_cfg.options.get("profiles", {}) if engine_cfg else {}
+        if provider and engine_cfg is not None and provider in profiles:
+            return _build_llm_engine(
+                sel.raw,
+                config,
+                engine_cfg,
+                profile=profiles[provider],
+                client=client,
+                temperature=temperature,
+                subvariant=sel.subvariant,
+            )
+        return _create_dynamic_llm_engine(
+            provider,
+            config,
+            engine_cfg,
+            client=client,
+            temperature=temperature,
+            subvariant=sel.subvariant,
+        )
     if engine == "lm":
         base_cfg = config.engines.get("lmstudio")
         options = dict(base_cfg.options) if base_cfg else {"base_url": "localhost:1234"}
@@ -137,9 +253,12 @@ def _create_from_selector(
             html_chunk_size=base_cfg.html_chunk_size if base_cfg else None,
             options=options,
         )
-        return LmstudioEngine(cfg, temperature=temperature)
+        family = lmstudio_family(options.get("model"), sel.subvariant)
+        return LmstudioEngine(cfg, temperature=temperature, family=family)
     if engine in {"ml", "gg"}:
-        family = sel.family
+        # ``ml/hy-mt2::x`` names the family explicitly; ``ml::translategemma-4b``
+        # infers it from the model, falling back to Hy-MT2.
+        family = sel.family if sel.subvariant else (family_for_model(provider) or sel.family)
         engine_cfg = _local_engine_config(config, family)
         options = dict(engine_cfg.options)
         model_path = (
@@ -147,26 +266,21 @@ def _create_from_selector(
             or options.get("model_path")
             or options.get("mlx_path" if engine == "ml" else "gguf_path")
         )
-        max_tokens_val = (
-            max_tokens if max_tokens is not None else int(options.get("max_tokens", 2048))
-        )
+        max_tokens_val = _optional_int(max_tokens, options.get("max_tokens"))
+        temp_val = _optional_float(temperature, options.get("temperature"))
         if engine == "ml":
             return LocalMlxEngine(
-                family, engine_cfg, str(model_path or ""), max_tokens=max_tokens_val
+                family,
+                engine_cfg,
+                str(model_path or ""),
+                max_tokens=max_tokens_val,
+                temperature=temp_val,
             )
-        temp_val = (
-            temperature if temperature is not None else float(options.get("temperature", 0.0))
-        )
         n_gpu_layers_val = (
             n_gpu_layers if n_gpu_layers is not None else int(options.get("n_gpu_layers", -1))
         )
-        n_ctx_val = n_ctx if n_ctx is not None else int(options.get("n_ctx", 4096))
-        n_threads_raw = options.get("n_threads")
-        n_threads_val = (
-            n_threads
-            if n_threads is not None
-            else (int(n_threads_raw) if n_threads_raw is not None else None)
-        )
+        n_ctx_val = _optional_int(n_ctx, options.get("n_ctx"))
+        n_threads_val = _optional_int(n_threads, options.get("n_threads"))
         return LocalGgufEngine(
             family,
             engine_cfg,
@@ -248,50 +362,10 @@ def create_engine(
                 client=client,
                 temperature=temperature,
             )
-        else:
-            # Dynamic loading (e.g. ullm/siliconflow:Qwen/Qwen2.5-7B-Instruct)
-            import os
-
-            from .providers.llm.discovery import load_recommended_settings, resolve_model
-
-            try:
-                sel = variant if variant else "siliconflow"
-                endpoint, resolved_model_name = resolve_model(sel)
-            except Exception as e:
-                raise EngineError(f"Failed to resolve LLM model from '{variant}': {e}") from e
-
-            rec = load_recommended_settings(endpoint.name)
-
-            token = os.getenv(endpoint.api_key_env)
-            if not token and endpoint.name == "gemini":
-                token = os.getenv("GOOGLE_API_KEY")
-            if not token and engine_cfg:
-                token = resolve_credential(config, engine_cfg.credential)
-
-            if not token:
-                raise EngineError(
-                    f"Missing API key for provider '{endpoint.name}'. "
-                    f"Please set the environment variable '{endpoint.api_key_env}'."
-                )
-
-            base_url = endpoint.base_url
-            model = resolved_model_name
-            temp = temperature if temperature is not None else rec.get("temperature", 0.3)
-
-            openai_client = client or _make_openai_client(token, base_url)
-            dummy_cfg = EngineConfig(
-                name=f"ullm/{variant}" if variant else "ullm",
-                chunk_size=rec.get("chunk_size", 2000),
-                html_chunk_size=rec.get("chunk_size", 2000),
-            )
-
-            return LlmEngine(
-                dummy_cfg,
-                openai_client,
-                model=model,
-                temperature=temp,
-                static_prolog={},
-            )
+        # Dynamic loading (e.g. ullm/siliconflow:Qwen/Qwen2.5-7B-Instruct)
+        return _create_dynamic_llm_engine(
+            variant, config, engine_cfg, client=client, temperature=temperature
+        )
     if base in {"mthy", "gemma"}:
         assert engine_cfg is not None
         options = dict(engine_cfg.options)
@@ -303,25 +377,20 @@ def create_engine(
         model_path = (
             options.get(f"{backend}_path") or options.get("model_path") or model_map.get(backend)
         )
-        max_tokens_val = (
-            max_tokens if max_tokens is not None else int(options.get("max_tokens", 2048))
-        )
-        temp_val = (
-            temperature if temperature is not None else float(options.get("temperature", 0.0))
-        )
+        max_tokens_val = _optional_int(max_tokens, options.get("max_tokens"))
+        temp_val = _optional_float(temperature, options.get("temperature"))
         n_gpu_layers_val = (
             n_gpu_layers if n_gpu_layers is not None else int(options.get("n_gpu_layers", -1))
         )
-        n_ctx_val = n_ctx if n_ctx is not None else int(options.get("n_ctx", 4096))
-        n_threads_raw = options.get("n_threads")
-        n_threads_val = (
-            n_threads
-            if n_threads is not None
-            else (int(n_threads_raw) if n_threads_raw is not None else None)
-        )
+        n_ctx_val = _optional_int(n_ctx, options.get("n_ctx"))
+        n_threads_val = _optional_int(n_threads, options.get("n_threads"))
         if backend == "mlx":
             return LocalMlxEngine(
-                base, engine_cfg, str(model_path or ""), max_tokens=max_tokens_val
+                base,
+                engine_cfg,
+                str(model_path or ""),
+                max_tokens=max_tokens_val,
+                temperature=temp_val,
             )
         if backend == "gguf":
             return LocalGgufEngine(

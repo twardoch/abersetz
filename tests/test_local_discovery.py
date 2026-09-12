@@ -6,8 +6,9 @@ from types import SimpleNamespace
 
 import pytest
 
+from abersetz.providers.base import EngineError
 from abersetz.providers.llm.local_discovery import LocalModelFinder
-from abersetz.providers.mlx import EngineError, resolve_and_download_model
+from abersetz.providers.local_models import resolve_and_download_model
 
 
 def test_local_model_finder_scans_correctly(
@@ -163,7 +164,7 @@ def test_resolve_local_mlx_situation_model(tmp_path: Path, monkeypatch: pytest.M
         / ".cache"
         / "huggingface"
         / "hub"
-        / "models--p0we7--Hy-MT2-1.8B-oQ8-fp16"
+        / "models--mlx-community--Hy-MT2-1.8B-8bit"
         / "snapshots"
         / "1234abcd"
     )

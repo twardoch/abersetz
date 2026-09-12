@@ -16,6 +16,7 @@ from .chunking import TextFormat, chunk_text, detect_format
 from .config import AbersetzConfig, load_config
 from .engine_catalog import normalize_selector
 from .engines import Engine, EngineRequest, EngineResult, create_engine
+from .retrieval import exact_translation, example_json, examples_for, with_memory
 
 try:
     from twat_cache.decorators import bcache
@@ -56,6 +57,12 @@ class TranslatorOptions:
     n_ctx: int | None = None
     max_tokens: int | None = None
     n_threads: int | None = None
+    tm: Path | str | Any | None = None
+    tm_model_path: str | None = None
+    tm_top_k: int = 5
+    tm_minimum: float = 0.5
+    tm_context_chars: int = 4000
+    tm_exact_only: bool = False
 
 
 @dataclass(slots=True)
@@ -75,12 +82,23 @@ class TranslationResult:
     chunk_size: int = 0
 
 
+class _LazyEngine:
+    def __init__(self, factory):
+        self.factory, self.instance = factory, None
+
+    def __getattr__(self, name):
+        if self.instance is None:
+            self.instance = self.factory()
+        return getattr(self.instance, name)
+
+
 class PipelineError(RuntimeError):
     """Raised when translation cannot proceed.
 
     Catch this if you pass a bad path, lack read permissions, or something breaks catastrophically in the middle of translation."""
 
 
+@with_memory
 def translate_path(
     path: Path | str,
     options: TranslatorOptions | None = None,
@@ -129,7 +147,7 @@ def translate_path(
     if "n_threads" in sig.parameters and getattr(opts, "n_threads", None) is not None:
         kwargs["n_threads"] = opts.n_threads
 
-    engine = create_engine(engine_selector, cfg, client=client, **kwargs)
+    engine = _LazyEngine(lambda: create_engine(engine_selector, cfg, client=client, **kwargs))
     results: list[TranslationResult] = []
 
     # Simple translation without progress bar
@@ -140,6 +158,7 @@ def translate_path(
     return results
 
 
+@with_memory
 def translate_string(
     text: str,
     options: TranslatorOptions | None = None,
@@ -155,6 +174,12 @@ def translate_string(
     cfg = config or load_config()
     opts = _merge_defaults(options, cfg)
     engine_selector = normalize_selector(opts.engine or cfg.defaults.engine) or cfg.defaults.engine
+
+    if not text.strip():
+        return text
+    exact = exact_translation(text, opts)
+    if exact is not None:
+        return exact
 
     kwargs: dict[str, Any] = {}
     for attr in ("temperature", "n_gpu_layers", "n_ctx", "max_tokens", "n_threads"):
@@ -222,6 +247,22 @@ def _translate_file(
     engine_selector = normalize_selector(engine_selector) or engine_selector
     source_lang = opts.from_lang or config.defaults.from_lang
     target_lang = opts.to_lang or config.defaults.to_lang
+
+    exact = exact_translation(text, opts)
+    if exact is not None:
+        fmt = detect_format(text)
+        destination = _persist_output(source, exact, dict(opts.initial_voc), fmt, opts, target_lang)
+        return TranslationResult(
+            source,
+            destination,
+            1,
+            dict(opts.initial_voc),
+            fmt,
+            "uubed-tm",
+            source_lang,
+            target_lang,
+            len(text),
+        )
 
     # Handle edge cases
     if not text.strip():
@@ -371,10 +412,8 @@ def _cached_translate_call(
     voc_json: str,
     prolog_json: str,
     temperature: float | None,
+    examples_json: str = "[]",
 ) -> tuple[str, str]:
-    print(
-        f"\n[CACHE MISS] engine={engine_name} text={text!r} src={source_lang} tgt={target_lang} voc={voc_json} prolog={prolog_json}"
-    )
     engine = getattr(_active_engine, "current", None)
     if not engine:
         raise RuntimeError("No active engine configured in thread-local storage")
@@ -388,6 +427,7 @@ def _cached_translate_call(
         prolog=json.loads(prolog_json),
         chunk_index=0,
         total_chunks=1,
+        examples=json.loads(examples_json),
     )
     result = engine.translate(request)
     return result.text, json.dumps(result.voc, ensure_ascii=False)
@@ -409,6 +449,16 @@ def _apply_engine(
     _active_engine.current = engine
     try:
         for _index, chunk in enumerate(chunk_list):
+            exact = exact_translation(chunk, opts)
+            if exact is not None:
+                results.append(EngineResult(text=exact, voc=dict(voc)))
+                continue
+            examples = examples_for(chunk, opts)
+            # These providers have no reference-context input; never silently discard it.
+            if examples and not getattr(engine, "supports_translation_examples", False):
+                raise PipelineError(
+                    "TM examples require ll, lm, or a Hy-MT engine; use tm_exact_only for this engine"
+                )
             voc_json = json.dumps(voc, sort_keys=True, ensure_ascii=False)
             prolog_json = json.dumps(prolog, sort_keys=True, ensure_ascii=False)
 
@@ -432,6 +482,7 @@ def _apply_engine(
                 voc_json=voc_json,
                 prolog_json=prolog_json,
                 temperature=temperature,
+                **({"examples_json": example_json(examples)} if examples else {}),
             )
 
             new_voc = json.loads(res_voc_json)
@@ -473,12 +524,14 @@ def _select_chunk_size(
     config: AbersetzConfig,
 ) -> int:
     if fmt is TextFormat.HTML:
-        html_size = (
-            opts.html_chunk_size or engine.chunk_size_for(fmt) or config.defaults.html_chunk_size
-        )
-        return max(html_size, 1)
-    plain_size = opts.chunk_size or engine.chunk_size_for(fmt) or config.defaults.chunk_size
-    return max(plain_size, 1)
+        size = opts.html_chunk_size or engine.chunk_size_for(fmt) or config.defaults.html_chunk_size
+    else:
+        size = opts.chunk_size or engine.chunk_size_for(fmt) or config.defaults.chunk_size
+    # Engines with a hard input window (MADLAD's 512-token encoder) publish a ceiling.
+    ceiling = getattr(engine, "max_chunk_size", None)
+    if ceiling:
+        size = min(size, ceiling)
+    return max(size, 1)
 
 
 def _persist_output(

@@ -86,3 +86,16 @@ def test_catalog_to_job() -> None:
     assert job.to_lang == "pl"
     # Engine-level entries are excluded; only concrete combos remain.
     assert {e.selector for e in job.entries} == {"tr::google", "ll::openai:gpt-4o"}
+
+
+def test_local_engine_prefix_lists_known_aliases(monkeypatch: pytest.MonkeyPatch) -> None:
+    """``ls gg::`` shows curated Hy-MT2 / TranslateGemma aliases before any disk scan."""
+    from abersetz import listing
+
+    monkeypatch.setattr(listing, "_local_model_entries", lambda *_: [])
+    selectors = {e.selector: e for e in listing.build_catalog("gg::")}
+    assert "gg::7b-gguf" in selectors
+    assert "gg::tg-4b-gguf" in selectors
+    assert "gg::7b-mlx" not in selectors, "MLX aliases must not leak into the GGUF list"
+    assert selectors["gg::7b-gguf"].notes == "hy-mt2 tencent/Hy-MT2-7B-GGUF"
+    assert selectors["gg::tg-4b-gguf"].notes.startswith("translategemma ")

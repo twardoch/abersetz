@@ -7,6 +7,63 @@ All notable changes to abersetz will be documented in this file.
 
 ## [Unreleased]
 
+### Added — Hy-MT2, TranslateGemma, SalamandraTA and MADLAD-400 support (issues 201, 202)
+- `providers/hymt2.py`: official Hy-MT2 English instruction (default and
+  terminology variants), the 38-row language table, and Tencent's recommended
+  sampling blocks (dense 1.8B/7B vs. 30B-A3B MoE). All four engines that can
+  run Hy-MT2 build their request here.
+- `providers/local_models.py`: curated catalog of the Hugging Face repos from
+  the issues (official `tencent/*-GGUF`, `mlx-community/Hy-MT2-*`,
+  `kuotient`, `dawncr0w`, `mradermacher` quants, `mlx-community/translategemma-*`,
+  `thirteenbit/madlad400-10b-mt-gguf`, `mradermacher/salamandraTA-7b-instruct-GGUF`),
+  short aliases, `repo:QUANT` selection for GGUF repos, and prompt-family
+  inference from a model name. Machine-specific LM Studio paths were dropped in
+  favour of local discovery.
+- `providers/llm/api/tencent.py`: Tencent Cloud TokenHub endpoint
+  (`TENCENTCLOUD_API_KEY`, fallback `TENCENT_API_KEY`) with `hy-mt2-pro/plus/lite`;
+  OpenRouter known models now list `tencent/hy-mt2-1.8b|7b|30b-a3b`.
+- `LlmEngine` prompt families (`generic`, `mthy`, `gemma`, `salamandra`):
+  dedicated translation models get their native prompt, no XML wrapper, the
+  recommended `temperature`/`top_p`/`max_tokens`, and the raw reply is used.
+  Families are inferred from the model id or forced via `ll/<family>::…`.
+- `LmstudioEngine` gained the same families with LM Studio prediction configs
+  (`topPSampling`, `topKSampling`, `repeatPenalty`, `maxTokens`).
+- `providers/translategemma.py`: renders TranslateGemma's chat-template text
+  verbatim (verified against `chat_template.jinja`) for string-only runtimes,
+  greedy decoding, explicit source language.
+- `providers/salamandra.py`: SalamandraTA model-card prompts (plain, glossary,
+  markup-preserving), English language names, greedy decoding.
+- `providers/madlad.py`: MADLAD-400 `<2xx>` prompt with the vocabulary's 455
+  target tokens, and a low-level llama.cpp encode/greedy-decode loop because
+  `create_completion` aborts on T5 models. `gg::madlad-10b` defaults to a
+  512-token context and 300-character chunks.
+- `abersetz ls ml::` / `ls gg::` list the curated aliases without scanning disk.
+- MLX Hy-MT2 now decodes with `mlx_lm.sample_utils` (top-p/top-k/repetition
+  penalty); GGUF Hy-MT2 passes `top_p`/`top_k`/`repeat_penalty`.
+
+### Changed
+- Hy-MT2 prompts switched from the Chinese to the official English template;
+  the legacy `build_mthy_prompt` / `_resolve_mthy_language` helpers in
+  `providers/mlx.py` were removed (use `providers.hymt2`).
+- Engines whose prompt has no slot for reference pairs (TranslateGemma,
+  SalamandraTA on `lm`/`ll`) now report `supports_translation_examples = False`
+  so the pipeline refuses TM examples instead of dropping them.
+- MADLAD engines publish `max_chunk_size`; the pipeline clamps configured
+  chunk sizes to it (512-token encoder), and HTML input is rejected.
+- Dynamic `ll` engines no longer borrow the configured `ullm` credential unless
+  it belongs to the same provider.
+- `create_engine` leaves `max_tokens` / `temperature` / `n_ctx` unset when not
+  configured so each model family can apply its own defaults.
+
+### Fixed
+- `openai_lite`: HTTP 4xx responses other than 429 are no longer retried three times and then hidden behind a `RetryError`; `ApiError` carries the server's message (e.g. TokenHub's `INSUFFICIENT_BALANCE`).
+
+### Tested
+- New suites: `test_hymt2.py`, `test_local_engines.py`, `test_llm_families.py`,
+  `test_translategemma.py`, `test_madlad_salamandra.py`; full suite green.
+- Live checks: `ll::openrouter:tencent/hy-mt2-7b` and `-1.8b` (en→pl/de),
+  `gg::madlad-10b` and `gg::salamandra-7b` against the local GGUF files.
+
 ### Fixed — test suite runs offline and deterministically
 - `tests/conftest.py`: added a session-scoped autouse `_prefect_test_harness`
   fixture wrapping the suite in `prefect.testing.utilities.prefect_test_harness`.
@@ -223,3 +280,40 @@ All notable changes to abersetz will be documented in this file.
 - Offline-friendly dry-run mode for testing
 - Optional voc sidecar files with --save-voc flag
 - Retry logic with tenacity for robust API calls
+
+## 2026-09-11 — Uubed translation memory
+
+Added optional local Uubed TM integration, lazy exact reuse for strings/files,
+bounded request examples for ll/lm/Hy-MT, and context-sensitive translation caching.
+CLI retrieval options cover tr/tf/td; unsupported provider context fails explicitly.
+Verification: new retrieval tests, full suite, and actual persisted SQLite index
+through exact and recording-LLM request paths. Final evidence is in
+`../uubed-project/research/consolidation/`.
+
+## Unreleased — release tooling
+
+Added consistent publish/build/test scripts; Hatch VCS Python versions and synchronized Cargo workspace releases. Excluded local corpora, databases, credentials, generated versions and agent state from Git/package inputs. Removed conflicting auto-publish jobs and broad site upload workflows.
+
+## 2026-09-12 — License-file release validation
+
+The shared archive gate now checks every License-File declaration in metadata
+2.4+ against a regular file at the required sdist or wheel location. Missing,
+misplaced and directory-only licenses fail before pushing or uploading. Synced
+the helper across all six repositories. Verification: 14 release-tool tests
+passed; nine existing sibling preview artifacts passed the stronger checks.
+
+## 2026-09-12 — Hatch test import repair
+
+Added tests/__init__.py so the two Salamandra tests can import the shared
+FakeClient through tests.test_llm_families under Hatch's pytest entry point.
+The targeted baseline reproduced both ModuleNotFoundError failures. The release
+check now passes 381 tests with 8 optional skips; no runtime code changed.
+The Abersetz v1.0.27 dry run built and validated wheel/sdist artifacts, including
+the test package marker in the sdist while excluding tests from the runtime wheel.
+Ruff passed for the new file. No source-repository commit/tag or upload was made.
+
+Confirmed Uubed 1.0.6 and Vexy Paraltext 1.0.1 are already on PyPI and GitHub;
+registry artifact hashes match the saved manifests. The repaired uubed-rs 1.0.13
+sdist is also published with its expected recovery hash. Abersetz v1.0.27 has no
+local/remote release tag or PyPI release. Continue from the workspace root using
+`./publish.sh --from abersetz`.

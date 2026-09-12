@@ -555,15 +555,19 @@ def test_create_engine_raises_when_config_missing_selector() -> None:
         create_engine("tr/google", cfg)
 
 
-def test_resolve_mthy_language_accepts_codes_and_names() -> None:
-    assert engines_module._resolve_mthy_language("en") == "英语"
-    assert engines_module._resolve_mthy_language("English") == "英语"
-    assert engines_module._resolve_mthy_language("中文") == "中文"
+def test_hymt2_language_name_zh_accepts_codes_and_names() -> None:
+    from abersetz.providers.hymt2 import hymt2_language_name_zh
+
+    assert hymt2_language_name_zh("en") == "英语"
+    assert hymt2_language_name_zh("English") == "英语"
+    assert hymt2_language_name_zh("中文") == "中文"
 
 
-def test_resolve_mthy_language_unknown_raises_engine_error() -> None:
-    with pytest.raises(EngineError, match="Unsupported HY-MT language"):
-        engines_module._resolve_mthy_language("xx")
+def test_hymt2_language_name_zh_unknown_raises_engine_error() -> None:
+    from abersetz.providers.hymt2 import hymt2_language_name_zh
+
+    with pytest.raises(EngineError, match="Unsupported Hy-MT2 language"):
+        hymt2_language_name_zh("xx")
 
 
 def test_local_mthy_mlx_engine_translates_with_prompt(
@@ -616,7 +620,8 @@ def test_local_mthy_mlx_engine_translates_with_prompt(
     assert result.voc == {"existing": "value"}
     assert captured["prompt"] == "templated"
     message = captured["messages"][0]["content"]
-    assert "将以下文本翻译为英语" in message
+    assert "Translate the following text into English." in message
+    assert message.endswith("Hello")
 
 
 def test_local_gemma_gguf_engine_uses_structured_messages(
@@ -745,10 +750,10 @@ def test_local_mthy_mlx_engine_hymt2_prompt_with_terminology(
     assert result.voc == {"hello": "bonjour", "apple": "pomme"}
     assert captured["prompt"] == "templated"
     message = captured["messages"][0]["content"]
-    assert "参考下面的翻译：" in message
-    assert "apple翻译成pomme" in message
-    assert "hello翻译成bonjour" in message
-    assert "将以下文本翻译为英语" in message
+    assert message.startswith("Reference the following translations:\n")
+    assert "apple translates to pomme" in message
+    assert "hello translates to bonjour" in message
+    assert "Translate the following text into English." in message
 
 
 def test_legacy_hymt1_models_raise_engine_error(tmp_path: Path) -> None:
@@ -768,52 +773,77 @@ def test_legacy_hymt1_models_raise_engine_error(tmp_path: Path) -> None:
         create_engine("mthy", cfg)
 
 
-def test_resolve_and_download_model_uses_lmstudio_path(
+def test_resolve_and_download_model_prefers_local_discovery(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
-    # Mock LMStudio path exists
-    lmstudio_dir = tmp_path / "QwQbb" / "Hy-MT2-30B-A3B-MLX-4bit"
-    lmstudio_dir.mkdir(parents=True)
+    local_dir = tmp_path / "mlx-community" / "Hy-MT2-7B-8bit"
+    local_dir.mkdir(parents=True)
+    from abersetz.providers import local_models
 
-    # Patch the KNOWN_MAPPING dict entry to point to our temp lmstudio path
-    from abersetz.providers.mlx import KNOWN_MAPPING, resolve_and_download_model
+    monkeypatch.setattr(local_models, "find_local_model_path", lambda *_: str(local_dir))
+    monkeypatch.setattr(
+        "huggingface_hub.snapshot_download",
+        lambda **_: pytest.fail("must not download when a local copy exists"),
+    )
 
-    original_path = KNOWN_MAPPING["QwQbb/Hy-MT2-30B-A3B-MLX-4bit"]["lmstudio_path"]
-    KNOWN_MAPPING["QwQbb/Hy-MT2-30B-A3B-MLX-4bit"]["lmstudio_path"] = str(lmstudio_dir)
-    monkeypatch.setattr("abersetz.providers.mlx.find_local_model_path", lambda *_: None)
-
-    try:
-        res = resolve_and_download_model("QwQbb/Hy-MT2-30B-A3B-MLX-4bit", "mlx")
-        assert res == str(lmstudio_dir.resolve())
-    finally:
-        KNOWN_MAPPING["QwQbb/Hy-MT2-30B-A3B-MLX-4bit"]["lmstudio_path"] = original_path
+    assert local_models.resolve_and_download_model("7b-mlx", "mlx") == str(local_dir)
 
 
 def test_resolve_and_download_model_triggers_huggingface_download(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    # Ensure LMStudio path does NOT exist by patching it to a non-existent temp path
-    from abersetz.providers.mlx import KNOWN_MAPPING, resolve_and_download_model
+    from abersetz.providers import local_models
 
-    original_path = KNOWN_MAPPING["p0we7/Hy-MT2-1.8B-oQ8-fp16"]["lmstudio_path"]
-    KNOWN_MAPPING["p0we7/Hy-MT2-1.8B-oQ8-fp16"]["lmstudio_path"] = "/nonexistent/lmstudio/path"
-    monkeypatch.setattr("abersetz.providers.mlx.find_local_model_path", lambda *_: None)
-
-    captured_repo = None
+    monkeypatch.setattr(local_models, "find_local_model_path", lambda *_: None)
+    captured: dict[str, object] = {}
 
     def fake_snapshot_download(repo_id: str) -> str:
-        nonlocal captured_repo
-        captured_repo = repo_id
+        captured["repo"] = repo_id
         return "/cached/huggingface/path"
 
     monkeypatch.setattr("huggingface_hub.snapshot_download", fake_snapshot_download)
 
-    try:
-        res = resolve_and_download_model("p0we7/Hy-MT2-1.8B-oQ8-fp16", "mlx")
-        assert res == "/cached/huggingface/path"
-        assert captured_repo == "p0we7/Hy-MT2-1.8B-oQ8-fp16"
-    finally:
-        KNOWN_MAPPING["p0we7/Hy-MT2-1.8B-oQ8-fp16"]["lmstudio_path"] = original_path
+    res = local_models.resolve_and_download_model("mlx-community/Hy-MT2-1.8B-8bit", "mlx")
+    assert res == "/cached/huggingface/path"
+    assert captured["repo"] == "mlx-community/Hy-MT2-1.8B-8bit"
+
+
+def test_resolve_and_download_model_gguf_quant_suffix_selects_file(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from abersetz.providers import local_models
+
+    monkeypatch.setattr(local_models, "find_local_model_path", lambda *_: None)
+    monkeypatch.setattr(
+        "huggingface_hub.list_repo_files",
+        lambda repo: ["README.md", "Hy-MT2-1.8B-Q4_K_M.gguf", "Hy-MT2-1.8B-Q8_0.gguf"],
+    )
+    captured: dict[str, object] = {}
+
+    def fake_hf_hub_download(repo_id: str, filename: str) -> str:
+        captured["repo"], captured["file"] = repo_id, filename
+        return f"/cache/{filename}"
+
+    monkeypatch.setattr("huggingface_hub.hf_hub_download", fake_hf_hub_download)
+
+    res = local_models.resolve_and_download_model("tencent/Hy-MT2-1.8B-GGUF:Q4_K_M", "gguf")
+    assert res == "/cache/Hy-MT2-1.8B-Q4_K_M.gguf"
+    assert captured == {"repo": "tencent/Hy-MT2-1.8B-GGUF", "file": "Hy-MT2-1.8B-Q4_K_M.gguf"}
+
+
+def test_resolve_and_download_model_gguf_default_file_when_no_quant(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from abersetz.providers import local_models
+
+    monkeypatch.setattr(local_models, "find_local_model_path", lambda *_: None)
+    captured: dict[str, object] = {}
+    monkeypatch.setattr(
+        "huggingface_hub.hf_hub_download",
+        lambda repo_id, filename: captured.update(repo=repo_id, file=filename) or "/x",
+    )
+    local_models.resolve_and_download_model("7b-gguf", "gguf")
+    assert captured == {"repo": "tencent/Hy-MT2-7B-GGUF", "file": "HY-MT2-7B-Q8_0.gguf"}
 
 
 def test_create_engine_override_parameters(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

@@ -5,6 +5,9 @@ name = "openrouter"
 base_url = "https://openrouter.ai/api/v1"
 api_key_env = "OPENROUTER_API_KEY"
 known_models = [
+    "tencent/hy-mt2-7b",
+    "tencent/hy-mt2-1.8b",
+    "tencent/hy-mt2-30b-a3b",
     "google/gemma-2-9b-it:free",
     "meta-llama/llama-3-8b-instruct:free",
     "mistralai/mistral-7b-instruct:free",

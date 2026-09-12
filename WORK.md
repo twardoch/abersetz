@@ -3,6 +3,17 @@ this_file: WORK.md
 ---
 # Work Log
 
+## 2026-09-12
+### Hy-MT2 / TranslateGemma / SalamandraTA / MADLAD-400 (issues 201, 202)
+- Researched upstream prompt formats: Hy-MT2 README (English/Chinese templates, terminology block, sampling per size, `max_context 8192`, no system prompt), TranslateGemma `chat_template.jinja` (content-list with language codes; greedy), SalamandraTA model card (ChatML, English language names, temperature 0), MADLAD-400 (`<2xx>` tokens read straight from the GGUF vocabulary, T5 context 512).
+- New modules: `providers/hymt2.py`, `providers/translategemma.py`, `providers/salamandra.py`, `providers/madlad.py`, `providers/local_models.py`, `providers/llm/api/tencent.py`.
+- `ml`/`gg`/`lm`/`ll` engines dispatch on a prompt family inferred from the model name (or forced by the selector subvariant); each family carries its own prompt, sampler and decoding defaults.
+- MADLAD: llama-cpp-python 0.3.35 aborts in `llama_decode` for T5 (no `llama_encode` call); implemented the encode/greedy-decode loop over the low-level bindings and verified on the local 10B Q8_0 file (en→de/pl correct, ~0.5 s per sentence on Metal).
+- Live smoke: `ll::openrouter:tencent/hy-mt2-7b`, `-1.8b`, `gg::madlad-10b`, `gg::salamandra-7b`.
+- Tests: full suite green (`.venv/bin/python -m pytest`); `uv run` was intermittently blocked by a concurrent edit that moved `[tool.uv.sources]` into `uv.toml`.
+- Tencent TokenHub: key present, `/v1/models` lists `hy-mt2-pro/plus/lite`, but chat completions return HTTP 402 `endpoint is inactive: INSUFFICIENT_BALANCE` — the account needs credit before a live translation check. `openai_lite` now fails fast on 4xx (except 429) and surfaces the gateway message instead of a tenacity `RetryError`.
+- LM Studio families are unit-tested against the SDK dict config (keys verified against `LlmPredictionConfigDict`) only.
+
 ## 2026-05-25
 ### Engine Selector Overhaul (issue 111)
 - Implemented the new `engine[/subvariant]::provider` selector grammar (`selector.py`) with codes `tr`/`dt`/`lm`/`ll`/`ml`/`gg`; legacy `engine/provider` form preserved so all prior tests pass unchanged.
@@ -649,3 +660,44 @@ this_file: WORK.md
 - 2025-09-21 05:48 UTC — `python -m pytest --cov=. --cov-report=term-missing` (86 passed, 8 skipped; coverage steady at 91% with `tests/test_pipeline.py` now 99% covered and `pipeline.py` at 96%).
 - 2025-09-21 05:50 UTC — `uvx mypy examples/basic_api.py tests/test_examples.py tests/test_setup.py src/abersetz/setup.py tests/test_pipeline.py` (22 errors, all attributable to missing stubs for httpx/tenacity/pytest/langcodes/rich/semantic-text-splitter and existing openai shims; confirmed the prior union-attr diagnostic cleared.)
 - 2025-09-21 05:51 UTC — Removed `.pytest_cache`, `.mypy_cache`, `.benchmarks`, `.coverage` after full-suite run.
+
+## 2026-09-11 — Uubed translation memory
+
+Added optional local Uubed TM integration, lazy exact reuse for strings/files,
+bounded request examples for ll/lm/Hy-MT, and context-sensitive translation caching.
+CLI retrieval options cover tr/tf/td; unsupported provider context fails explicitly.
+Verification: new retrieval tests, full suite, and actual persisted SQLite index
+through exact and recording-LLM request paths. Final evidence is in
+`../uubed-project/research/consolidation/`.
+
+## Release and privacy cleanup
+
+Implemented standalone tag-derived release commands, source/archive privacy gates, fresh artifact manifests, dry runs and same-tag retries. Verification is recorded in the workspace release report. Existing local data remains on disk.
+
+### Release verification — 2026-09-12
+
+347 tests passed, 8 skipped; v1.0.27 wheel/sdist preview verified against the current concurrent model-provider changes. Shared release-flow suite: 11 passed. Source HEAD and latest tag remained unchanged. No live publication was performed.
+
+## 2026-09-12 — License-file release validation
+
+The shared archive gate now checks every License-File declaration in metadata
+2.4+ against a regular file at the required sdist or wheel location. Missing,
+misplaced and directory-only licenses fail before pushing or uploading. Synced
+the helper across all six repositories. Verification: 14 release-tool tests
+passed; nine existing sibling preview artifacts passed the stronger checks.
+
+## 2026-09-12 — Hatch test import repair
+
+Added tests/__init__.py so the two Salamandra tests can import the shared
+FakeClient through tests.test_llm_families under Hatch's pytest entry point.
+The targeted baseline reproduced both ModuleNotFoundError failures. The release
+check now passes 381 tests with 8 optional skips; no runtime code changed.
+The Abersetz v1.0.27 dry run built and validated wheel/sdist artifacts, including
+the test package marker in the sdist while excluding tests from the runtime wheel.
+Ruff passed for the new file. No source-repository commit/tag or upload was made.
+
+Confirmed Uubed 1.0.6 and Vexy Paraltext 1.0.1 are already on PyPI and GitHub;
+registry artifact hashes match the saved manifests. The repaired uubed-rs 1.0.13
+sdist is also published with its expected recovery hash. Abersetz v1.0.27 has no
+local/remote release tag or PyPI release. Continue from the workspace root using
+`./publish.sh --from abersetz`.

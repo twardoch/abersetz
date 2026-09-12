@@ -26,8 +26,8 @@ this_file: DEPENDENCIES.md
 - **pydantic** (>=2.0): Data validation for the job-JSON format (`Job`/`JobEntry`). Parses and validates job files at the I/O boundary so the rest of the code works with typed objects.
 
 ### Optional Local Engines
-- **mlx-lm**: Enables local MLX inference for HY-MT and TranslateGemma (`mthy/mlx`, `gemma/mlx`). Optional dependency, conditional for macOS only.
-- **llama-cpp-python**: Enables local GGUF inference for HY-MT and TranslateGemma (`mthy/gguf`, `gemma/gguf`). Optional dependency, conditional for macOS only.
+- **mlx-lm**: Enables local MLX inference for Hy-MT2, TranslateGemma and SalamandraTA (`ml/...`); `mlx_lm.sample_utils` supplies the Hy-MT2 top-p/top-k/repetition-penalty sampler. Optional dependency, conditional for macOS only.
+- **llama-cpp-python**: Enables local GGUF inference for Hy-MT2, TranslateGemma, SalamandraTA and MADLAD-400 (`gg/...`). MADLAD (T5) uses the package's low-level `llama_encode`/`llama_decode` bindings because the high-level chat API only supports decoder-only models. Optional dependency.
 - **lmstudio**: Official LMStudio Python SDK. Enables local inference using LMStudio models via the `lms` / `lmstudio` engine.
 - **huggingface-hub**: Enables automatic downloading and resolution of local models from Hugging Face.
 
@@ -72,3 +72,9 @@ this_file: DEPENDENCIES.md
 - 2025-09-21 06:27 UTC — Post-/work regression tests touched only test code; dependency roster unchanged.
 - 2025-09-21 06:38 UTC — /report verification: reran full test/coverage/mypy/bandit sweep; dependency lineup unchanged.
 - 2025-09-21 06:46 UTC — Configuration hardening tests added without altering dependencies; latest sweep confirms package set remains stable.
+
+Optional `tm` dependencies: uubed (TMX/model-aware API) and uubed-rs (native SQLite exact/int8 search). Install an inference backend separately for semantic queries.
+
+## Release tools
+
+uv runs isolated build tools; gitnextver 1.0.1 calculates the next semantic tag; tomlkit preserves Cargo formatting during version synchronization; Hatch VCS generates Python versions; Maturin builds the native Python distribution; Cargo packages/verifies Rust crates; MkDocs builds/deploys the documentation site. These are development/release tools, not new runtime dependencies.

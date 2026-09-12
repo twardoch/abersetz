@@ -9,7 +9,40 @@ from typing import Any
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from ...config import EngineConfig
-from ..base import EngineBase, EngineRequest, EngineResult
+from ...retrieval import reference_context
+from ...selector import family_for_subvariant
+from ..base import EngineBase, EngineError, EngineRequest, EngineResult
+from ..hymt2 import build_hymt2_prompt, hymt2_messages, hymt2_sampling, is_hymt2_model
+from ..salamandra import (
+    SALAMANDRA_MAX_TOKENS,
+    build_salamandra_prompt,
+    is_salamandra_model,
+)
+from ..translategemma import (
+    clean_translategemma_output,
+    is_translategemma_model,
+    render_translategemma_prompt,
+)
+
+#: Prompt families the engine can speak. ``generic`` is the XML protocol below;
+#: ``mthy`` and ``gemma`` send the model's native instruction and take the raw reply.
+PROMPT_FAMILIES = ("generic", "mthy", "gemma", "salamandra")
+
+
+def llm_prompt_family(model: str | None, subvariant: str | None = None) -> str:
+    """Pick the prompt family: explicit ``ll/hy-mt2::…`` subvariant, else sniff the model id."""
+    forced = family_for_subvariant(subvariant)
+    if forced == "madlad":
+        raise EngineError("MADLAD-400 has no hosted chat API; use gg::madlad-10b")
+    if forced in PROMPT_FAMILIES:
+        return forced
+    if is_hymt2_model(model):
+        return "mthy"
+    if is_translategemma_model(model):
+        return "gemma"
+    if is_salamandra_model(model):
+        return "salamandra"
+    return "generic"
 
 
 class LlmEngine(EngineBase):
@@ -30,8 +63,16 @@ class LlmEngine(EngineBase):
     **Privacy**: Text is sent to the remote API endpoint.
     **Offline**: No — requires internet access.
     **Credential**: Set via the matching env var (``OPENAI_API_KEY``,
-      ``SILICONFLOW_API_KEY``, ``ANTHROPIC_API_KEY``, ``GEMINI_API_KEY``, …)
-      or configure in ``[credentials]`` in ``abersetz.toml``.
+      ``SILICONFLOW_API_KEY``, ``ANTHROPIC_API_KEY``, ``GEMINI_API_KEY``,
+      ``TENCENTCLOUD_API_KEY``, …) or configure in ``[credentials]`` in
+      ``abersetz.toml``.
+
+    **Dedicated translation models**: when the model id is a Hy-MT2 checkpoint
+    (``ll::openrouter:tencent/hy-mt2-7b``, ``ll::tencent:hy-mt2-pro``) the engine
+    switches to Tencent's official instruction, no system prompt, and the
+    recommended ``temperature``/``top_p``; TranslateGemma ids get Google's
+    rendered chat-template text with greedy decoding. Both return the reply as-is
+    instead of parsing ``<output>`` tags.
     """
 
     OUTPUT_RE = re.compile(r"<output>(?P<body>.*?)</output>", re.DOTALL | re.IGNORECASE)
@@ -45,12 +86,30 @@ class LlmEngine(EngineBase):
         model: str,
         temperature: float,
         static_prolog: Mapping[str, str] | None = None,
+        prompt_family: str = "generic",
     ) -> None:
         super().__init__(config.name, config.chunk_size, config.html_chunk_size)
         self._client = client
         self._model = model
         self._temperature = temperature
         self._static_prolog = dict(static_prolog or {})
+        if prompt_family not in PROMPT_FAMILIES:
+            raise ValueError(f"Unknown prompt family '{prompt_family}'")
+        self._prompt_family = prompt_family
+        self._sampling = hymt2_sampling(model)
+
+    @property
+    def supports_translation_examples(self) -> bool:
+        """TranslateGemma / SalamandraTA prompts have no slot for reference pairs."""
+        return self._prompt_family not in {"gemma", "salamandra"}
+
+    def _request_kwargs(self) -> dict[str, Any]:
+        """Extra chat-completion parameters for dedicated translation models."""
+        if self._prompt_family == "mthy":
+            return {"top_p": self._sampling.top_p, "max_tokens": self._sampling.max_tokens}
+        if self._prompt_family == "salamandra":
+            return {"max_tokens": SALAMANDRA_MAX_TOKENS}
+        return {}
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1), reraise=True)
     def _invoke(self, messages: list[dict[str, str]]) -> str:
@@ -58,10 +117,37 @@ class LlmEngine(EngineBase):
             model=self._model,
             messages=messages,
             temperature=self._temperature,
+            **self._request_kwargs(),
         )
         return response.choices[0].message.content or ""
 
     def translate(self, request: EngineRequest) -> EngineResult:
+        if self._prompt_family == "mthy":
+            prompt = build_hymt2_prompt(
+                request.text,
+                request.target_lang,
+                voc=request.voc,
+                preamble=reference_context(request),
+            )
+            return EngineResult(
+                text=self._invoke(hymt2_messages(prompt)).strip(), voc=dict(request.voc)
+            )
+        if self._prompt_family == "gemma":
+            prompt = render_translategemma_prompt(
+                request.source_lang, request.target_lang, request.text
+            )
+            raw = self._invoke([{"role": "user", "content": prompt}])
+            return EngineResult(text=clean_translategemma_output(raw), voc=dict(request.voc))
+        if self._prompt_family == "salamandra":
+            prompt = build_salamandra_prompt(
+                request.text,
+                request.source_lang,
+                request.target_lang,
+                voc=request.voc,
+                preserve_markup=request.is_html,
+            )
+            raw = self._invoke([{"role": "user", "content": prompt}])
+            return EngineResult(text=raw.strip(), voc=dict(request.voc))
         voc = dict(self._static_prolog)
         voc.update(request.prolog)
         merged = dict(request.voc)
@@ -104,7 +190,7 @@ class LlmEngine(EngineBase):
             vocab_payload.setdefault("__current__", json.dumps(merged, ensure_ascii=False))
         prolog = json.dumps(vocab_payload, ensure_ascii=False) if vocab_payload else "{}"
         meta = {
-            "chunk": request.chunk_index + 1,   # 1-based for human readability
+            "chunk": request.chunk_index + 1,  # 1-based for human readability
             "total": request.total_chunks,
             "is_html": str(request.is_html).lower(),
         }
@@ -116,7 +202,7 @@ class LlmEngine(EngineBase):
             '<output>...</output> and optionally <voc>{"new": "value"}</voc>.'
         )
         user_content = (
-            f"<instructions>{instructions}</instructions>\n"
+            reference_context(request) + f"<instructions>{instructions}</instructions>\n"
             f"<meta>{json.dumps(meta, ensure_ascii=False)}</meta>\n"
             f"<prolog>{prolog}</prolog>\n"
             f"<target>{request.target_lang}</target>\n"

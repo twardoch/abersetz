@@ -108,13 +108,11 @@ def _deep_provider_entries(include_paid: bool) -> list[CatalogEntry]:
 
 
 def _endpoint_entries() -> list[CatalogEntry]:
-    from .providers.llm.discovery import all_endpoints
+    from .providers.llm.discovery import all_endpoints, endpoint_api_key
 
     entries: list[CatalogEntry] = []
     for name, endpoint in sorted(all_endpoints().items()):
-        import os
-
-        has_key = bool(os.getenv(endpoint.api_key_env))
+        has_key = endpoint_api_key(endpoint) is not None
         entries.append(
             CatalogEntry(
                 f"ll::{name}",
@@ -153,6 +151,21 @@ def _llm_model_entries(endpoint_name: str | None, force: bool) -> list[CatalogEn
                 _write_cache(cache_key, models)
         for model in models:
             entries.append(CatalogEntry(f"ll::{name}:{model}", "model", requires_key=True))
+    return entries
+
+
+def _known_local_entries(engine: str) -> list[CatalogEntry]:
+    """Curated Hy-MT2 / TranslateGemma aliases for ``ml``/``gg`` (no disk scan, no network)."""
+    from .providers.local_models import ALIASES, KNOWN_MAPPING
+
+    wanted = "mlx" if engine == "ml" else "gguf"
+    entries: list[CatalogEntry] = []
+    for alias, repo in ALIASES.items():
+        info = KNOWN_MAPPING.get(repo)
+        if info is None or info["type"] != wanted:
+            continue
+        family = {"mthy": "hy-mt2", "gemma": "translategemma"}.get(info["family"], info["family"])
+        entries.append(CatalogEntry(f"{engine}::{alias}", "provider", notes=f"{family} {repo}"))
     return entries
 
 
@@ -227,10 +240,11 @@ def build_catalog(
             entries.extend(_llm_model_entries(endpoint_name, force))
     if include("lm") and wants_models:
         entries.extend(_local_model_entries("lm", force))
-    if include("ml") and wants_models:
-        entries.extend(_local_model_entries("ml", force))
-    if include("gg") and wants_models:
-        entries.extend(_local_model_entries("gg", force))
+    for local_engine in ("ml", "gg"):
+        if include(local_engine):
+            entries.extend(_known_local_entries(local_engine))
+            if wants_models:
+                entries.extend(_local_model_entries(local_engine, force))
 
     # Wildcard / prefix filtering against the generated selectors.
     if prefix:

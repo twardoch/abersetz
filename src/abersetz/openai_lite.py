@@ -7,7 +7,33 @@ from dataclasses import dataclass
 from typing import Any
 
 import httpx
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
+
+
+class ApiError(RuntimeError):
+    """Non-retryable HTTP error from the chat-completions endpoint, with the server's message."""
+
+    def __init__(self, status: int, detail: str) -> None:
+        super().__init__(f"HTTP {status}: {detail}")
+        self.status = status
+
+
+def _is_retryable(exc: BaseException) -> bool:
+    """Retry network faults and 429/5xx; fail fast on other 4xx (auth, balance, bad model)."""
+    if isinstance(exc, ApiError):
+        return exc.status == 429 or exc.status >= 500
+    return isinstance(exc, (httpx.TransportError, httpx.TimeoutException))
+
+
+def _error_detail(response: httpx.Response) -> str:
+    try:
+        payload = response.json()
+        error = payload.get("error", payload) if isinstance(payload, dict) else payload
+        if isinstance(error, dict):
+            return str(error.get("message") or error)
+        return str(error)
+    except ValueError:
+        return response.text[:300] or response.reason_phrase
 
 
 @dataclass
@@ -43,7 +69,12 @@ class ChatCompletions:
     def __init__(self, client: OpenAI):
         self.client = client
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, max=10))
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, max=10),
+        retry=retry_if_exception(_is_retryable),
+        reraise=True,
+    )
     def create(
         self, model: str, messages: list[dict[str, str]], temperature: float = 0.7, **kwargs: Any
     ) -> ChatCompletionResponse:
@@ -70,7 +101,8 @@ class ChatCompletions:
         # Use httpx for the request
         with httpx.Client(timeout=60.0) as client:
             response = client.post(url, json=payload, headers=headers)
-            response.raise_for_status()
+            if response.status_code >= 400:
+                raise ApiError(response.status_code, _error_detail(response))
 
         data = response.json()
 
@@ -127,6 +159,7 @@ class Chat:
 
 
 __all__ = [
+    "ApiError",
     "OpenAI",
     "ChatCompletionResponse",
     "ChatCompletionChoice",

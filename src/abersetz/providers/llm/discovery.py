@@ -20,6 +20,7 @@ from .api import (
     openai,
     openrouter,
     siliconflow,
+    tencent,
     together,
 )
 
@@ -54,7 +55,23 @@ BUILTIN_ENDPOINTS = {
     "anthropic": Endpoint(
         anthropic.name, anthropic.base_url, anthropic.api_key_env, anthropic.known_models
     ),
+    "tencent": Endpoint(tencent.name, tencent.base_url, tencent.api_key_env, tencent.known_models),
 }
+
+#: Secondary env vars accepted when an endpoint's primary key variable is unset.
+FALLBACK_API_KEY_ENVS: dict[str, tuple[str, ...]] = {
+    "gemini": ("GOOGLE_API_KEY",),
+    "tencent": ("TENCENT_API_KEY",),
+}
+
+
+def endpoint_api_key(endpoint: Endpoint) -> str | None:
+    """Read the endpoint's API key from its primary env var or a known fallback."""
+    for env in (endpoint.api_key_env, *FALLBACK_API_KEY_ENVS.get(endpoint.name, ())):
+        value = os.getenv(env)
+        if value:
+            return value
+    return None
 
 
 def discover_env_endpoints() -> dict[str, Endpoint]:
@@ -83,9 +100,7 @@ def all_endpoints() -> dict[str, Endpoint]:
 
 def fetch_models(endpoint: Endpoint) -> list[str]:
     """Fetch model list from the provider's API endpoint."""
-    api_key = os.getenv(endpoint.api_key_env)
-    if not api_key and endpoint.name == "gemini":
-        api_key = os.getenv("GOOGLE_API_KEY")
+    api_key = endpoint_api_key(endpoint)
 
     headers = {}
     if api_key:

@@ -8,7 +8,7 @@ from typing import Any, get_type_hints
 import httpx
 import pytest
 
-from abersetz.openai_lite import Chat, ChatCompletions, OpenAI
+from abersetz.openai_lite import ApiError, Chat, ChatCompletions, OpenAI
 
 
 class _DummyResponse:
@@ -22,6 +22,9 @@ class _DummyResponse:
 
     def json(self) -> dict[str, Any]:
         return self._payload
+
+    text = ""
+    reason_phrase = "error"
 
 
 class _DummyClient:
@@ -107,12 +110,33 @@ def test_chat_completions_create_raises_for_http_errors(monkeypatch: pytest.Monk
     client = OpenAI(api_key="secret")
     completions = client.chat.completions
 
-    with pytest.raises(httpx.HTTPStatusError):
+    with pytest.raises(ApiError, match="HTTP 500"):
         ChatCompletions.create.__wrapped__(
             completions,
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": "Hi"}],
         )
+
+
+def test_chat_completions_create_when_4xx_then_fails_fast_with_server_message(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A 402/401/400 is not retried and the gateway's message reaches the user."""
+    calls: list[dict[str, Any]] = []
+    response = _DummyResponse(
+        status_code=402,
+        payload={
+            "error": {"code": "401006", "message": "endpoint is inactive: INSUFFICIENT_BALANCE"}
+        },
+    )
+    monkeypatch.setattr(httpx, "Client", lambda **_: _DummyClient(response=response, calls=calls))
+
+    client = OpenAI(api_key="secret")
+    with pytest.raises(ApiError, match="HTTP 402: endpoint is inactive: INSUFFICIENT_BALANCE"):
+        client.chat.completions.create(
+            model="hy-mt2-pro", messages=[{"role": "user", "content": "Hi"}]
+        )
+    assert len(calls) == 1, "4xx other than 429 must not be retried"
 
 
 def test_openai_base_url_trims_trailing_slash() -> None:

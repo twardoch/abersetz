@@ -61,10 +61,27 @@ _SUBVARIANT_TO_FAMILY: dict[str, str] = {
     "mthy": "mthy",
     "hunyuan": "mthy",
     "gemma": "gemma",
+    "translategemma": "gemma",
+    "tg": "gemma",
+    "madlad": "madlad",
+    "madlad400": "madlad",
+    "salamandra": "salamandra",
+    "salamandrata": "salamandra",
 }
 
 #: Default prompt family for local engines when no subvariant is given.
 DEFAULT_LOCAL_FAMILY = "mthy"
+
+
+def family_for_subvariant(subvariant: str | None) -> str | None:
+    """Map a selector subvariant (``hy-mt2``, ``tg``, ``salamandra`` …) to a prompt family.
+
+    Returns ``None`` when no subvariant was given; unknown names are returned
+    lower-cased so callers can decide whether to reject them."""
+    if not subvariant:
+        return None
+    key = subvariant.lower()
+    return _SUBVARIANT_TO_FAMILY.get(key, key)
 
 
 @dataclass(slots=True, frozen=True)
@@ -85,9 +102,7 @@ class Selector:
     @property
     def family(self) -> str:
         """Internal prompt family for local (``ml``/``gg``) engines."""
-        if self.subvariant is None:
-            return DEFAULT_LOCAL_FAMILY
-        return _SUBVARIANT_TO_FAMILY.get(self.subvariant.lower(), self.subvariant.lower())
+        return family_for_subvariant(self.subvariant) or DEFAULT_LOCAL_FAMILY
 
     def canonical(self) -> str:
         """Render the canonical ``engine[/subvariant]::provider`` string."""
@@ -134,7 +149,7 @@ def parse_selector(raw: str | None) -> Selector | None:
 
 def is_new_syntax(raw: str | None) -> bool:
     """Return whether the selector uses the new ``::`` grammar."""
-    return bool(raw) and "::" in raw
+    return raw is not None and "::" in raw
 
 
 def slugify_selector(selector: Selector | str) -> str:
@@ -164,6 +179,7 @@ __all__ = [
     "ENGINE_CODES",
     "DEFAULT_LOCAL_FAMILY",
     "Selector",
+    "family_for_subvariant",
     "parse_selector",
     "is_new_syntax",
     "slugify_selector",

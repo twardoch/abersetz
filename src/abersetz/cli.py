@@ -332,6 +332,12 @@ def _build_options_from_cli(
     n_ctx: int | None = None,
     max_tokens: int | None = None,
     n_threads: int | None = None,
+    tm: str | None = None,
+    tm_model_path: str | None = None,
+    tm_top_k: int = 5,
+    tm_minimum: float = 0.5,
+    tm_context_chars: int = 4000,
+    tm_exact_only: bool = False,
 ) -> TranslatorOptions:
     # Validate language codes
     validated_from_lang = _validate_language_code(from_lang, "--from-lang")
@@ -345,6 +351,12 @@ def _build_options_from_cli(
     output_dir = None if output is None else Path(output).resolve()
 
     return TranslatorOptions(
+        tm=tm,
+        tm_model_path=tm_model_path,
+        tm_top_k=tm_top_k,
+        tm_minimum=tm_minimum,
+        tm_context_chars=tm_context_chars,
+        tm_exact_only=tm_exact_only,
         to_lang=validated_to_lang,
         engine=normalized_engine,
         from_lang=validated_from_lang,
@@ -424,6 +436,12 @@ class AbersetzCLI:
         n_threads: int | None = None,
         job: str | None = None,
         verbose: bool = False,
+        tm: str | None = None,
+        tm_model_path: str | None = None,
+        tm_top_k: int = 5,
+        tm_minimum: float = 0.5,
+        tm_context_chars: int = 4000,
+        tm_exact_only: bool = False,
     ) -> None:
         """Shared implementation for ``tf`` (file) and ``td`` (directory)."""
         # Handle case-based overrides and fallbacks
@@ -433,11 +451,19 @@ class AbersetzCLI:
 
         _configure_logging(verbose)
 
+        if job and tm is not None:
+            raise ValueError("TM file translation currently uses tf/td directly, without --job")
         if job:
             self._run_file_job(path, job, output=output, dry_run=dry_run, verbose=verbose)
             return
 
         opts = _build_options_from_cli(
+            tm=tm,
+            tm_model_path=tm_model_path,
+            tm_top_k=tm_top_k,
+            tm_minimum=tm_minimum,
+            tm_context_chars=tm_context_chars,
+            tm_exact_only=tm_exact_only,
             to_lang=to_lang,
             path=path,
             engine=engine,
@@ -551,6 +577,12 @@ class AbersetzCLI:
         temperature: float | None = None,
         job: str | None = None,
         verbose: bool = False,
+        tm: str | None = None,
+        tm_model_path: str | None = None,
+        tm_top_k: int = 5,
+        tm_minimum: float = 0.5,
+        tm_context_chars: int = 4000,
+        tm_exact_only: bool = False,
     ) -> None:
         """Translate a string and print the result to stdout.
 
@@ -573,6 +605,12 @@ class AbersetzCLI:
             loaded = load_job(job)
             for entry in loaded.resolved_entries():
                 opts = TranslatorOptions(
+                    tm=tm,
+                    tm_model_path=tm_model_path,
+                    tm_top_k=tm_top_k,
+                    tm_minimum=tm_minimum,
+                    tm_context_chars=tm_context_chars,
+                    tm_exact_only=tm_exact_only,
                     engine=entry.selector,
                     from_lang=entry.from_lang or from_lang,
                     to_lang=entry.to_lang or to_lang,
@@ -588,6 +626,12 @@ class AbersetzCLI:
             return
 
         opts = TranslatorOptions(
+            tm=tm,
+            tm_model_path=tm_model_path,
+            tm_top_k=tm_top_k,
+            tm_minimum=tm_minimum,
+            tm_context_chars=tm_context_chars,
+            tm_exact_only=tm_exact_only,
             engine=normalize_selector(engine) if engine else engine,
             from_lang=from_lang,
             to_lang=to_lang,

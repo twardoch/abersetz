@@ -68,3 +68,15 @@ Extend Abersetz with LM Studio auto-starting, modular LLM provider discovery wit
 ### Manual Verification
 - Run benchmark dry-run: `uv run examples/benchmark.py --providers google,lms,siliconflow --dry-run`.
 - Verify validation command: `abersetz validate`.
+
+## Issues 201 & 202 — dedicated translation models (done 2026-09-12)
+
+Scope: give every engine that can run Hy-MT2, TranslateGemma, SalamandraTA or
+MADLAD-400 the model's native prompt and decoding parameters, sourced from the
+upstream model cards, and catalogue the checkpoints named in the issues.
+
+Design: one prompt-helper module per model family under `providers/`
+(`hymt2.py`, `translategemma.py`, `salamandra.py`, `madlad.py`); engines pick
+the family from the selector subvariant or the model name and delegate prompt
+construction there. `local_models.py` holds the alias/repo catalog shared by
+`ml` and `gg`. Remaining follow-ups are listed in `TODO.md`.

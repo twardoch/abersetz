@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Protocol
 
 from ..chunking import TextFormat
@@ -24,6 +24,7 @@ class EngineRequest:
     prolog: dict[str, str]
     chunk_index: int
     total_chunks: int
+    examples: list[dict[str, str]] = field(default_factory=list)
 
 
 @dataclass(slots=True)
@@ -60,6 +61,11 @@ class EngineBase:
         self.name = name
         self.chunk_size = chunk_size
         self.html_chunk_size = html_chunk_size
+
+    @property
+    def supports_translation_examples(self) -> bool:
+        """Whether the engine's prompt has a slot for translation-memory examples."""
+        return False
 
     def chunk_size_for(self, fmt: TextFormat) -> int | None:
         if fmt is TextFormat.HTML and self.html_chunk_size:

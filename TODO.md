@@ -57,3 +57,16 @@ Detailed requirements: [issues/111.md](issues/111.md). Full design in [TASKS.md]
 ## Phase 7 — Wrap-up
 - [x] `fd -e py -x uvx ruff ...` + `uvx hatch test` all green.
 - [x] Update README.md, CHANGELOG.md, WORK.md, DEPENDENCIES.md.
+
+## Issues 201 & 202 — dedicated translation models
+- [x] Hy-MT2 prompt module with official template, language table, sampling defaults.
+- [x] Hy-MT2 on `ml`, `gg`, `lm`, `ll` (OpenRouter, Tencent TokenHub); curated model catalog.
+- [x] TranslateGemma rendered prompt for `lm`/`ll`; greedy decoding; catalog.
+- [x] SalamandraTA prompts on `gg`/`ml`/`lm`/`ll`.
+- [x] MADLAD-400 on `gg` via low-level T5 loop.
+- [ ] Live check `ll::tencent:hy-mt2-pro` once `TENCENTCLOUD_API_KEY` is available.
+- [ ] Try SalamandraTA / TranslateGemma inside LM Studio end to end.
+
+## Release tooling — completed 2026-09-12
+
+- [x] Provide verified Git-tag releases, a real dry run, same-tag retries, and private-data exclusions.
