@@ -17,7 +17,13 @@ from .chunking import TextFormat, chunk_text, detect_format
 from .config import AbersetzConfig, load_config
 from .engine_catalog import normalize_selector
 from .engines import Engine, EngineRequest, EngineResult, create_engine
-from .retrieval import exact_translation, example_json, examples_for, with_memory
+from .retrieval import (
+    _exact_translation,
+    _with_memory,
+    example_json,
+    examples_for,
+    warn_tm_deprecated,
+)
 
 DEFAULT_PATTERNS = ("*.txt", "*.md", "*.mdx", "*.html", "*.htm")
 
@@ -58,6 +64,27 @@ class TranslatorOptions:
     tm_max_hops: int = 2
     tm_origins: list[str] | None = None
 
+    def __post_init__(self) -> None:
+        # Deprecated since 1.1.0; removed in 2.0.
+        changed = [name for name, default in _TM_DEFAULTS.items() if getattr(self, name) != default]
+        if changed:
+            warn_tm_deprecated(f"TranslatorOptions.{changed[0]}", stacklevel=4)
+
+
+#: Defaults of the deprecated ``TranslatorOptions.tm*`` fields.
+_TM_DEFAULTS: dict[str, Any] = {
+    "tm": None,
+    "tm_model_path": None,
+    "tm_top_k": 5,
+    "tm_minimum": 0.5,
+    "tm_context_chars": 4000,
+    "tm_exact_only": False,
+    "tm_search_backend": None,
+    "tm_related_to": None,
+    "tm_max_hops": 2,
+    "tm_origins": None,
+}
+
 
 @dataclass(slots=True)
 class TranslationResult:
@@ -92,7 +119,7 @@ class PipelineError(RuntimeError):
     Catch this if you pass a bad path, lack read permissions, or something breaks catastrophically in the middle of translation."""
 
 
-@with_memory
+@_with_memory
 def translate_path(
     path: Path | str,
     options: TranslatorOptions | None = None,
@@ -152,7 +179,7 @@ def translate_path(
     return results
 
 
-@with_memory
+@_with_memory
 def translate_string(
     text: str,
     options: TranslatorOptions | None = None,
@@ -171,7 +198,7 @@ def translate_string(
 
     if not text.strip():
         return text
-    exact = exact_translation(text, opts)
+    exact = _exact_translation(text, opts)
     if exact is not None:
         return exact
 
@@ -242,7 +269,7 @@ def _translate_file(
     source_lang = opts.from_lang or config.defaults.from_lang
     target_lang = opts.to_lang or config.defaults.to_lang
 
-    exact = exact_translation(text, opts)
+    exact = _exact_translation(text, opts)
     if exact is not None:
         fmt = detect_format(text)
         destination = _persist_output(source, exact, dict(opts.initial_voc), fmt, opts, target_lang)
@@ -462,7 +489,7 @@ def _apply_engine(
     _active_engine.current = engine
     try:
         for _index, chunk in enumerate(chunk_list):
-            exact = exact_translation(chunk, opts)
+            exact = _exact_translation(chunk, opts)
             if exact is not None:
                 results.append(EngineResult(text=exact, voc=dict(voc)))
                 continue

@@ -272,6 +272,9 @@ def resolve_and_download_model(model_name_or_path: str | None, backend: str) -> 
     p = Path(model_name_or_path)
     if p.exists():
         return str(p.resolve())
+    if p.is_absolute():
+        # A Hugging Face repo id is never absolute; do not search or download.
+        raise EngineError(f"Model path does not exist: {model_name_or_path}")
 
     # 2. Optional ``:QUANT`` suffix (GGUF only), then aliases
     quant: str | None = None

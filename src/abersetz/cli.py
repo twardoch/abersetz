@@ -310,6 +310,19 @@ def _validate_language_code(code: str | None, param_name: str) -> str | None:
     return code
 
 
+def _warn_tm_flags(**flags: object) -> None:
+    """Deprecated ``--tm*`` flags: warn visibly (loguru) and as a ``DeprecationWarning``."""
+    from .pipeline import _TM_DEFAULTS
+    from .retrieval import TM_DEPRECATION, warn_tm_deprecated
+
+    changed = [name for name, value in flags.items() if value != _TM_DEFAULTS[name]]
+    if not changed:
+        return
+    flag = "--" + changed[0].replace("_", "-")
+    logger.warning("{} is deprecated and will be removed in abersetz 2.0: {}", flag, TM_DEPRECATION)
+    warn_tm_deprecated(f"The {flag} flag")
+
+
 def _build_options_from_cli(
     path: str | Path,
     *,
@@ -343,6 +356,18 @@ def _build_options_from_cli(
     tm_max_hops: int = 2,
     tm_origins: list[str] | None = None,
 ) -> TranslatorOptions:
+    _warn_tm_flags(
+        tm=tm,
+        tm_model_path=tm_model_path,
+        tm_top_k=tm_top_k,
+        tm_minimum=tm_minimum,
+        tm_context_chars=tm_context_chars,
+        tm_exact_only=tm_exact_only,
+        tm_search_backend=tm_search_backend,
+        tm_related_to=tm_related_to,
+        tm_max_hops=tm_max_hops,
+        tm_origins=tm_origins,
+    )
     # Validate language codes
     validated_from_lang = _validate_language_code(from_lang, "--from-lang")
     validated_to_lang = _validate_language_code(to_lang, "target language")
@@ -618,6 +643,18 @@ class AbersetzCLI:
             verbose: Enable debug log output.
         """
         _configure_logging(verbose)
+        _warn_tm_flags(
+            tm=tm,
+            tm_model_path=tm_model_path,
+            tm_top_k=tm_top_k,
+            tm_minimum=tm_minimum,
+            tm_context_chars=tm_context_chars,
+            tm_exact_only=tm_exact_only,
+            tm_search_backend=tm_search_backend,
+            tm_related_to=tm_related_to,
+            tm_max_hops=tm_max_hops,
+            tm_origins=tm_origins,
+        )
 
         if job:
             from .job import load_job

@@ -1,17 +1,48 @@
 # this_file: src/abersetz/retrieval.py
-"""Exact-first TM reuse and bounded, request-local translation examples."""
+"""Exact-first TM reuse and bounded, request-local translation examples.
+
+Deprecated since 1.1.0: translation memories belong to vexy-localizzy. abersetz keeps
+``EngineRequest.examples`` and ``voc`` as engine hints (see :func:`reference_context`).
+The TM options and helpers here keep working until 2.0.
+"""
 
 from __future__ import annotations
 
+import copy
 import json
-from dataclasses import replace
+import warnings
 from functools import wraps
 from pathlib import Path
 
 from .cache import cached_result
 
+TM_DEPRECATION = (
+    "translation memories moved to vexy-localizzy; abersetz keeps examples/voc as engine hints"
+)
+
+
+def warn_tm_deprecated(feature: str, *, stacklevel: int = 3) -> None:
+    """Emit the one TM ``DeprecationWarning``; ``stacklevel`` points at the caller's code."""
+    warnings.warn(
+        f"{feature} is deprecated and will be removed in abersetz 2.0: {TM_DEPRECATION}",
+        DeprecationWarning,
+        stacklevel=stacklevel,
+    )
+
 
 def with_memory(function):
+    """Deprecated public decorator; see :data:`TM_DEPRECATION`."""
+    warn_tm_deprecated("abersetz.retrieval.with_memory")
+    return _with_memory(function)
+
+
+def exact_translation(text, opts):
+    """Deprecated public helper; see :data:`TM_DEPRECATION`."""
+    warn_tm_deprecated("abersetz.retrieval.exact_translation")
+    return _exact_translation(text, opts)
+
+
+def _with_memory(function):
     """Open one lazy embedding runtime per pipeline call, including directory jobs."""
 
     @wraps(function)
@@ -34,12 +65,15 @@ def with_memory(function):
             model_path=options.tm_model_path,
             search_backend=options.tm_search_backend,
         ) as memory:
-            return function(value, replace(options, tm=memory), **kwargs)
+            # copy.copy skips __post_init__, so the caller is not warned twice.
+            opened = copy.copy(options)
+            opened.tm = memory
+            return function(value, opened, **kwargs)
 
     return wrapped
 
 
-def exact_translation(text, opts):
+def _exact_translation(text, opts):
     if opts.tm is None:
         return None
     source = opts.from_lang or "auto"

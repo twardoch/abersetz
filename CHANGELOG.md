@@ -5,6 +5,54 @@ this_file: CHANGELOG.md
 
 All notable changes to abersetz will be documented in this file.
 
+## [1.1.0] - Unreleased
+
+Minor release: one new public API and deprecations, no removals. The version comes
+from the Git tag (`./publish.sh --bump minor`); no file records it.
+
+### Added — stable engine API
+- `abersetz.engine_api.create_engine(selector, *, config=None, client=None,
+  max_attempts=None, **overrides)`: the supported surface for library callers that
+  drive one engine directly. Also exported lazily as `abersetz.create_engine`,
+  `EngineRequest`, `EngineResult` and `EngineError`. `config` defaults to
+  `load_config()`. `max_attempts` is accepted only for `ll` engines; other engines
+  raise `EngineError`.
+  `engine_api` also re-exports `LlmEngine`, `EngineConfig` and `AbersetzConfig` for
+  callers that inject their own OpenAI-compatible client.
+- `LlmEngine(..., max_attempts=3)`: the Tenacity retry is built per call from
+  `max_attempts` instead of a class decorator. The default (3 attempts,
+  exponential back-off) is unchanged. `max_attempts=1` makes exactly one
+  engine-level call. The built-in HTTP client (`openai_lite`) still retries
+  429/5xx/transport errors on its own; inject a client to control that layer.
+- `LlmEngine._invoke.__wrapped__` now aliases the single-attempt `_invoke_once`,
+  so code that bypassed the old decorator keeps working. Removed in 2.0.
+
+### Deprecated — translation memories moved to vexy-localizzy
+- `TranslatorOptions.tm*`, the CLI `--tm*` flags, and `abersetz.retrieval.with_memory`
+  and `exact_translation` emit `DeprecationWarning` ("translation memories moved to
+  vexy-localizzy; abersetz keeps examples/voc as engine hints"). The CLI also logs
+  the notice, because Python hides `DeprecationWarning` by default. Behaviour is
+  unchanged; removal is planned for 2.0.
+- `EngineRequest.examples` and `voc` stay: they are engine hints.
+- The pipeline calls private `_with_memory` and `_exact_translation`, so a
+  translation without TM options stays warning-free.
+
+### Fixed
+- `resolve_and_download_model` raises `EngineError` for an absolute path that does
+  not exist instead of treating it as a Hugging Face repo id.
+
+### Downstream note
+- vexy-localizzy should replace its `_SingleAttemptEngine` subclass with
+  `LlmEngine(..., max_attempts=1)`, pin `abersetz>=1.1,<2` and bump its
+  `TRANSPORT_ID`. That ID is part of the translation cache key, so the bump
+  invalidates fl10n's existing `.fl10n/translation-cache.sqlite` entries by design.
+
+### Tests
+- New `tests/test_engine_api.py` (single attempt, default three attempts, invalid
+  values, legacy alias, `ll::` profile resolution with an injected client, non-`ll`
+  rejection, lazy exports) and `tests/test_tm_deprecation.py` (warning text and
+  caller stack level for each deprecated surface, silence on the normal path).
+
 ## [Unreleased]
 
 ### Added — Hy-MT2, TranslateGemma, SalamandraTA and MADLAD-400 support (issues 201, 202)

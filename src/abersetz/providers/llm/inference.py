@@ -6,7 +6,7 @@ import re
 from collections.abc import Mapping
 from typing import Any
 
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import Retrying, stop_after_attempt, wait_exponential
 
 from ...config import EngineConfig
 from ...retrieval import reference_context
@@ -27,6 +27,9 @@ from ..translategemma import (
 #: Prompt families the engine can speak. ``generic`` is the XML protocol below;
 #: ``mthy`` and ``gemma`` send the model's native instruction and take the raw reply.
 PROMPT_FAMILIES = ("generic", "mthy", "gemma", "salamandra")
+
+#: Engine-level attempts per chunk when the caller does not choose.
+DEFAULT_MAX_ATTEMPTS = 3
 
 
 def llm_prompt_family(model: str | None, subvariant: str | None = None) -> str:
@@ -58,8 +61,12 @@ class LlmEngine(EngineBase):
       * SiliconFlow ``Qwen2.5-7B``: ~$0.05 / 1M tokens total.
       * Anthropic ``claude-haiku``: ~$0.80 / 1M input, ~$4 / 1M output.
       * Gemini ``gemini-2.0-flash``: generous free tier, then ~$0.10 / 1M.
-    **Rate limits**: Provider-specific.  Abersetz retries up to 3 times with
-      exponential back-off (1 s, 2 s, 4 s …) before re-raising.
+    **Rate limits**: Provider-specific.  Abersetz makes up to ``max_attempts``
+      (default 3) attempts with exponential back-off (1 s, 2 s, 4 s …) before
+      re-raising. ``max_attempts=1`` makes exactly one engine-level call; callers
+      that own their retry policy use it. The built-in HTTP client
+      (:mod:`abersetz.openai_lite`) separately retries 429/5xx/transport errors;
+      inject your own client to control that layer too.
     **Privacy**: Text is sent to the remote API endpoint.
     **Offline**: No — requires internet access.
     **Credential**: Set via the matching env var (``OPENAI_API_KEY``,
@@ -87,8 +94,10 @@ class LlmEngine(EngineBase):
         temperature: float,
         static_prolog: Mapping[str, str] | None = None,
         prompt_family: str = "generic",
+        max_attempts: int = DEFAULT_MAX_ATTEMPTS,
     ) -> None:
         super().__init__(config.name, config.chunk_size, config.html_chunk_size)
+        self.max_attempts = max_attempts
         self._client = client
         self._model = model
         self._temperature = temperature
@@ -111,8 +120,28 @@ class LlmEngine(EngineBase):
             return {"max_tokens": SALAMANDRA_MAX_TOKENS}
         return {}
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1), reraise=True)
+    @property
+    def max_attempts(self) -> int:
+        """Engine-level attempts per chunk, including the first; always ``>= 1``."""
+        return self._max_attempts
+
+    @max_attempts.setter
+    def max_attempts(self, value: int) -> None:
+        if type(value) is not int or value < 1:
+            raise ValueError(f"max_attempts must be an integer >= 1, got {value!r}")
+        self._max_attempts = value
+
     def _invoke(self, messages: list[dict[str, str]]) -> str:
+        """Call the model, retrying up to ``max_attempts`` times with exponential back-off."""
+        retrying = Retrying(
+            stop=stop_after_attempt(self._max_attempts),
+            wait=wait_exponential(multiplier=1),
+            reraise=True,
+        )
+        return retrying(self._invoke_once, messages)
+
+    def _invoke_once(self, messages: list[dict[str, str]]) -> str:
+        """One chat-completion request, no retries."""
         response = self._client.chat.completions.create(
             model=self._model,
             messages=messages,
@@ -232,3 +261,9 @@ class LlmEngine(EngineBase):
         if isinstance(vocab, dict):
             return text, {str(k): str(v) for k, v in vocab.items()}
         return text, {}
+
+
+# Compatibility for vexy-localizzy <= the abersetz 1.0.28 pin, which bypassed the
+# former Tenacity decorator via ``LlmEngine._invoke.__wrapped__``. Use
+# ``LlmEngine(..., max_attempts=1)`` instead; this alias goes away in 2.0.
+LlmEngine._invoke.__wrapped__ = LlmEngine._invoke_once  # type: ignore[attr-defined]

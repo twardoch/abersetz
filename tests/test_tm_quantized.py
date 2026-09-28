@@ -11,6 +11,9 @@ from abersetz import pipeline
 from abersetz.pipeline import TranslatorOptions, translate_string
 from abersetz.providers.base import EngineResult
 
+# Deprecated since 1.1.0 (moved to vexy-localizzy); these tests guard the 1.x behaviour.
+pytestmark = pytest.mark.filterwarnings("ignore:.*translation memories moved:DeprecationWarning")
+
 
 class Encoder:
     dimensions = 32

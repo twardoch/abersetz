@@ -3,6 +3,13 @@ this_file: WORK.md
 ---
 # Work Log
 
+## 2026-09-28
+### 1.1.0: stable engine API and TM deprecation (toolchain plan steps A1, A2)
+- Added `engine_api.create_engine` and `LlmEngine(max_attempts=…)` (runtime Tenacity `Retrying`); lazy exports from `abersetz`.
+- Deprecated `TranslatorOptions.tm*`, `--tm*`, `retrieval.with_memory`/`exact_translation`; README states the abersetz → vexy-localizzy → fl10n layering.
+- Fixed the pre-existing failure `test_resolve_model_nonexistent_path_raises` (absolute non-existent paths no longer fall through to a Hugging Face download).
+- Not committed or published; version 1.1.0 comes from `./publish.sh --bump minor`.
+
 ## 2026-09-12
 ### Hy-MT2 / TranslateGemma / SalamandraTA / MADLAD-400 (issues 201, 202)
 - Researched upstream prompt formats: Hy-MT2 README (English/Chinese templates, terminology block, sampling per size, `max_context 8192`, no system prompt), TranslateGemma `chat_template.jinja` (content-list with language codes; greedy), SalamandraTA model card (ChatML, English language names, temperature 0), MADLAD-400 (`<2xx>` tokens read straight from the GGUF vocabulary, T5 context 512).

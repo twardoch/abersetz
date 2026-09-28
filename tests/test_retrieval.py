@@ -8,6 +8,9 @@ from abersetz.pipeline import TranslatorOptions, translate_string
 from abersetz.providers.base import EngineRequest, EngineResult
 from abersetz.retrieval import reference_context, select_examples
 
+# Deprecated since 1.1.0 (moved to vexy-localizzy); these tests guard the 1.x behaviour.
+pytestmark = pytest.mark.filterwarnings("ignore:.*translation memories moved:DeprecationWarning")
+
 
 def hit(source, target):
     return SimpleNamespace(source=source, target=target)

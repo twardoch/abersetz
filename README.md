@@ -6,7 +6,9 @@ Translate entire directories of text and Markdown files using modern AI. Feed it
 
 Abersetz takes a file or directory tree, detects the text format (plain text or HTML), slices large documents into chunks at natural sentence and paragraph boundaries, feeds each chunk to a translation engine, and stitches the results back together preserving the original layout.
 
-Translation memory carries vocabulary terms forward across chunks so "widget" in paragraph 1 still means "widget" in paragraph 47.
+A running vocabulary (`voc`) carries terms forward across chunks so "widget" in paragraph 1 still means "widget" in paragraph 47.
+
+abersetz is a translation engine: text in, text out, through pluggable engines and providers, with chunking and vocabulary hints (`voc`, reference `examples`). Localization software is built on top of it. [vexy-localizzy](https://github.com/vexyart/vexy-localizzy) owns message catalogs, translation memories, catalog upgrades, QA and review, and drives abersetz engines through the stable `abersetz.engine_api` module. FontLab's fl10n project uses localizzy. The `--tm*` options below are deprecated since 1.1.0 and will be removed in 2.0.
 
 ## Engines
 
@@ -188,6 +190,9 @@ Vocabulary accumulated during earlier chunks is included in the prompt for later
 License: MIT.
 
 ## Uubed translation memory and Rust caching
+
+**Deprecated since 1.1.0.** Translation memories moved to vexy-localizzy; the options
+below still work in 1.x and emit a `DeprecationWarning`.
 
 Use `--tm=localization.sqlite` with Uubed FastEmbed and TurboQuant search.
 `diskcache-rs` persists translations and TM examples; `ABERSETZ_CACHE=0` disables it.
