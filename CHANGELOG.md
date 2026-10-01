@@ -5,7 +5,7 @@ this_file: CHANGELOG.md
 
 All notable changes to abersetz will be documented in this file.
 
-## [1.1.0] - Unreleased
+## [1.1.0] - 2026-10-01
 
 Minor release: one new public API and deprecations, no removals. The version comes
 from the Git tag (`./publish.sh --bump minor`); no file records it.
